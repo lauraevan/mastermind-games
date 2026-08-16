@@ -4,7 +4,8 @@
 <meta name="description" content="Mastermind Academy — master K-12 skills at your own pace with fun, interactive questions, built-in support, and motivating awards across math, language arts, science, social studies and Spanish.">
 <link rel="stylesheet" href="assets/css/main.css">
 <style>
-  .hero { position: relative; overflow: hidden; background: linear-gradient(180deg,#dcf0fb 0%, #e9f6ef 55%, #eef8e6 100%); }
+  .hero { position: relative; overflow: hidden; background: linear-gradient(180deg,#f4f3fe 0%, #eeecfb 100%); border-bottom: 1px solid var(--line); }
+  .hero-blob { position: absolute; border-radius: 50%; filter: blur(2px); opacity: .5; z-index: 1; }
   .hero-in { position: relative; z-index: 2; display: grid; grid-template-columns: 1.15fr .85fr; gap: 30px; align-items: center; padding: 40px 0 48px; }
   .hero h1 { font-size: clamp(2.1rem,4.5vw,3.1rem); color: var(--blue-dark); }
   .hero p.lead { font-size: 1.12rem; color: #55606b; max-width: 46ch; margin: 12px 0 22px; font-weight: 700; }
@@ -51,14 +52,8 @@
 <div id="nav"></div>
 
 <header class="hero">
-  <svg class="hero-scene" preserveAspectRatio="none" viewBox="0 0 1200 420" aria-hidden="true">
-    <circle cx="1050" cy="90" r="46" fill="#ffe08a" opacity=".85"/>
-    <ellipse cx="230" cy="120" rx="60" ry="20" fill="#ffffff" opacity=".7"/>
-    <ellipse cx="300" cy="132" rx="42" ry="16" fill="#ffffff" opacity=".7"/>
-    <ellipse cx="860" cy="80" rx="55" ry="18" fill="#ffffff" opacity=".6"/>
-    <path d="M0 360 Q 300 300 600 350 T 1200 340 V420 H0 Z" fill="#bfe6a6" opacity=".7"/>
-    <path d="M0 390 Q 350 340 700 385 T 1200 380 V420 H0 Z" fill="#a4d98a" opacity=".8"/>
-  </svg>
+  <span class="hero-blob" style="width:240px;height:240px;background:#d7d2f7;top:-60px;right:8%"></span>
+  <span class="hero-blob" style="width:150px;height:150px;background:#e8e4fb;bottom:-40px;left:44%"></span>
   <div class="wrap hero-in">
     <div>
       <span class="tag accent"><span data-icon="graduation-cap" data-size="13"></span> Kindergarten &ndash; Grade 12</span>
@@ -179,7 +174,7 @@
     '</svg>';
 
   var pool = Problems.estimatedProblems();
-  document.getElementById('tStats').textContent = Problems.totalSkills() + ' skills · ' + (Math.floor(pool / 1000) * 1000).toLocaleString() + '+ problems';
+  document.getElementById('tStats').textContent = Problems.totalSkills() + ' skills · ' + (Math.floor(pool / 500) * 500).toLocaleString() + '+ problems';
 
   // ---- grade rows ----
   var GRADES = ['K','1','2','3','4','5','6','7','8','9','10','11','12'];

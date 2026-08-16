@@ -5,7 +5,7 @@
 
   function logoSVG() {
     return '<svg class="logo" width="24" height="24" viewBox="0 0 32 32" aria-hidden="true">' +
-      '<rect x="2" y="2" width="28" height="28" rx="8" fill="#57ad2b"/>' +
+      '<rect x="2" y="2" width="28" height="28" rx="8" fill="#5a4bd6"/>' +
       '<path d="M8 23V10l8 8 8-8v13" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/></svg>';
   }
   function ic(name, size) { return global.Icons ? Icons.icon(name, { size: size || 20 }) : ''; }

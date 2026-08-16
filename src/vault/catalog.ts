@@ -54,7 +54,25 @@ namespace Catalog {
     });
     state.loaded = true;
     buildSources();
+    buildHero();
     applyFilter();
+  }
+
+  function buildHero(): void {
+    const iconGames = state.rows.filter((r) => r.icon.indexOf('lauraevan/greatestgreatest-revive') !== -1);
+    const pool = iconGames.length ? iconGames : state.rows;
+    if (!pool.length) return;
+    const feat = pool[Math.floor(Math.random() * Math.min(120, pool.length))];
+    const img = byId('gheroImg') as HTMLImageElement | null;
+    const title = byId('gheroTitle');
+    const get = byId('gheroGet');
+    const hero = byId('ghero');
+    if (!img || !hero) return;
+    img.onerror = () => { img.style.display = 'none'; };
+    img.src = encodeURI(feat.icon);
+    if (title) title.textContent = feat.title;
+    if (get) get.onclick = () => open(feat);
+    hero.removeAttribute('hidden');
   }
 
   function currentSourceLabel(): string {

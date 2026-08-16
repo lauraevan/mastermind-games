@@ -34,8 +34,21 @@ html, body { margin: 0; min-height: 100%; background: #000; color: #d7d7d7;
 .src-chip.on { background: #1a1a1a; color: #eee; border-color: #383838; }
 .src-chip.on b { color: #888; }
 
-.grid { max-width: 1600px; margin: 0 auto; padding: 12px 16px 60px;
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 4px; }
+/* featured hero (styled after a store front) */
+.hero-wrap { max-width: 1600px; margin: 0 auto; padding: 14px 16px 2px; }
+.g-hero { position: relative; height: 300px; border-radius: 14px; overflow: hidden; background: #0c0c0c; border: 1px solid #1a1a1a; }
+.g-hero .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transform: scale(1.06); }
+.g-hero .shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(3,3,6,.94) 0%, rgba(3,3,6,.78) 34%, rgba(3,3,6,.15) 72%, rgba(3,3,6,0) 100%); }
+.g-hero .info { position: absolute; left: 0; bottom: 0; padding: 30px 34px; max-width: 62%; }
+.g-hero .eyebrow2 { color: #8b93ff; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; font-size: .72rem; }
+.g-hero h1 { color: #fff; font-size: 2.5rem; margin: 8px 0 6px; font-weight: 900; line-height: 1.04; }
+.g-hero .sub { color: #b9b9c2; font-size: .9rem; margin-bottom: 16px; font-weight: 700; }
+.g-hero .get { background: #fff; color: #101014; border: 0; border-radius: 999px; padding: 12px 36px; font: inherit; font-weight: 800; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+.g-hero .get:hover { background: #e6e6ea; }
+@media (max-width: 640px){ .g-hero { height: 220px; } .g-hero .info { max-width: 90%; padding: 20px; } .g-hero h1 { font-size: 1.7rem; } }
+
+.grid { max-width: 1600px; margin: 0 auto; padding: 14px 16px 60px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 5px; }
 .tile { position: relative; border: 1px solid #141414; border-radius: 4px; padding: 0; cursor: pointer;
   overflow: hidden; aspect-ratio: 1 / 1; display: block; background: #080808; }
 .tile:hover { border-color: #555; z-index: 2; }

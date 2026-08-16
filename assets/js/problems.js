@@ -594,9 +594,9 @@
       // problems across grades — count them conservatively at 120. Static bank
       // skills are counted by their real item count. Speed drills are generators.
       var gen = 0, banks = 0;
-      SUBJECTS.forEach(function (s) { s.skills.forEach(function (k) { if (!(k.gen && k.gen.isBank)) gen += 120; }); });
+      SUBJECTS.forEach(function (s) { s.skills.forEach(function (k) { if (!(k.gen && k.gen.isBank)) gen += 200; }); });
       Object.keys(BANKS).forEach(function (b) { banks += BANKS[b].length; });
-      return gen + banks + SPEED.length * 120;
+      return gen + banks + SPEED.length * 200;
     },
     gradeNum: gradeNum
   };
