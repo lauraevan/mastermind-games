@@ -14,6 +14,7 @@
   .mascot-wrap { position: relative; display: flex; justify-content: center; align-items: flex-end; min-height: 300px; }
   .mascot { width: 240px; max-width: 70%; filter: drop-shadow(0 12px 18px rgba(40,80,60,.22)); animation: bob 4s ease-in-out infinite; }
   .mascot2 { position: absolute; left: 4%; bottom: 6px; width: 130px; filter: drop-shadow(0 10px 14px rgba(40,80,60,.22)); animation: bob 4s ease-in-out .8s infinite; }
+  .mascot3 { position: absolute; right: 2%; bottom: 4px; width: 108px; filter: drop-shadow(0 10px 14px rgba(40,80,60,.2)); animation: bob 4.4s ease-in-out .4s infinite; }
   @keyframes bob { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-8px) } }
   @media (max-width: 900px){ .mascot2 { left: 12%; width: 110px; } }
 
@@ -74,7 +75,7 @@
     <div style="text-align:center;max-width:640px;margin:0 auto 26px">
       <span class="eyebrow">Learning</span>
       <h2>Pick your grade to get started</h2>
-      <p class="muted" style="font-weight:700">Every grade scales the difficulty of all nine subjects, from counting to calculus.</p>
+      <p class="muted" style="font-weight:700">Every grade scales the difficulty across every subject, from counting to calculus.</p>
     </div>
     <div class="grade-list" id="gradeList"></div>
   </div>
@@ -84,7 +85,8 @@
   <div class="wrap">
     <div style="text-align:center;max-width:640px;margin:0 auto 26px">
       <span class="eyebrow">Curriculum</span>
-      <h2>Nine colorful subjects</h2>
+      <h2>Thousands of skills across every subject</h2>
+      <p class="muted" id="catLine" style="font-weight:700"></p>
     </div>
     <div class="subj-strip" id="subjStrip"></div>
   </div>
@@ -171,10 +173,30 @@
     '<path d="M140 132 q20 6 22 26" stroke="#e59a2b" stroke-width="9" fill="none" stroke-linecap="round"/><circle cx="163" cy="160" r="8" fill="#f4b64a"/>' +
     // feet
     '<rect x="72" y="184" width="22" height="14" rx="5" fill="#c9822a"/><rect x="106" y="184" width="22" height="14" rx="5" fill="#c9822a"/>' +
+    '</svg>' +
+    // ---- Pixel the cat ----
+    '<svg class="mascot3" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">' +
+    '<defs><linearGradient id="cat" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9b7be6"/><stop offset="1" stop-color="#7a5bd6"/></linearGradient></defs>' +
+    '<ellipse cx="100" cy="188" rx="50" ry="9" fill="#000" opacity=".08"/>' +
+    // tail
+    '<path d="M150 150 q34 6 20 -34" stroke="#7a5bd6" stroke-width="12" fill="none" stroke-linecap="round"/>' +
+    // ears
+    '<path d="M64 70 L52 34 L88 58 Z" fill="#7a5bd6"/><path d="M136 70 L148 34 L112 58 Z" fill="#7a5bd6"/>' +
+    '<path d="M68 64 L62 46 L82 58 Z" fill="#d9b3ff"/><path d="M132 64 L138 46 L118 58 Z" fill="#d9b3ff"/>' +
+    // body/head
+    '<circle cx="100" cy="118" r="62" fill="url(#cat)"/>' +
+    '<ellipse cx="100" cy="140" rx="40" ry="44" fill="#efe6ff"/>' +
+    // eyes
+    '<circle cx="80" cy="108" r="11" fill="#fff"/><circle cx="120" cy="108" r="11" fill="#fff"/>' +
+    '<circle cx="82" cy="110" r="6" fill="#3a3f47"/><circle cx="122" cy="110" r="6" fill="#3a3f47"/>' +
+    '<circle cx="84" cy="107" r="2" fill="#fff"/><circle cx="124" cy="107" r="2" fill="#fff"/>' +
+    // nose + mouth + whiskers
+    '<path d="M100 120 l-6 7 h12 Z" fill="#f0a5c0"/>' +
+    '<path d="M100 127 q-8 8 -16 2 M100 127 q8 8 16 2" stroke="#7a5bd6" stroke-width="2.5" fill="none" stroke-linecap="round"/>' +
+    '<path d="M60 118 h-16 M60 126 h-14 M140 118 h16 M140 126 h14" stroke="#b79bea" stroke-width="2" stroke-linecap="round"/>' +
     '</svg>';
 
-  var pool = Problems.estimatedProblems();
-  document.getElementById('tStats').textContent = Problems.totalSkills() + ' skills · ' + (Math.floor(pool / 500) * 500).toLocaleString() + '+ problems';
+  document.getElementById('tStats').textContent = (Math.floor(Problems.totalSkills() / 1000) * 1000).toLocaleString() + '+ skills · Unlimited problems';
 
   // ---- grade rows ----
   var GRADES = ['K','1','2','3','4','5','6','7','8','9','10','11','12'];
@@ -209,6 +231,9 @@
       '<div class="bd"><p>' + s.blurb + '</p><span class="meta">' + s.skills.length + (s.skills.length === 1 ? ' skill ' : ' skills ') + Icons.icon('arrow-right', { size: 14 }) + '</span></div>';
     strip.appendChild(a);
   });
+
+  var cl = document.getElementById('catLine');
+  if (cl) cl.textContent = Problems.totalSkills().toLocaleString() + ' skills across ' + Problems.categoryCount() + ' categories — every problem is generated fresh, so you never run out.';
 
   Icons.hydrate();
 </script>

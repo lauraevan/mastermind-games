@@ -27,6 +27,27 @@
   .fact-out .row b { min-width: 180px; color: var(--muted); font-weight: 600; }
   .chips { display: flex; flex-wrap: wrap; gap: 5px; }
   .chips span { border: 1px solid var(--line-2); border-radius: var(--r); padding: 2px 8px; font-family: var(--mono); font-size: .82rem; }
+  /* scientific calculator */
+  .calc-wrap { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; align-items: start; }
+  .calc-display { background: #1b1f2e; border-radius: var(--r); padding: 16px 18px; text-align: right; margin-bottom: 12px; }
+  .calc-expr { color: #9aa2c0; font-family: var(--mono); font-size: .95rem; min-height: 1.3em; word-break: break-all; }
+  .calc-result { color: #fff; font-family: var(--mono); font-size: 2rem; font-weight: 700; word-break: break-all; }
+  .calc-modes { display: flex; gap: 6px; align-items: center; margin-bottom: 12px; }
+  .calc-mode { border: 0; background: var(--surface-2); color: var(--ink-2); font: inherit; font-weight: 800; font-size: .76rem; border-radius: 8px; padding: 6px 12px; cursor: pointer; }
+  .calc-mode.on { background: var(--brand); color: #fff; }
+  .calc-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 7px; }
+  .ckey { border: 0; background: var(--surface-2); color: var(--ink); font: inherit; font-weight: 800; font-size: 1rem; border-radius: 10px; padding: 14px 0; cursor: pointer; }
+  .ckey:hover { background: #e4ecf5; }
+  .ckey.fn { background: #eceafb; color: var(--brand-dark); font-size: .82rem; }
+  .ckey.op { background: #e7edfb; color: var(--blue-dark); }
+  .ckey.eq { background: var(--brand); color: #fff; grid-column: span 2; }
+  .ckey.clr { background: var(--danger-soft); color: var(--danger); }
+  .calc-notes .const-item { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--line); cursor: pointer; font-family: var(--mono); font-size: .86rem; }
+  .calc-notes .const-item:hover { color: var(--brand-dark); }
+  .formula-list { list-style: none; padding: 0; margin: 0; }
+  .formula-list li { padding: 6px 0; border-bottom: 1px solid var(--line); font-size: .84rem; }
+  .formula-list li b { font-family: var(--mono); color: var(--ink); }
+  @media (max-width: 820px) { .calc-wrap { grid-template-columns: 1fr; } }
 </style>
 
 <div id="nav"></div>
@@ -34,16 +55,43 @@
 <main class="lab wrap">
   <span class="eyebrow">Tools</span>
   <h1>Math Lab</h1>
-  <p class="muted">Explore, don't just drill. A function grapher, a multiplication matrix, and a factor engine.</p>
+  <p class="muted">Explore, don't just drill. A scientific calculator, a function grapher, a multiplication matrix, and a factor engine.</p>
 
   <div class="lab-tabs">
-    <button class="lab-tab on" data-tool="grapher"><span data-icon="spline"></span> Function Grapher</button>
-    <button class="lab-tab" data-tool="times"><span data-icon="calculator"></span> Times-Table Matrix</button>
+    <button class="lab-tab on" data-tool="calc"><span data-icon="calculator"></span> Scientific Calculator</button>
+    <button class="lab-tab" data-tool="grapher"><span data-icon="spline"></span> Function Grapher</button>
+    <button class="lab-tab" data-tool="times"><span data-icon="variable"></span> Times-Table Matrix</button>
     <button class="lab-tab" data-tool="factor"><span data-icon="binary"></span> Factor Explorer</button>
   </div>
 
+  <!-- SCIENTIFIC CALCULATOR -->
+  <section class="tool on" id="calc">
+    <div class="calc-wrap">
+      <div class="panel calc-body">
+        <div class="calc-display">
+          <div class="calc-expr" id="calcExpr">&nbsp;</div>
+          <div class="calc-result" id="calcResult">0</div>
+        </div>
+        <div class="calc-modes">
+          <button class="calc-mode on" id="degBtn">DEG</button>
+          <button class="calc-mode" id="radBtn">RAD</button>
+          <button class="calc-mode" id="sciBtn">SCI</button>
+          <span class="muted small" id="calcHint" style="margin-left:auto">Type or click. Enter = evaluate.</span>
+        </div>
+        <div class="calc-grid" id="calcGrid"></div>
+      </div>
+      <aside class="panel calc-notes">
+        <h3 style="margin-top:0">Scientific notes</h3>
+        <p class="muted small">Handy constants and formulas. Click a constant to insert it.</p>
+        <div id="constList"></div>
+        <h3 style="margin-top:16px;font-size:1rem">Formulas</h3>
+        <ul class="formula-list" id="formulaList"></ul>
+      </aside>
+    </div>
+  </section>
+
   <!-- GRAPHER -->
-  <section class="tool on" id="grapher">
+  <section class="tool" id="grapher">
     <div class="panel">
       <div class="grapher-controls">
         <span class="mono muted">y =</span>
@@ -92,6 +140,76 @@
 <script src="assets/js/hidden.js"></script>
 <script>
   Layout.mount({ active: 'mathlab' });
+
+  /* ---- scientific calculator ---- */
+  (function () {
+    var expr = '', ans = 0, deg = true, sci = false;
+    var exprEl = document.getElementById('calcExpr'), resEl = document.getElementById('calcResult');
+    var KEYS = [
+      ['sin','fn'],['cos','fn'],['tan','fn'],['(','op'],[')','op'],['C','clr'],
+      ['√','fn'],['x²','fn'],['x^y','fn'],['log','fn'],['ln','fn'],['⌫','clr'],
+      ['7','num'],['8','num'],['9','num'],['÷','op'],['π','fn'],['e','fn'],
+      ['4','num'],['5','num'],['6','num'],['×','op'],['(-)','op'],['%','op'],
+      ['1','num'],['2','num'],['3','num'],['−','op'],['Ans','fn'],['^','op'],
+      ['0','num'],['.','num'],['00','num'],['+','op'],['=','eq']
+    ];
+    var grid = document.getElementById('calcGrid');
+    KEYS.forEach(function (k) {
+      var b = document.createElement('button');
+      b.className = 'ckey ' + (k[1] === 'eq' ? 'eq' : k[1] === 'clr' ? 'clr' : k[1] === 'fn' ? 'fn' : k[1] === 'op' ? 'op' : '');
+      b.textContent = k[0];
+      b.onclick = function () { press(k[0]); };
+      grid.appendChild(b);
+    });
+    function press(t) {
+      if (t === 'C') { expr = ''; render(''); return; }
+      if (t === '⌫') { expr = expr.slice(0, -1); render(); return; }
+      if (t === '=') { evaluate(); return; }
+      if (t === 'Ans') { expr += String(ans); render(); return; }
+      if (t === 'x²') { expr += '^2'; render(); return; }
+      if (t === 'x^y') { expr += '^'; render(); return; }
+      if (t === '(-)') { expr += '-'; render(); return; }
+      if (t === 'sin' || t === 'cos' || t === 'tan' || t === 'log' || t === 'ln' || t === '√') { expr += t + '('; render(); return; }
+      expr += t; render();
+    }
+    function render(force) { exprEl.textContent = (force !== undefined ? force : expr) || ' '; }
+    function evaluate() {
+      try {
+        var e = expr.replace(/×/g, '*').replace(/÷/g, '/').replace(/−/g, '-').replace(/π/g, 'PI').replace(/√/g, 'sqrt').replace(/\^/g, '**');
+        if (/[^0-9+\-*/(). ,a-zA-Z_]/.test(e)) throw 'bad';
+        var trig = deg
+          ? { sin: function (x) { return Math.sin(x * Math.PI / 180); }, cos: function (x) { return Math.cos(x * Math.PI / 180); }, tan: function (x) { return Math.tan(x * Math.PI / 180); } }
+          : { sin: Math.sin, cos: Math.cos, tan: Math.tan };
+        var scope = { sqrt: Math.sqrt, log: function (x) { return Math.log(x) / Math.LN10; }, ln: Math.log, PI: Math.PI, e: Math.E, E: Math.E, abs: Math.abs, sin: trig.sin, cos: trig.cos, tan: trig.tan };
+        var ks = Object.keys(scope);
+        var val = Function.apply(null, ks.concat('return (' + e + ')')).apply(null, ks.map(function (k) { return scope[k]; }));
+        if (typeof val !== 'number' || !isFinite(val)) throw 'nan';
+        ans = val;
+        var out = sci ? val.toExponential(6) : (Math.round(val * 1e10) / 1e10);
+        resEl.textContent = out;
+        exprEl.textContent = expr;
+      } catch (err) { resEl.textContent = 'Error'; }
+    }
+    document.getElementById('degBtn').onclick = function () { deg = true; this.classList.add('on'); document.getElementById('radBtn').classList.remove('on'); };
+    document.getElementById('radBtn').onclick = function () { deg = false; this.classList.add('on'); document.getElementById('degBtn').classList.remove('on'); };
+    document.getElementById('sciBtn').onclick = function () { sci = !sci; this.classList.toggle('on', sci); };
+    document.addEventListener('keydown', function (ev) {
+      if (!document.getElementById('calc').classList.contains('on')) return;
+      var k = ev.key;
+      if (/[0-9.+\-*/()]/.test(k) && k.length === 1) { expr += k.replace('*', '×').replace('/', '÷').replace('-', '−'); render(); }
+      else if (k === 'Enter' || k === '=') { ev.preventDefault(); evaluate(); }
+      else if (k === 'Backspace') { expr = expr.slice(0, -1); render(); }
+      else if (k === 'Escape') { expr = ''; render(''); }
+    });
+    // notes: constants + formulas
+    var CONST = [['π', '3.14159265'], ['e', '2.71828183'], ['√2', '1.41421356'], ['g (m/s²)', '9.81'], ['c (m/s)', '3e8'], ['Avogadro', '6.022e23']];
+    var cl = document.getElementById('constList');
+    CONST.forEach(function (c) { var d = document.createElement('div'); d.className = 'const-item'; d.innerHTML = '<span>' + c[0] + '</span><span>' + c[1] + '</span>'; d.onclick = function () { expr += c[0] === 'π' ? 'π' : c[0] === 'e' ? 'e' : c[1].replace('e', 'E'); render(); }; cl.appendChild(d); });
+    var FORM = ['Area of circle: <b>πr²</b>', 'Pythagoras: <b>a²+b²=c²</b>', 'Quadratic: <b>(-b±√(b²-4ac))/2a</b>', 'Slope: <b>(y₂-y₁)/(x₂-x₁)</b>', 'Speed: <b>distance/time</b>', 'Density: <b>mass/volume</b>'];
+    var fl = document.getElementById('formulaList');
+    FORM.forEach(function (f) { var li = document.createElement('li'); li.innerHTML = f; fl.appendChild(li); });
+    render('');
+  })();
 
   // tabs
   [].forEach.call(document.querySelectorAll('.lab-tab'), function (t) {

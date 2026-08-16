@@ -26,6 +26,17 @@
     return ('00000000' + h.toString(16)).slice(-8);
   }
 
+  // IXL-style SmartScore update.
+  function smartScore(cur, correct) {
+    cur = cur || 0;
+    if (correct) {
+      var inc = cur < 40 ? 12 : cur < 70 ? 8 : cur < 85 ? 5 : cur < 95 ? 3 : cur < 99 ? 2 : 1;
+      return Math.min(100, cur + inc);
+    }
+    var dec = cur < 40 ? 5 : cur < 70 ? 10 : cur < 90 ? 15 : 20;
+    return Math.max(0, cur - dec);
+  }
+
   function todayKey(d) {
     d = d || new Date();
     return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate();
@@ -123,11 +134,12 @@
       s.solved += 1; if (correct) s.correct += 1; s.xp += xpGain;
       p.bySubject[subjectId] = s;
 
-      // per skill mastery
+      // per-skill SmartScore (IXL-style): rises with correct answers but the
+      // gains shrink near 100 (true mastery needs a run of correct answers),
+      // and a wrong answer costs more the closer you are to mastery.
       var sk = p.skills[skillId] || { solved: 0, correct: 0, mastery: 0 };
       sk.solved += 1; if (correct) sk.correct += 1;
-      // mastery drifts up on correct, down slightly on wrong (0..100)
-      sk.mastery = Math.max(0, Math.min(100, sk.mastery + (correct ? 12 : -6)));
+      sk.mastery = smartScore(sk.mastery || 0, correct);
       p.skills[skillId] = sk;
 
       // level

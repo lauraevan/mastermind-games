@@ -538,7 +538,313 @@
   ];
 
   var SKILL_INDEX = {};
-  SUBJECTS.forEach(function (s) { s.skills.forEach(function (k) { k.subject = s.id; SKILL_INDEX[k.id] = k; }); });
+  var OWN_STRAND = ['reading', 'spanish', 'science', 'history', 'geography', 'civics', 'economics'];
+  SUBJECTS.forEach(function (s) {
+    s.skills.forEach(function (k) {
+      k.subject = s.id;
+      if (!k.strand) k.strand = OWN_STRAND.indexOf(s.id) !== -1 ? k.name : 'Essentials';
+      SKILL_INDEX[k.id] = k;
+    });
+  });
+
+  /* ============================================================
+     MEGA CATALOG — procedural micro-skills (IXL-style).
+     Thousands of grade- and level-specific skills, each backed by
+     a generator that produces a brand-new problem on every call.
+     ============================================================ */
+  (function () {
+    var subjById = {};
+    SUBJECTS.forEach(function (s) { subjById[s.id] = s; s.strands = {}; });
+    var seq = 0;
+    var LX = 4; // level multiplier — scales per-skill difficulty tiers to reach an IXL-sized catalog
+    function addFam(sub, strand, name, band, makeGen, levels) {
+      var s = subjById[sub]; if (!s) return;
+      levels = Math.max(1, Math.round((levels || 1) * LX));
+      for (var g = band[0]; g <= band[1]; g++) {
+        for (var lv = 1; lv <= levels; lv++) {
+          var nm = levels > 1 ? name + ' · Level ' + lv : name;
+          var id = 'k' + (seq++);
+          var sk = { id: id, name: nm, subject: sub, strand: strand, grade: g, grades: [g, g], level: lv, gen: makeGen(g, lv) };
+          s.skills.push(sk); SKILL_INDEX[id] = sk;
+        }
+        s.strands[strand] = true;
+      }
+    }
+
+    // ----- number & operations -----
+    [2,3,4,5,6,7,8,9,10,11,12].forEach(function (n) {
+      addFam('math','Multiplication','Multiply by '+n,[3,8], function(g,lv){ return function(){ var b=rnd(2, 9+(lv-1)*20+Math.max(0,g-3)*4); return inp(n+' × '+b+' =', n*b, n+' groups of '+b+'.'); }; }, 3);
+      addFam('math','Division','Divide by '+n,[3,8], function(g,lv){ return function(){ var q=rnd(2, 9+(lv-1)*10); return inp((n*q)+' ÷ '+n+' =', q, n+' × '+q+' = '+(n*q)+'.'); }; }, 3);
+      addFam('math','Multiplication','Missing factor: '+n+' × ?',[3,7], function(g,lv){ return function(){ var q=rnd(2, 9+(lv-1)*6); return inp(n+' × ? = '+(n*q)+'   (find ?)', q); }; }, 2);
+    });
+    [10,20,50,100,500,1000,10000].forEach(function (m) {
+      addFam('math','Addition','Add within '+m,[0,6], function(g,lv){ return function(){ var a=rnd(0,m), b=rnd(0,Math.max(0,m-a)); return inp(a+' + '+b+' =', a+b); }; }, 2);
+      addFam('math','Subtraction','Subtract within '+m,[0,6], function(g,lv){ return function(){ var a=rnd(1,m), b=rnd(0,a); return inp(a+' − '+b+' =', a-b); }; }, 2);
+    });
+    [2,3,4,5,10,25,50,100].forEach(function (n) {
+      addFam('math','Number sense','Skip-count by '+n,[0,4], function(g,lv){ return function(){ var st=rnd(0,6)*n; return inp('Skip-count by '+n+':  '+st+', '+(st+n)+', '+(st+2*n)+', ?', st+3*n); }; });
+    });
+    [10,100,1000,10000].forEach(function (p) {
+      addFam('math','Rounding','Round to nearest '+p,[3,7], function(g,lv){ return function(){ var n=rnd(p, p*(40+lv*40)+rnd(1,p-1)); return mcNum('Round '+n+' to the nearest '+p, Math.round(n/p)*p, {spread:p}); }; }, 2);
+    });
+    [['tens',10],['hundreds',100],['thousands',1000],['ten thousands',10000]].forEach(function (pv) {
+      addFam('math','Place value','Value of a digit ('+pv[0]+')',[2,6], function(g,lv){ return function(){ var d=rnd(4,6); var n=rnd(Math.pow(10,d-1), Math.pow(10,d)-1); var s=String(n); var idx=rnd(0,s.length-1); var val=Math.pow(10, s.length-1-idx); var names={1:'ones',10:'tens',100:'hundreds',1000:'thousands',10000:'ten thousands',100000:'hundred thousands'}; return mcStr('In '+n+', the digit '+s[idx]+' is in the ___ place.', names[val], ['ones','tens','hundreds','thousands','ten thousands'].filter(function(x){return x!==names[val];}).slice(0,3)); }; });
+    });
+    [2,3,4,5,6,7,8,9,10,11,12].forEach(function (d) {
+      addFam('math','Fractions','Add fractions (denominator '+d+')',[4,9], function(g,lv){ return function(){ var a=rnd(1,d-1), b=rnd(1,d-1); if(a+b>=d) b=Math.max(1,d-a); return inp(a+'/'+d+' + '+b+'/'+d+' =   (write n/'+d+')', (a+b)+'/'+d); }; }, 2);
+      addFam('math','Fractions','Subtract fractions (denominator '+d+')',[4,9], function(g,lv){ return function(){ var a=rnd(2,d-1), b=rnd(1,a-1); return inp(a+'/'+d+' − '+b+'/'+d+' =   (write n/'+d+')', (a-b)+'/'+d); }; }, 2);
+      addFam('math','Fractions','Compare fractions (denominator '+d+')',[3,8], function(g,lv){ return function(){ var a=rnd(1,d-1), b=rnd(1,d-1); var ans=a>b?'>':(a<b?'<':'='); return mcStr(a+'/'+d+'  ?  '+b+'/'+d, ans, ['>','<','='].filter(function(x){return x!==ans;})); }; });
+      addFam('math','Fractions','Equivalent fractions of 1/'+d,[4,8], function(g,lv){ return function(){ var k=rnd(2,6); return inp('1/'+d+' = ?/'+(d*k)+'   (numerator)', k); }; });
+    });
+    ['Add','Subtract','Multiply','Round','Compare'].forEach(function (op) {
+      addFam('math','Decimals',op+' decimals',[5,9], function(g,lv){ return function(){ var a=rnd(1,99)/Math.pow(10,rnd(1,2)), b=rnd(1,99)/Math.pow(10,rnd(1,2));
+        if(op==='Add') return inp(a+' + '+b+' =', Math.round((a+b)*100)/100);
+        if(op==='Subtract'){ var x=Math.max(a,b),y=Math.min(a,b); return inp(x+' − '+y+' =', Math.round((x-y)*100)/100); }
+        if(op==='Multiply'){ var c=rnd(2,9); return inp(a+' × '+c+' =', Math.round(a*c*100)/100); }
+        if(op==='Round'){ var n=rnd(100,9999)/100; return mcNum('Round '+n+' to the nearest whole number', Math.round(n), {spread:2}); }
+        var ans=a>b?'>':(a<b?'<':'='); return mcStr(a+'  ?  '+b, ans, ['>','<','='].filter(function(z){return z!==ans;})); }; }, 2);
+    });
+    [5,10,15,20,25,50,75].forEach(function (p) {
+      addFam('math','Percents','Find '+p+'% of a number',[6,10], function(g,lv){ return function(){ var w=pick([20,40,60,80,100,120,160,200,240]); return mcNum(p+'% of '+w+' = ?', Math.round(p/100*w), {spread:8,nonneg:true}); }; }, 2);
+    });
+    ['Percent increase','Percent decrease','Discount price','Sales tax','Tip amount','Fraction to percent','Decimal to percent'].forEach(function (t) {
+      addFam('math','Percents',t,[6,11], function(g,lv){ return function(){
+        if(t==='Fraction to percent'){ var d=pick([2,4,5,10,20,25]); var nn=rnd(1,d-1); return inp(nn+'/'+d+' as a percent (e.g. 50) =', Math.round(nn/d*100)); }
+        if(t==='Decimal to percent'){ var x=rnd(1,99)/100; return inp(x+' as a percent (e.g. 50) =', Math.round(x*100)); }
+        var base=pick([20,40,50,80,100,200]), pc=pick([10,20,25,50]);
+        if(t==='Percent increase') return mcNum(base+' increased by '+pc+'% = ?', base+base*pc/100,{spread:6});
+        if(t==='Percent decrease') return mcNum(base+' decreased by '+pc+'% = ?', base-base*pc/100,{spread:6});
+        if(t==='Discount price') return mcNum('A $'+base+' item is '+pc+'% off. Sale price = ?', base-base*pc/100,{spread:6,nonneg:true});
+        if(t==='Sales tax') return mcNum('A $'+base+' item has '+pc+'% tax. Total = ?', base+base*pc/100,{spread:6});
+        return mcNum('A '+pc+'% tip on a $'+base+' bill = ?', base*pc/100,{spread:5,nonneg:true}); }; }, 1);
+    });
+    [2,3,4,5,6,7,8,9,10].forEach(function (n) {
+      addFam('math','Exponents','Powers of '+n,[6,10], function(g,lv){ return function(){ var e=rnd(2, 2+lv); return inp(n+'^'+e+' =', Math.pow(n,e)); }; }, 2);
+    });
+    addFam('math','Exponents','Square roots (perfect squares)',[6,10], function(g,lv){ return function(){ var r=rnd(2, 12+lv*6); return inp('√'+(r*r)+' =', r); }; }, 2);
+    addFam('math','Exponents','Scientific notation',[7,11], function(g,lv){ return function(){ var a=rnd(1,9), e=rnd(2,6); return inp('Write '+a+' × 10^'+e+' as a whole number', a*Math.pow(10,e)); }; });
+    ['Add','Subtract','Multiply','Divide','Compare'].forEach(function (op) {
+      addFam('math','Integers',op+' integers',[6,9], function(g,lv){ return function(){ var a=rnd(-9-(lv-1)*10,9+(lv-1)*10), b=rnd(-9-(lv-1)*10,9+(lv-1)*10); var A=(a<0?'('+a+')':a), B=(b<0?'('+b+')':b);
+        if(op==='Add') return mcNum(A+' + '+B+' =', a+b);
+        if(op==='Subtract') return mcNum(A+' − '+B+' =', a-b);
+        if(op==='Multiply') return mcNum(A+' × '+B+' =', a*b);
+        if(op==='Divide'){ if(b===0)b=2; return mcNum((a*b)+' ÷ ('+b+') =', a); }
+        var ans=a>b?'>':(a<b?'<':'='); return mcStr(A+'  ?  '+B, ans, ['>','<','='].filter(function(z){return z!==ans;})); }; }, 2);
+    });
+    addFam('math','Order of operations','Evaluate expressions',[5,9], function(g,lv){ return function(){ var a=rnd(2,9),b=rnd(2,9),c=rnd(2,9); if(lv>1) return mcNum('('+a+' + '+b+') × '+c+' =', (a+b)*c); return mcNum(a+' + '+b+' × '+c+' =', a+b*c); }; }, 2);
+    [2,3,4,5,6,9,10].forEach(function (n) {
+      addFam('math','Number theory','Divisibility by '+n,[4,8], function(g,lv){ return function(){ var x=rnd(10,200); var ans=(x%n===0)?'Yes':'No'; return mcStr('Is '+x+' divisible by '+n+'?', ans, [ans==='Yes'?'No':'Yes']); }; });
+    });
+    ['Prime or composite','Factor count','Multiples','Greatest common factor','Least common multiple','Even or odd'].forEach(function (t) {
+      addFam('math','Number theory',t,[4,8], function(g,lv){ return function(){
+        if(t==='Prime or composite'){ var n=rnd(2,60); var ans=isPrime(n)?'Prime':'Composite'; return mcStr('Is '+n+' prime or composite?', ans, [ans==='Prime'?'Composite':'Prime']); }
+        if(t==='Even or odd'){ var n2=rnd(1,200); var a2=n2%2?'Odd':'Even'; return mcStr('Is '+n2+' even or odd?', a2, [a2==='Odd'?'Even':'Odd']); }
+        if(t==='Greatest common factor'){ var a=rnd(6,48),b=rnd(6,48); return inp('GCF of '+a+' and '+b+' =', gcd(a,b)); }
+        if(t==='Least common multiple'){ var a=rnd(2,12),b=rnd(2,12); return inp('LCM of '+a+' and '+b+' =', a*b/gcd(a,b)); }
+        if(t==='Multiples'){ var n3=rnd(2,9),k=rnd(3,7); return inp('The '+k+'th multiple of '+n3+' =', n3*k); }
+        var n4=rnd(12,60); var f=0; for(var i=1;i<=n4;i++) if(n4%i===0) f++; return mcNum('How many factors does '+n4+' have?', f, {nonneg:true,spread:3}); }; }, 1);
+    });
+    [['minutes','hours',60],['seconds','minutes',60],['days','weeks',7],['centimeters','meters',100],['millimeters','centimeters',10],['inches','feet',12],['feet','yards',3],['grams','kilograms',1000],['milliliters','liters',1000],['ounces','pounds',16],['hours','days',24]].forEach(function (u) {
+      addFam('math','Measurement','Convert '+u[1]+' to '+u[0],[2,7], function(g,lv){ return function(){ var q=rnd(2, 9+lv*3); return inp(q+' '+u[1]+' = ? '+u[0], q*u[2]); }; }, 2);
+    });
+    ['Add money','Make change','Count coins'].forEach(function (t) {
+      addFam('math','Money',t,[1,5], function(g,lv){ return function(){
+        if(t==='Add money'){ var a=rnd(1,20),b=rnd(1,20); return inp('$'+a+' + $'+b+' = $?', a+b); }
+        if(t==='Make change'){ var cost=rnd(1,19); return mcNum('You pay $20 for a $'+cost+' item. Change = ?', 20-cost,{nonneg:true,spread:4}); }
+        var q=rnd(1,4),d=rnd(1,5),n=rnd(1,5); return inp(q+' quarters, '+d+' dimes, '+n+' nickels = ? cents', q*25+d*10+n*5); }; });
+    });
+    addFam('math','Time','Elapsed time',[1,5], function(g,lv){ return function(){ var h=rnd(1,6),m=pick([0,15,30,45]); var add=rnd(1,4)*15; var tot=h*60+m+add; var eh=Math.floor(tot/60)%12||12, em=tot%60; return mcStr('It is '+h+':'+(m<10?'0'+m:m)+'. Time '+add+' minutes later?', eh+':'+(em<10?'0'+em:em), [(eh+1)+':'+(em<10?'0'+em:em), h+':'+(m<10?'0'+m:m)]); }; });
+    ['Addition','Subtraction','Multiplication','Division','Multi-step','Fraction','Percent','Rate'].forEach(function (ty) {
+      addFam('math','Word problems',ty+' word problems',[2,9], function(g,lv){ return function(){ return G.word(); }; });
+    });
+    addFam('math','Word problems','Challenge word problems',[5,10], function(g,lv){ return function(){ return G.challenge(); }; });
+    ['Mean','Median','Mode','Range','Probability'].forEach(function (t) {
+      addFam('math','Data & statistics',t,[4,9], function(g,lv){ return function(){
+        if(t==='Mean'){ var n=rnd(3,4),arr=[],s=0; for(var i=0;i<n;i++){var v=rnd(2,20);arr.push(v);s+=v;} while(s%n){arr[0]++;s++;} return mcNum('Mean of '+arr.join(', '), s/n,{spread:4}); }
+        if(t==='Median'){ var a=[]; for(var j=0;j<5;j++)a.push(rnd(1,20)); var so=a.slice().sort(function(x,y){return x-y;}); return mcNum('Median of '+a.join(', '), so[2],{spread:4}); }
+        if(t==='Mode'){ var bb=rnd(1,9); var a2=shuffle([bb,bb,bb,rnd(10,19),rnd(20,29)]); return mcNum('Mode of '+a2.join(', '), bb,{spread:5}); }
+        if(t==='Range'){ var a3=[]; for(var k=0;k<5;k++)a3.push(rnd(1,40)); return mcNum('Range of '+a3.join(', '), Math.max.apply(null,a3)-Math.min.apply(null,a3),{spread:6}); }
+        var tot=pick([4,5,6,8,10]),fav=rnd(1,tot-1); return inp('A bag has '+tot+' marbles, '+fav+' red. P(red) as n/'+tot+' =', fav+'/'+tot); }; }, 2);
+    });
+
+    // ----- geometry -----
+    ['Rectangle','Square','Triangle','Parallelogram','Circle'].forEach(function (shape) {
+      addFam('geometry','Area','Area of a '+shape.toLowerCase(),[3,9], function(g,lv){ return function(){ var a=rnd(3,12+lv*4), b=rnd(2,10+lv*4);
+        if(shape==='Rectangle') return inp('Rectangle '+a+' × '+b+'. Area = ?', a*b);
+        if(shape==='Square') return inp('Square with side '+a+'. Area = ?', a*a);
+        if(shape==='Triangle'){ var base=a*2; return inp('Triangle base '+base+', height '+b+'. Area = ?', base*b/2); }
+        if(shape==='Parallelogram') return inp('Parallelogram base '+a+', height '+b+'. Area = ?', a*b);
+        return mcStr('Circle radius '+a+'. Area (use π) = ?', (a*a)+'π', [(2*a)+'π', a+'π', (a*a*a)+'π']); }; }, 2);
+    });
+    ['Rectangle','Square','Triangle'].forEach(function (shape) {
+      addFam('geometry','Perimeter','Perimeter of a '+shape.toLowerCase(),[3,7], function(g,lv){ return function(){ var a=rnd(3,15),b=rnd(2,12); if(shape==='Rectangle') return inp('Rectangle '+a+' × '+b+'. Perimeter = ?', 2*(a+b)); if(shape==='Square') return inp('Square side '+a+'. Perimeter = ?', 4*a); var c=rnd(2,12); return inp('Triangle sides '+a+', '+b+', '+c+'. Perimeter = ?', a+b+c); }; });
+    });
+    ['Rectangular prism','Cube','Cylinder'].forEach(function (shape) {
+      addFam('geometry','Volume','Volume of a '+shape.toLowerCase(),[5,10], function(g,lv){ return function(){ var a=rnd(2,9),b=rnd(2,9),c=rnd(2,9); if(shape==='Rectangular prism') return inp('Prism '+a+'×'+b+'×'+c+'. Volume = ?', a*b*c); if(shape==='Cube') return inp('Cube side '+a+'. Volume = ?', a*a*a); return mcStr('Cylinder r='+a+', h='+b+'. Volume (use π) = ?', (a*a*b)+'π', [(a*b)+'π',(2*a*b)+'π',(a*a*a)+'π']); }; });
+    });
+    ['Complementary angles','Supplementary angles','Triangle angle sum','Vertical angles'].forEach(function (t) {
+      addFam('geometry','Angles',t,[4,9], function(g,lv){ return function(){
+        if(t==='Complementary angles'){ var a=rnd(15,75); return mcNum('One of two complementary angles is '+a+'°. The other = ?', 90-a,{nonneg:true,spread:10}); }
+        if(t==='Supplementary angles'){ var a=rnd(20,160); return mcNum('One of two supplementary angles is '+a+'°. The other = ?', 180-a,{nonneg:true,spread:12}); }
+        if(t==='Triangle angle sum'){ var a=rnd(30,80),b=rnd(30,80); if(a+b>150){a=50;b=60;} return mcNum('A triangle has angles '+a+'° and '+b+'°. The third = ?', 180-a-b,{nonneg:true,spread:10}); }
+        var a2=rnd(20,160); return mcNum('Two vertical angles: one is '+a2+'°. The other = ?', a2,{spread:10}); }; }, 1);
+    });
+    addFam('geometry','Pythagorean theorem','Find the hypotenuse',[8,11], function(g,lv){ return function(){ var t=pick([[3,4,5],[6,8,10],[5,12,13],[8,15,17],[9,12,15]]); return inp('Right triangle legs '+t[0]+' and '+t[1]+'. Hypotenuse = ?', t[2]); }; });
+    addFam('geometry','Coordinate geometry','Distance from the origin',[6,10], function(g,lv){ return function(){ var t=pick([[3,4,5],[6,8,10],[5,12,13]]); return inp('From (0,0) to ('+t[0]+','+t[1]+'). Distance = ?', t[2]); }; });
+
+    // ----- algebra -----
+    ['x + a = b','x − a = b','a · x = b','x ÷ a = b'].forEach(function (form) {
+      addFam('algebra','One-step equations','Solve: '+form,[6,9], function(g,lv){ return function(){ var x=rnd(1,9+(lv-1)*10), a=rnd(2,9);
+        if(form==='x + a = b') return inp('Solve:  x + '+a+' = '+(x+a), x);
+        if(form==='x − a = b') return inp('Solve:  x − '+a+' = '+(x-a), x);
+        if(form==='a · x = b') return inp('Solve:  '+a+'x = '+(a*x), x);
+        return inp('Solve:  x ÷ '+a+' = '+x+'   (find x)', x*a); }; }, 2);
+    });
+    addFam('algebra','Two-step equations','Solve ax + b = c',[7,10], function(g,lv){ return function(){ var a=rnd(2,6),x=rnd(1,9),b=rnd(1,10); return inp('Solve:  '+a+'x + '+b+' = '+(a*x+b), x); }; }, 2);
+    addFam('algebra','Expressions','Evaluate expressions',[6,9], function(g,lv){ return function(){ var c=rnd(2,6),k=rnd(1,7),x=rnd(2,9); return mcNum('If x = '+x+', evaluate '+c+'x + '+k, c*x+k); }; }, 2);
+    addFam('algebra','Expressions','Combine like terms',[7,10], function(g,lv){ return function(){ var a=rnd(2,7),b=rnd(2,7),c=rnd(1,8); return mcStr('Simplify '+a+'x + '+c+' + '+b+'x', (a+b)+'x + '+c, [(a+b)+'x',(a*b)+'x + '+c]); }; });
+    addFam('algebra','Expressions','Distributive property',[7,10], function(g,lv){ return function(){ var a=rnd(2,6),b=rnd(1,7); return mcStr('Expand '+a+'(x + '+b+')', a+'x + '+(a*b), [a+'x + '+b,(a+1)+'x + '+(a*b)]); }; });
+    addFam('algebra','Linear functions','Slope from two points',[8,11], function(g,lv){ return function(){ var x1=rnd(-4,4),y1=rnd(-4,4),dx=rnd(1,4),m=rnd(-4,4); return mcNum('Slope through ('+x1+','+y1+') and ('+(x1+dx)+','+(y1+m*dx)+') = ?', m,{spread:4}); }; });
+    addFam('algebra','Linear functions','Evaluate y = mx + b',[8,11], function(g,lv){ return function(){ var m=rnd(1,5),b=rnd(-5,5),x=rnd(1,5); return mcNum('y = '+m+'x + '+(b<0?'('+b+')':b)+'. Find y when x = '+x, m*x+b); }; });
+    addFam('algebra','Inequalities','Solve one-step inequalities',[8,11], function(g,lv){ return function(){ var a=rnd(1,9),b=rnd(a+1,a+12); return mcStr('Solve  x + '+a+' > '+b, 'x > '+(b-a), ['x > '+(b+a),'x < '+(b-a)]); }; });
+    addFam('algebra','Systems','Solve systems (elimination)',[9,12], function(g,lv){ return function(){ var x=rnd(1,6),y=rnd(1,6); return inp('If x + y = '+(x+y)+' and x − y = '+(x-y)+', find x.', x); }; });
+    addFam('algebra','Quadratics','Factor x² + bx + c',[9,12], function(g,lv){ return function(){ var p=rnd(1,6),q=rnd(1,6); return mcStr('Factor x² + '+(p+q)+'x + '+p*q, '(x + '+p+')(x + '+q+')', ['(x + '+(p+q)+')(x + '+p*q+')','(x − '+p+')(x − '+q+')']); }; });
+    addFam('algebra','Quadratics','Solve x² + bx + c = 0',[9,12], function(g,lv){ return function(){ var p=rnd(1,6),q=rnd(1,6); return mcNum('A root of x² − '+(p+q)+'x + '+p*q+' = 0 (smaller) = ?', Math.min(p,q),{nonneg:true,spread:3}); }; });
+    ['Product of powers','Quotient of powers','Power of a power'].forEach(function (t) {
+      addFam('algebra','Exponent laws',t,[8,11], function(g,lv){ return function(){ var a=rnd(2,7),b=rnd(2,7); if(t==='Product of powers') return mcStr('x^'+a+' · x^'+b, 'x^'+(a+b), ['x^'+(a*b),'x^'+Math.abs(a-b)]); if(t==='Quotient of powers') return mcStr('x^'+(a+b)+' ÷ x^'+b, 'x^'+a, ['x^'+b,'x^'+(a+b)]); return mcStr('(x^'+a+')^'+b, 'x^'+(a*b), ['x^'+(a+b),'x^'+a]); }; });
+    });
+    addFam('algebra','Functions','Function notation',[8,11], function(g,lv){ return function(){ var a=rnd(2,5),b=rnd(1,6),k=rnd(2,6); return mcNum('f(x) = '+a+'x − '+b+'. Find f('+k+').', a*k-b); }; });
+    addFam('algebra','Sequences','Arithmetic sequences',[9,12], function(g,lv){ return function(){ var a=rnd(1,8),d=rnd(2,6),n=rnd(4,9); return inp('Starts at '+a+', common difference '+d+'. The '+n+'th term = ?', a+(n-1)*d); }; });
+    addFam('algebra','Sequences','Geometric sequences',[9,12], function(g,lv){ return function(){ var a=rnd(1,4),r=rnd(2,3),n=rnd(3,5); return inp('Starts at '+a+', ratio '+r+'. The '+n+'th term = ?', a*Math.pow(r,n-1)); }; });
+    addFam('algebra','Radicals','Simplify radicals',[9,12], function(g,lv){ return function(){ var a=rnd(2,6),b=pick([2,3,5,6,7]); return mcStr('Simplify √'+(a*a*b), a+'√'+b, [(a*b)+'√'+a, a+'√'+(b*b)]); }; });
+    addFam('algebra','Absolute value','Evaluate absolute value',[7,10], function(g,lv){ return function(){ var a=rnd(-15,-1),b=rnd(1,8); return mcNum('|'+a+'| + '+b+' =', Math.abs(a)+b,{nonneg:true}); }; });
+
+    // ----- calculus / precalc -----
+    addFam('calculus','Limits','Limits of polynomials',[11,12], function(){ return function(){ return G.limitPoly(); }; });
+    addFam('calculus','Limits','Limits by factoring',[11,12], function(){ return function(){ return G.limitRational(); }; });
+    ['Power rule','Polynomials','Chain rule','Trig functions','Second derivative'].forEach(function (t) {
+      addFam('calculus','Derivatives','Differentiate: '+t,[11,12], function(){ return function(){ if(t==='Power rule')return G.derivPower(); if(t==='Polynomials')return G.derivPoly(); if(t==='Chain rule')return G.derivChain(); if(t==='Trig functions')return G.derivTrig(); return G.deriv2(); }; });
+    });
+    ['Power rule','Definite integrals'].forEach(function (t) {
+      addFam('calculus','Integrals','Integrate: '+t,[12,12], function(){ return function(){ if(t==='Definite integrals')return G.defIntegral(); return G.integralPower(); }; });
+    });
+    addFam('calculus','Applications','Tangent line slope',[11,12], function(){ return function(){ return G.tangent(); }; });
+    [2,3,5,10].forEach(function (b) {
+      addFam('calculus','Logarithms','Evaluate log base '+b,[10,12], function(g,lv){ return function(){ var e=rnd(1,3+lv); return inp('log base '+b+' of '+Math.pow(b,e)+' =', e); }; }, 2);
+    });
+
+    // ----- science formula generators -----
+    [['Speed = distance ÷ time','speed'],['Density = mass ÷ volume','density'],['Force = mass × acceleration','force'],['Work = force × distance','work'],['Ohm’s law: V = I × R','ohm']].forEach(function (f) {
+      addFam('science','Physics formulas',f[0],[6,11], function(){ return function(){
+        if(f[1]==='speed'){ var d=rnd(20,80),t=rnd(2,5); return inp('An object travels '+d+' m in '+t+' s. Speed (m/s) = ?', Math.round(d/t*100)/100); }
+        if(f[1]==='density'){ var m=rnd(10,90),v=rnd(2,9); return inp('Mass '+m+' g, volume '+v+' cm³. Density (g/cm³) = ?', Math.round(m/v*100)/100); }
+        if(f[1]==='force'){ var mm=rnd(2,20),aa=rnd(2,9); return inp('Mass '+mm+' kg, acceleration '+aa+' m/s². Force (N) = ?', mm*aa); }
+        if(f[1]==='work'){ var ff=rnd(5,30),dd=rnd(2,12); return inp('Force '+ff+' N over '+dd+' m. Work (J) = ?', ff*dd); }
+        var I=rnd(1,9),R=rnd(2,12); return inp('Current '+I+' A, resistance '+R+' Ω. Voltage (V) = ?', I*R); }; });
+    });
+    [['Celsius to Fahrenheit','c2f'],['Kilometers to meters','km2m'],['Metric mass (kilo)','kilo']].forEach(function (f) {
+      addFam('science','Measurement & units',f[0],[4,9], function(){ return function(){ if(f[1]==='c2f'){ var c=pick([0,10,20,25,30,37,100]); return inp(c+'°C in °F = ?', Math.round(c*9/5+32)); } if(f[1]==='km2m'){ var k=rnd(2,20); return inp(k+' km = ? m', k*1000); } var x=rnd(2,9); return inp(x+' kilograms = ? grams', x*1000); }; });
+    });
+
+    // ===== SECOND WAVE — more categories & variety =====
+    // fraction operations per denominator
+    [2,3,4,5,6,8,10,12].forEach(function (d) {
+      addFam('math','Multiply fractions','Multiply a fraction by a whole (denominator '+d+')',[5,9], function(){ return function(){ var a=rnd(1,d-1),w=rnd(2,6); var num=a*w; return inp(w+' × '+a+'/'+d+' =   (write n/'+d+')', num+'/'+d); }; }, 2);
+      addFam('math','Fraction of a number','Find a fraction of a number (1/'+d+')',[4,8], function(){ return function(){ var w=d*rnd(2,8); return inp('1/'+d+' of '+w+' = ?', w/d); }; }, 2);
+      addFam('math','Mixed numbers','Add mixed numbers (denominator '+d+')',[5,9], function(){ return function(){ var w1=rnd(1,4),a=rnd(1,d-1),w2=rnd(1,4),b=rnd(1,d-1); if(a+b>=d) b=Math.max(1,d-a); return inp(w1+' '+a+'/'+d+' + '+w2+' '+b+'/'+d+' =   (write W n/'+d+')', (w1+w2)+' '+(a+b)+'/'+d); }; }, 1);
+    });
+    // multi-digit operations
+    [2,3,4].forEach(function (dg) {
+      var lo=Math.pow(10,dg-1), hi=Math.pow(10,dg)-1;
+      addFam('math','Multi-digit addition',dg+'-digit addition',[2,7], function(){ return function(){ var a=rnd(lo,hi),b=rnd(lo,hi); return inp(a+' + '+b+' =', a+b); }; }, 2);
+      addFam('math','Multi-digit subtraction',dg+'-digit subtraction',[2,7], function(){ return function(){ var a=rnd(lo,hi),b=rnd(lo,a); return inp(a+' − '+b+' =', a-b); }; }, 2);
+    });
+    [[2,1],[2,2],[3,1],[3,2],[4,1]].forEach(function (pr) {
+      addFam('math','Multi-digit multiplication',pr[0]+'-digit by '+pr[1]+'-digit multiplication',[4,8], function(){ return function(){ var a=rnd(Math.pow(10,pr[0]-1),Math.pow(10,pr[0])-1), b=rnd(Math.pow(10,pr[1]-1),Math.pow(10,pr[1])-1); return inp(a+' × '+b+' =', a*b); }; }, 2);
+    });
+    [2,3,4].forEach(function (dg) {
+      addFam('math','Long division',dg+'-digit ÷ 1-digit',[4,7], function(){ return function(){ var b=rnd(2,9),q=rnd(Math.pow(10,dg-2),Math.pow(10,dg-1)); return inp((b*q)+' ÷ '+b+' =', q); }; }, 2);
+    });
+    [10,100,1000].forEach(function (m) {
+      addFam('math','Powers of ten','Multiply by '+m,[3,7], function(){ return function(){ var a=rnd(2,99); return inp(a+' × '+m+' =', a*m); }; }, 1);
+      addFam('math','Powers of ten','Divide by '+m,[3,7], function(){ return function(){ var a=rnd(2,99); return inp((a*m)+' ÷ '+m+' =', a); }; }, 1);
+    });
+    addFam('math','Ratios','Simplify a ratio',[5,9], function(){ return function(){ var k=rnd(2,6),a=k*rnd(1,5),b=k*rnd(1,5),g=gcd(a,b); return mcStr('Simplify '+a+':'+b, (a/g)+':'+(b/g), [a+':'+b,(b/g)+':'+(a/g)]); }; }, 2);
+    addFam('math','Ratios','Equivalent ratios',[5,9], function(){ return function(){ var a=rnd(1,6),b=rnd(1,6),k=rnd(2,5); return inp(a+':'+b+' = '+(a*k)+':?', b*k); }; }, 2);
+    addFam('math','Rates','Unit rate',[6,9], function(){ return function(){ var n=rnd(2,8),per=rnd(2,9); return inp(n+' items cost $'+(n*per)+'. Price per item = $?', per); }; }, 2);
+    addFam('math','Proportions','Solve a proportion',[6,9], function(){ return function(){ var a=rnd(1,5),b=rnd(2,6),k=rnd(2,5); return inp('Solve  '+a+'/'+b+' = x/'+(b*k), a*k); }; }, 2);
+    addFam('math','Comparing numbers','Compare whole numbers',[1,6], function(){ return function(){ var a=rnd(1,9999),b=rnd(1,9999); var ans=a>b?'>':(a<b?'<':'='); return mcStr(a+'  ?  '+b, ans, ['>','<','='].filter(function(z){return z!==ans;})); }; }, 2);
+    addFam('math','Ordering numbers','Order from least to greatest',[2,6], function(){ return function(){ var arr=[rnd(1,99),rnd(1,99),rnd(1,99)]; var so=arr.slice().sort(function(x,y){return x-y;}); return inp('Least of '+arr.join(', ')+' = ?', so[0]); }; }, 1);
+    addFam('math','Estimation','Estimate sums by rounding',[3,7], function(){ return function(){ var a=rnd(11,99),b=rnd(11,99); var est=Math.round(a/10)*10+Math.round(b/10)*10; return mcNum('Estimate '+a+' + '+b+' (round to tens)', est,{spread:10}); }; }, 2);
+    addFam('math','Prime factorization','Prime factorization',[5,8], function(){ return function(){ var n=pick([12,18,20,24,36,40,48,60]); var m=n,pf=[],d2=2; while(m>1){while(m%d2===0){pf.push(d2);m/=d2;}d2++;} return inp('Number of prime factors (with repeats) of '+n+' = ?', pf.length); }; }, 1);
+    addFam('math','Squares & cubes','Square numbers',[5,9], function(){ return function(){ var n=rnd(2,15); return inp(n+'² =', n*n); }; }, 2);
+    addFam('math','Squares & cubes','Cube numbers',[6,10], function(){ return function(){ var n=rnd(2,10); return inp(n+'³ =', n*n*n); }; }, 2);
+    addFam('math','Coordinate plane','Identify the quadrant',[5,9], function(){ return function(){ var x=pick([-3,-2,-1,1,2,3]),y=pick([-3,-2,-1,1,2,3]); var q=(x>0&&y>0)?'I':(x<0&&y>0)?'II':(x<0&&y<0)?'III':'IV'; return mcStr('Which quadrant is ('+x+', '+y+') in?', q, ['I','II','III','IV'].filter(function(z){return z!==q;})); }; }, 1);
+    addFam('math','Number forms','Expanded form',[2,5], function(){ return function(){ var n=rnd(111,9999); return inp('The value of the hundreds place in '+n+' = ?', Math.floor(n/100)%10*100); }; }, 1);
+
+    // geometry second wave
+    ['Rectangular prism','Cube','Cylinder'].forEach(function (shape) {
+      addFam('geometry','Surface area','Surface area of a '+shape.toLowerCase(),[6,10], function(){ return function(){ var a=rnd(2,8),b=rnd(2,8),c=rnd(2,8); if(shape==='Rectangular prism') return inp('Prism '+a+'×'+b+'×'+c+'. Surface area = ?', 2*(a*b+b*c+a*c)); if(shape==='Cube') return inp('Cube side '+a+'. Surface area = ?', 6*a*a); return mcStr('Cylinder r='+a+', h='+b+'. Surface area (use π) = ?', (2*a*a+2*a*b)+'π', [(a*a*b)+'π',(2*a*b)+'π']); }; }, 2);
+    });
+    addFam('geometry','Circles','Circumference',[6,10], function(){ return function(){ var r=rnd(1,9); return mcStr('Circle radius '+r+'. Circumference (use π) = ?', (2*r)+'π', [r+'π',(r*r)+'π',(4*r)+'π']); }; }, 2);
+    addFam('geometry','Area','Area of a trapezoid',[6,10], function(){ return function(){ var b1=rnd(3,10),b2=rnd(3,10),h=rnd(2,8)*2; return inp('Trapezoid bases '+b1+' and '+b2+', height '+h+'. Area = ?', (b1+b2)*h/2); }; }, 2);
+    addFam('geometry','Polygons','Sum of interior angles',[6,10], function(){ return function(){ var n=rnd(3,10); return inp('Sum of interior angles of a '+n+'-sided polygon = ? degrees', (n-2)*180); }; }, 1);
+    addFam('geometry','Transformations','Reflect a point over the x-axis',[5,9], function(){ return function(){ var x=rnd(-6,6),y=rnd(-6,6); return inp('Reflect ('+x+', '+y+') over the x-axis: the new y = ?', -y); }; }, 1);
+    addFam('geometry','Coordinate geometry','Midpoint of a segment',[8,11], function(){ return function(){ var x1=rnd(-6,6)*2,y1=rnd(-6,6)*2,x2=rnd(-6,6)*2,y2=rnd(-6,6)*2; return inp('Midpoint x of ('+x1+','+y1+') and ('+x2+','+y2+') = ?', (x1+x2)/2); }; }, 1);
+    addFam('geometry','Similar figures','Scale factor',[6,10], function(){ return function(){ var k=rnd(2,5),a=rnd(2,8); return inp('A figure is scaled by '+k+'. A side of length '+a+' becomes ?', a*k); }; }, 2);
+
+    // algebra second wave
+    addFam('algebra','Polynomials','Multiply binomials (FOIL)',[9,12], function(){ return function(){ var p=rnd(1,5),q=rnd(1,5); return mcStr('Expand (x + '+p+')(x + '+q+')', 'x² + '+(p+q)+'x + '+p*q, ['x² + '+p*q+'x + '+(p+q),'x² + '+(p+q)+'x + '+(p+q)]); }; }, 2);
+    addFam('algebra','Polynomials','Add polynomials',[9,12], function(){ return function(){ var a=rnd(1,6),b=rnd(1,6),c=rnd(1,6),d=rnd(1,6); return mcStr('('+a+'x + '+b+') + ('+c+'x + '+d+')', (a+c)+'x + '+(b+d), [(a*c)+'x + '+(b+d),(a+c)+'x + '+(b*d)]); }; }, 2);
+    addFam('algebra','Factoring','Factor out the GCF',[8,11], function(){ return function(){ var g=rnd(2,6),a=rnd(1,5),b=rnd(1,5); return mcStr('Factor '+(g*a)+'x + '+(g*b), g+'('+a+'x + '+b+')', [(g*a)+'(x + '+b+')',a+'('+g+'x + '+b+')']); }; }, 2);
+    addFam('algebra','Factoring','Difference of squares',[9,12], function(){ return function(){ var a=rnd(1,9); return mcStr('Factor x² − '+(a*a), '(x + '+a+')(x − '+a+')', ['(x − '+a+')²','(x + '+a+')²']); }; }, 1);
+    addFam('algebra','Graphing lines','Find the y-intercept',[8,11], function(){ return function(){ var m=rnd(1,5),b=rnd(-6,6); return inp('The y-intercept of y = '+m+'x + '+(b<0?'('+b+')':b)+' = ?', b); }; }, 1);
+    addFam('algebra','Graphing lines','Parallel line slopes',[8,11], function(){ return function(){ var m=rnd(-5,5); if(m===0)m=2; return inp('A line parallel to y = '+m+'x + 3 has slope = ?', m); }; }, 1);
+    addFam('algebra','Exponents','Negative exponents',[8,11], function(){ return function(){ var n=rnd(2,6),e=rnd(1,3); return mcStr(n+'^(−'+e+') as a fraction', '1/'+Math.pow(n,e), ['−'+Math.pow(n,e),Math.pow(n,e)+'']); }; }, 1);
+    addFam('algebra','Exponents','Zero exponent',[8,11], function(){ return function(){ var n=rnd(2,20); return inp(n+'^0 =', 1); }; }, 1);
+    addFam('algebra','Word problems','Consecutive integers',[7,10], function(){ return function(){ return G.wpConsec(); }; }, 1);
+    addFam('algebra','Word problems','Age problems',[6,9], function(){ return function(){ return G.wpAge(); }; }, 1);
+
+    // statistics / probability
+    addFam('math','Probability','Probability with a die',[6,10], function(){ return function(){ var fav=rnd(1,5); return inp('Rolling one die, P(roll ≤ '+fav+') as n/6 = ?', fav+'/6'); }; }, 1);
+    addFam('math','Probability','Simple probability',[5,9], function(){ return function(){ var tot=pick([6,8,10,12]),fav=rnd(1,tot-1); return inp('A spinner has '+tot+' equal parts, '+fav+' blue. P(blue) as n/'+tot+' = ?', fav+'/'+tot); }; }, 2);
+    addFam('math','Counting','Permutations',[9,12], function(){ return function(){ var n=rnd(3,6); var f=1; for(var i=2;i<=n;i++)f*=i; return inp(n+'! (number of ways to order '+n+' items) = ?', f); }; }, 1);
+
+    // trigonometry (calculus subject)
+    addFam('calculus','Trigonometry','Degrees to radians',[10,12], function(){ return function(){ var d=pick([90,180,270,360,45,60,30]); var map={30:'π/6',45:'π/4',60:'π/3',90:'π/2',180:'π',270:'3π/2',360:'2π'}; return mcStr(d+'° in radians = ?', map[d], Object.keys(map).map(function(k){return map[k];}).filter(function(v){return v!==map[d];}).slice(0,3)); }; }, 1);
+    addFam('calculus','Trigonometry','Sine of special angles',[10,12], function(){ return function(){ var a=pick([0,30,90]); var map={0:'0',30:'1/2',90:'1'}; return mcStr('sin('+a+'°) = ?', map[a], ['0','1/2','1'].filter(function(v){return v!==map[a];})); }; }, 1);
+
+    // science second wave
+    addFam('science','Chemistry calculations','Protons from atomic number',[7,11], function(){ return function(){ var z=rnd(1,20); return inp('An element with atomic number '+z+' has how many protons?', z); }; }, 1);
+    addFam('science','Energy','Kinetic energy (½mv²)',[9,12], function(){ return function(){ var m=rnd(1,6)*2,v=rnd(1,5); return inp('Mass '+m+' kg at '+v+' m/s. KE = ½mv² = ? J', 0.5*m*v*v); }; }, 1);
+    addFam('science','Waves','Wave speed = frequency × wavelength',[8,12], function(){ return function(){ var f=rnd(2,9),w=rnd(2,9); return inp('Frequency '+f+' Hz, wavelength '+w+' m. Speed = ? m/s', f*w); }; }, 1);
+    addFam('science','Genetics','Punnett square ratios',[7,11], function(){ return function(){ return mcStr('Crossing Aa × Aa, what fraction of offspring are recessive (aa)?', '1/4', ['1/2','3/4','1/1']); }; }, 1);
+
+    // ===== generated Reading & Language (now infinite) =====
+    var NOUNS=['dog','city','freedom','teacher','river','courage','apple','mountain','idea','friend'];
+    var VERBS=['run','jump','write','think','build','sing','read','create','explore','solve'];
+    var ADJ=['bright','quick','ancient','gentle','fierce','curious','massive','silent','joyful','tiny'];
+    var ADV=['quickly','silently','bravely','often','carefully','rarely','loudly','gently','soon','well'];
+    addFam('reading','Parts of speech','Identify the noun',[1,6], function(){ return function(){ var n=pick(NOUNS); return mcStr('Which word is a noun?', n, [pick(VERBS),pick(ADJ),pick(ADV)]); }; }, 2);
+    addFam('reading','Parts of speech','Identify the verb',[1,6], function(){ return function(){ var v=pick(VERBS); return mcStr('Which word is a verb?', v, [pick(NOUNS),pick(ADJ),pick(ADV)]); }; }, 2);
+    addFam('reading','Parts of speech','Identify the adjective',[2,7], function(){ return function(){ var a=pick(ADJ); return mcStr('Which word is an adjective?', a, [pick(NOUNS),pick(VERBS),pick(ADV)]); }; }, 2);
+    addFam('reading','Parts of speech','Identify the adverb',[3,8], function(){ return function(){ var a=pick(ADV); return mcStr('Which word is an adverb?', a, [pick(NOUNS),pick(VERBS),pick(ADJ)]); }; }, 2);
+    var PLUR={'child':'children','mouse':'mice','foot':'feet','tooth':'teeth','goose':'geese','man':'men','woman':'women','person':'people','leaf':'leaves','knife':'knives'};
+    addFam('reading','Grammar','Irregular plurals',[2,7], function(){ return function(){ var k=pick(Object.keys(PLUR)); return mcStr('What is the plural of "'+k+'"?', PLUR[k], [k+'s',k+'es'].concat([pick(Object.keys(PLUR).map(function(x){return PLUR[x];}))]).slice(0,3)); }; }, 2);
+    var PAST={'run':'ran','go':'went','eat':'ate','swim':'swam','fly':'flew','see':'saw','take':'took','give':'gave','write':'wrote','begin':'began'};
+    addFam('reading','Grammar','Past tense verbs',[2,7], function(){ return function(){ var k=pick(Object.keys(PAST)); return mcStr('What is the past tense of "'+k+'"?', PAST[k], [k+'ed',k+'d',pick(Object.keys(PAST).map(function(x){return PAST[x];}))].slice(0,3)); }; }, 2);
+    var CONTR={"do not":"don't","cannot":"can't","I am":"I'm","they are":"they're","it is":"it's","we will":"we'll","you have":"you've","she is":"she's","did not":"didn't","would not":"wouldn't"};
+    addFam('reading','Grammar','Contractions',[2,6], function(){ return function(){ var k=pick(Object.keys(CONTR)); return mcStr('Which is the contraction for "'+k+'"?', CONTR[k], Object.keys(CONTR).map(function(x){return CONTR[x];}).filter(function(v){return v!==CONTR[k];}).slice(0,3)); }; }, 2);
+    addFam('reading','Word study','Count the syllables',[1,5], function(){ return function(){ var words={'cat':1,'apple':2,'banana':3,'butterfly':3,'elephant':3,'sun':1,'water':2,'computer':3,'happy':2,'dinosaur':3}; var k=pick(Object.keys(words)); return mcNum('How many syllables are in "'+k+'"?', words[k], {nonneg:true,spread:2}); }; }, 1);
+
+    // ===== generated Spanish (now infinite) =====
+    var ESNUM={'uno':'1','dos':'2','tres':'3','cuatro':'4','cinco':'5','seis':'6','siete':'7','ocho':'8','nueve':'9','diez':'10'};
+    addFam('spanish','Numbers','Spanish numbers',[1,8], function(){ return function(){ var k=pick(Object.keys(ESNUM)); return mcStr('What number is "'+k+'"?', ESNUM[k], Object.keys(ESNUM).map(function(x){return ESNUM[x];}).filter(function(v){return v!==ESNUM[k];}).slice(0,3)); }; }, 2);
+    var ESVERB=[['hablar','o','hablo'],['comer','o','como'],['vivir','o','vivo'],['estudiar','o','estudio'],['trabajar','o','trabajo']];
+    addFam('spanish','Verb conjugation','Present tense (yo)',[5,12], function(){ return function(){ var v=pick(ESVERB); return inp('Conjugate "'+v[0]+'" for yo (I ...):', v[2]); }; }, 2);
+
+    SUBJECTS.forEach(function (s) { s.strandList = Object.keys(s.strands || {}); });
+  })();
 
   /* ---------------- SPEED DRILLS ---------------- */
   var SPEED = [
@@ -566,6 +872,8 @@
     },
     speed: function (kind, level) { var s = SPEED_INDEX[kind]; if (!s) return null; var q = s.gen(level || 1); q.kind = kind; return q; },
     skillsForGrade: function (subjectId, grade) { var gn = gradeNum(grade), s = this.subject(subjectId); if (!s) return []; return s.skills.filter(function (k) { return gn >= k.grades[0] && gn <= k.grades[1]; }); },
+    strandsFor: function (subjectId) { var s = this.subject(subjectId); if (!s) return []; var seen = {}, out = []; s.skills.forEach(function (k) { var st = k.strand || 'Essentials'; if (!seen[st]) { seen[st] = 1; out.push(st); } }); return out; },
+    categoryCount: function () { var seen = {}; SUBJECTS.forEach(function (s) { s.skills.forEach(function (k) { seen[s.id + '|' + (k.strand || 'Essentials')] = 1; }); }); return Object.keys(seen).length; },
     // Build a mixed assessment of n questions for a subject at a grade (or 'all').
     buildTest: function (subjectId, grade, n) {
       n = n || 30;

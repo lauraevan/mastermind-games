@@ -143,6 +143,57 @@
         { q: 'What does the author recommend for building the habit?', choices: ['Finishing a hundred books a year', 'Reading only difficult classics', 'Making reading an ordinary daily routine', 'Reading as fast as possible'], answer: 'Making reading an ordinary daily routine' },
         { q: 'The phrase "Consistency, not intensity" suggests the author values...', choices: ['reading a lot all at once', 'reading a little, regularly', 'reading only intense books', 'avoiding reading'], answer: 'reading a little, regularly' }
       ]
+    },
+    {
+      id: 'wolf', title: 'The Boy Who Cried Wolf', author: 'Aesop', genre: 'Fable',
+      level: 'K-2', minutes: 2,
+      text: [
+        'There once was a shepherd boy who was bored as he sat on the hillside watching the village sheep.',
+        'To amuse himself he took a great breath and sang out, "Wolf! Wolf! The wolf is chasing the sheep!"',
+        'The villagers came running up the hill to help the boy drive the wolf away. But when they arrived they found no wolf at all. The boy laughed at the sight of their angry faces.',
+        '"Don\'t cry \'wolf\', shepherd boy," said the villagers, "when there is no wolf!" They went grumbling back down the hill.',
+        'Later, the boy sang out again, "Wolf! Wolf!" And again the villagers came running, only to be tricked once more.',
+        'Then, one evening, a real wolf truly did come out from the forest. The boy cried out as loudly as he could, "Wolf! Wolf!" But the villagers thought he was tricking them again, and so they did not come.',
+        'At sunset, the boy sat weeping. An old man came to comfort him and heard what had happened. "Nobody believes a liar," he said gently, "even when he is telling the truth."'
+      ],
+      questions: [
+        { q: 'Why did the boy first cry "Wolf"?', choices: ['A wolf appeared', 'He was bored and wanted to trick the villagers', 'He was hungry', 'He was lost'], answer: 'He was bored and wanted to trick the villagers' },
+        { q: 'Why did the villagers not come the last time?', choices: ['They were asleep', 'They no longer believed him', 'They were afraid', 'They moved away'], answer: 'They no longer believed him' },
+        { q: 'What is the lesson of this fable?', choices: ['Nobody believes a liar, even when telling the truth', 'Wolves are dangerous', 'Never watch sheep', 'Always shout for help'], answer: 'Nobody believes a liar, even when telling the truth' }
+      ]
+    },
+    {
+      id: 'sky', title: 'Why the Sky Is Blue', author: 'Mastermind Academy', genre: 'Informational',
+      level: '6-8', minutes: 4,
+      text: [
+        'Look up on a clear day and the sky is a deep, even blue. Look at a sunset and the same sky glows orange and red. The sky has no color of its own, so where do these colors come from? The answer lies in sunlight and the air itself.',
+        'Sunlight looks white, but it is actually a mixture of every color of the rainbow. Each color travels as a wave, and the waves are not all the same length. Blue and violet light travel in short, tight waves, while red and orange light travel in long, stretched-out waves.',
+        'As sunlight streams through the atmosphere, it collides with the countless tiny molecules of gas that make up the air. These molecules scatter the short blue waves far more strongly than the long red ones — a process scientists call Rayleigh scattering. The blue light bounces in every direction, filling the whole sky, so no matter where you look, blue light reaches your eyes.',
+        'This also explains the sunset. When the sun sits low on the horizon, its light must pass through much more air to reach you. Along that long path, the blue light is scattered away completely, leaving the longer red and orange waves to travel straight through. What remains is the warm glow we admire at the end of the day.',
+        'So the sky is not painted blue, and the sunset is not painted red. Both colors are simply sunlight, sorted by the air into the parts we happen to see.'
+      ],
+      questions: [
+        { q: 'What is white sunlight actually made of?', choices: ['Only blue light', 'A mixture of every color', 'Air molecules', 'Heat'], answer: 'A mixture of every color' },
+        { q: 'Why does the sky look blue?', choices: ['The ocean reflects onto it', 'Blue light is scattered most by air molecules', 'The sky is painted blue', 'Red light is heavier'], answer: 'Blue light is scattered most by air molecules' },
+        { q: 'Why do sunsets look red and orange?', choices: ['The sun changes color', 'Light passes through more air, scattering the blue away', 'Clouds turn red', 'The air cools down'], answer: 'Light passes through more air, scattering the blue away' },
+        { q: 'The word "scatter" in the passage most nearly means to', choices: ['gather together', 'send off in many directions', 'destroy', 'darken'], answer: 'send off in many directions' }
+      ]
+    },
+    {
+      id: 'gettysburg', title: 'The Gettysburg Address', author: 'Abraham Lincoln', genre: 'Historical Speech',
+      level: '9-12', minutes: 3,
+      text: [
+        'Four score and seven years ago our fathers brought forth on this continent, a new nation, conceived in Liberty, and dedicated to the proposition that all men are created equal.',
+        'Now we are engaged in a great civil war, testing whether that nation, or any nation so conceived and so dedicated, can long endure. We are met on a great battle-field of that war. We have come to dedicate a portion of that field, as a final resting place for those who here gave their lives that that nation might live. It is altogether fitting and proper that we should do this.',
+        'But, in a larger sense, we can not dedicate — we can not consecrate — we can not hallow — this ground. The brave men, living and dead, who struggled here, have consecrated it, far above our poor power to add or detract. The world will little note, nor long remember what we say here, but it can never forget what they did here.',
+        'It is for us the living, rather, to be dedicated here to the unfinished work which they who fought here have thus far so nobly advanced. It is rather for us to be here dedicated to the great task remaining before us — that from these honored dead we take increased devotion to that cause for which they gave the last full measure of devotion — that we here highly resolve that these dead shall not have died in vain — that this nation, under God, shall have a new birth of freedom — and that government of the people, by the people, for the people, shall not perish from the earth.'
+      ],
+      questions: [
+        { q: '"Four score and seven years" refers to how many years?', choices: ['47', '87', '407', '87 months'], answer: '87' },
+        { q: 'According to Lincoln, who has truly consecrated the ground?', choices: ['The speakers at the ceremony', 'The brave men who struggled there', 'The government', 'Future generations'], answer: 'The brave men who struggled there' },
+        { q: 'What "unfinished work" does Lincoln call the living to?', choices: ['Building monuments', 'Preserving the nation and its freedom', 'Writing speeches', 'Ending all ceremonies'], answer: 'Preserving the nation and its freedom' },
+        { q: 'The famous closing describes government of, by, and for the', choices: ['soldiers', 'people', 'states', 'founders'], answer: 'people' }
+      ]
     }
   ];
 

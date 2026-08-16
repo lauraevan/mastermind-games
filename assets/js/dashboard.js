@@ -77,7 +77,7 @@
     a.innerHTML = '<div class="rt" style="color:' + r.s.color + '">' + ic(r.s.icon, { size: 15 }) + r.s.name + '</div>' +
       '<b style="display:block;margin-bottom:8px;font-size:.92rem">' + r.k.name + '</b>' +
       '<div class="bar"><i style="width:' + Math.max(2, m) + '%;background:' + r.s.color + '"></i></div>' +
-      '<div class="muted small" style="margin-top:5px">' + (m >= 100 ? 'Mastered' : m > 0 ? m + '% mastery' : 'Not started') + '</div>';
+      '<div class="muted small" style="margin-top:5px">' + (m >= 100 ? 'Mastered' : m > 0 ? 'SmartScore ' + m : 'Not started') + '</div>';
     recWrap.appendChild(a);
   });
 
