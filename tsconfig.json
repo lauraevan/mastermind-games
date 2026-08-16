@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "module": "none",
+    "ignoreDeprecations": "6.0",
+    "lib": ["ES2017", "DOM", "DOM.Iterable"],
+    "outDir": "atlas",
+    "rootDir": "src/vault",
+    "strict": true,
+    "noImplicitAny": true,
+    "removeComments": false,
+    "noEmitOnError": false,
+    "sourceMap": false,
+    "declaration": false
+  },
+  "include": ["src/vault/**/*.ts"]
+}

@@ -1,0 +1,71 @@
+<title>Math Practice · Mastermind Academy</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/main.css">
+<link rel="stylesheet" href="../assets/css/practice.css">
+
+<div id="nav"></div>
+
+<main class="prac wrap">
+  <div class="prac-head">
+    <div class="ic" id="subIcon"></div>
+    <div>
+      <h1 id="subName">Subject</h1>
+      <p id="subBlurb"></p>
+    </div>
+    <div class="spacer"></div>
+    <a class="btn ghost" href="../dashboard.html">← Dashboard</a>
+    <span class="pill" id="subGradeTag">Grade</span>
+  </div>
+
+  <div class="prac-cols">
+    <aside class="skill-panel">
+      <h3>Choose a skill</h3>
+      <div id="skillList"></div>
+    </aside>
+
+    <section>
+      <div class="practice-empty" id="practiceEmpty">
+        <div class="big">👈</div>
+        <h2>Pick a skill to begin</h2>
+        <p>Choose any skill from the list to start practicing. Problems adjust to your grade level.</p>
+      </div>
+
+      <div class="practice-card" id="practiceCard" style="display:none">
+        <div class="q-top">
+          <div><span class="chip grey" id="skillTag">Subject</span>
+            <h2 id="skillTitle" style="margin:8px 0 0">Skill</h2></div>
+          <div class="mastery"><span class="bar"><i id="masteryBar" style="width:3%"></i></span>
+            <span class="soft" id="masteryText" style="font-weight:800;font-size:.82rem;white-space:nowrap">0%</span></div>
+        </div>
+
+        <div class="question" id="questionText"></div>
+        <div id="answerArea"></div>
+        <div class="feedback" id="feedback" style="display:none"></div>
+
+        <div class="prac-actions">
+          <button class="btn lg" id="nextBtn" style="display:none">Next question →</button>
+        </div>
+
+        <div class="session-bar">
+          <div class="sc"><b id="sesSolved">0</b><span>Answered</span></div>
+          <div class="sc"><b id="sesAcc">0%</b><span>Accuracy</span></div>
+          <div class="sc"><b id="sesXP">0</b><span>XP earned</span></div>
+          <div class="sc"><b id="sesRun">0</b><span>In a row</span></div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="toast-host"></div>
+<div id="footer"></div>
+
+<script src="../assets/js/store.js"></script>
+<script src="../assets/js/problems.js"></script>
+<script src="../assets/js/layout.js"></script>
+<script src="../assets/js/secret.js"></script>
+<script>window.SUBJECT_ID = "math"; Layout.mount({ active: 'subjects' });</script>
+<script src="../assets/js/practice.js"></script>

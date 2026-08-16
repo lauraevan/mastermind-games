@@ -1,0 +1,8 @@
+node_modules/
+.claude/settings.local.json
+*.log
+.DS_Store
+.cache/
+# local build/test scratch
+profile/
+__seed*.html
