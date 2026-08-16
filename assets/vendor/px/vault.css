@@ -1,31 +1,40 @@
-/* learnify — pitch black. No gradients, minimal radius, tightly
-   packed wall of icons. Labels appear on hover only. */
+/* pitch black. No gradients, minimal radius, tightly packed icons.
+   Sources hide behind a tiny pop-out button. */
 * { box-sizing: border-box; }
 html, body { margin: 0; min-height: 100%; background: #000; color: #d7d7d7;
   font-family: 'Nunito', ui-sans-serif, system-ui, sans-serif; font-weight: 700; }
 ::selection { background: #222; }
 [hidden] { display: none !important; }
 
-.top { position: sticky; top: 0; z-index: 20; background: #000; border-bottom: 1px solid #161616; }
-.top-in { max-width: 1600px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.top { position: sticky; top: 0; z-index: 30; background: #000; border-bottom: 1px solid #161616; }
+.top-in { max-width: 1600px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .mark { width: 22px; height: 22px; border-radius: 3px; background: #1c1c1c; border: 1px solid #2a2a2a; flex: 0 0 auto; }
-.search { flex: 1; min-width: 160px; display: flex; align-items: center; gap: 7px; background: #0b0b0b; border: 1px solid #1c1c1c; border-radius: 4px; padding: 0 10px; }
+.search { flex: 1; min-width: 150px; display: flex; align-items: center; gap: 7px; background: #0b0b0b; border: 1px solid #1c1c1c; border-radius: 4px; padding: 0 10px; }
 .search svg { color: #555; flex: 0 0 auto; }
 .search input { flex: 1; background: transparent; border: 0; color: #ddd; font: inherit; font-weight: 700; padding: 8px 0; outline: none; }
 .count { color: #666; font-size: .8rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
 .back { color: #666; display: inline-flex; padding: 6px; border-radius: 4px; }
 .back:hover { color: #ccc; background: #111; }
 
-.sources { max-width: 1600px; margin: 0 auto; padding: 9px 16px 0; display: flex; gap: 5px; flex-wrap: wrap; }
-.src-chip { font: inherit; font-size: .74rem; font-weight: 700; padding: 4px 9px; border-radius: 4px;
-  background: #0b0b0b; border: 1px solid #1c1c1c; color: #7a7a7a; cursor: pointer; }
-.src-chip b { color: #4a4a4a; margin-left: 3px; }
-.src-chip:hover { border-color: #333; color: #ccc; }
+/* tiny source button + popout */
+.src-wrap { position: relative; flex: 0 0 auto; }
+.src-btn { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-weight: 700; font-size: .78rem;
+  background: #0b0b0b; border: 1px solid #1c1c1c; color: #9a9a9a; border-radius: 4px; padding: 7px 10px; cursor: pointer; }
+.src-btn:hover { border-color: #333; color: #ddd; }
+.src-btn svg { color: #666; }
+.src-btn #srcLabel { color: #ddd; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.src-panel { position: absolute; right: 0; top: calc(100% + 6px); z-index: 40; width: 240px; max-height: 60vh; overflow: auto;
+  background: #0a0a0a; border: 1px solid #222; border-radius: 6px; padding: 8px; display: flex; flex-direction: column; gap: 4px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.6); }
+.src-panel .src-chip { width: 100%; text-align: left; display: flex; justify-content: space-between; }
+.src-chip { font: inherit; font-size: .78rem; font-weight: 700; padding: 6px 9px; border-radius: 4px;
+  background: #0f0f0f; border: 1px solid #1c1c1c; color: #9a9a9a; cursor: pointer; }
+.src-chip b { color: #4a4a4a; }
+.src-chip:hover { border-color: #333; color: #ddd; }
 .src-chip.on { background: #1a1a1a; color: #eee; border-color: #383838; }
 .src-chip.on b { color: #888; }
 
-/* tightly packed, small, square-ish tiles */
-.grid { max-width: 1600px; margin: 0 auto; padding: 10px 16px 60px;
+.grid { max-width: 1600px; margin: 0 auto; padding: 12px 16px 60px;
   display: grid; grid-template-columns: repeat(auto-fill, minmax(78px, 1fr)); gap: 4px; }
 .tile { position: relative; border: 1px solid #141414; border-radius: 4px; padding: 0; cursor: pointer;
   overflow: hidden; aspect-ratio: 1 / 1; display: block; background: #080808; }

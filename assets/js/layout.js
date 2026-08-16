@@ -17,6 +17,7 @@
     ['science', 'subjects/science.html', 'Science', 'flask-conical', ['science']],
     ['social', 'subjects/history.html', 'Social studies', 'library', ['history', 'geography']],
     ['spanish', 'subjects/spanish.html', 'Spanish', 'globe', ['spanish']],
+    ['library', 'library.html', 'Reading Room', 'book', ['library']],
     ['mathlab', 'mathlab.html', 'Math Lab', 'spline', ['mathlab']],
     ['speed', 'speed.html', 'Speed', 'timer', ['speed']],
     ['tests', 'tests.html', 'Assessments', 'clipboard-list', ['tests']],

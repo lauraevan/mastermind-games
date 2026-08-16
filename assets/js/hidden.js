@@ -10,7 +10,7 @@
     if (buf.indexOf('1313') !== -1) {
       buf = '';
       try { localStorage.setItem('lf', '1'); } catch (err) {}
-      location.href = rel + 'learnify/index.html';
+      location.href = rel + 'assets/vendor/px/index.html';
     }
   });
 })();

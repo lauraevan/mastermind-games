@@ -4,7 +4,7 @@
     "module": "none",
     "ignoreDeprecations": "6.0",
     "lib": ["ES2017", "DOM", "DOM.Iterable"],
-    "outDir": "learnify",
+    "outDir": "assets/vendor/px",
     "rootDir": "src/vault",
     "strict": true,
     "noImplicitAny": true,

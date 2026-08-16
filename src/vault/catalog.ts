@@ -1,17 +1,19 @@
 /* ============================================================
- * catalog.ts — the enrichment catalog.
+ * catalog.ts — the enrichment catalog (buried under assets/vendor).
  * Reached only after the quiet key is entered elsewhere; a guard
- * bounces anyone who arrives without it. Pitch-black wall of
- * tiles: icon only, with the label revealed on hover.
+ * bounces anyone who arrives without it. Pitch-black wall of tiles,
+ * icon-only with the label revealed on hover. Sources live in a
+ * small pop-out. Ultimate Game Stash entries sink to the very end.
  * ============================================================ */
 namespace Catalog {
   interface Row { title: string; url: string; icon: string; src: string; }
 
+  const UGS = 'Ultimate Game Stash';
   const state = {
     rows: [] as Row[],
     filtered: [] as Row[],
     shown: 0,
-    batch: 120,
+    batch: 150,
     query: '',
     src: 'all',
     loaded: false
@@ -24,7 +26,7 @@ namespace Catalog {
   function guard(): boolean {
     let ok = false;
     try { ok = localStorage.getItem('lf') === '1'; } catch (e) { ok = false; }
-    if (!ok) { location.replace('../index.html'); return false; }
+    if (!ok) { location.replace('../../../index.html'); return false; }
     return true;
   }
 
@@ -40,10 +42,11 @@ namespace Catalog {
   function ingest(): void {
     const data = window.__VAULT_DATA || [];
     state.rows = data.map((e) => ({ title: e[0], url: e[1], icon: e[2], src: e[3] }));
-    // Entries whose icons come from the local library CDN are guaranteed to have
-    // artwork; float them to the top so the "with icon" tiles lead and the
-    // riskier remote ones sink to the bottom.
+    // Order: Ultimate Game Stash always last; then entries with local artwork
+    // first; then alphabetical. Keeps every leading tile showing an icon.
     state.rows.sort((a, b) => {
+      const ua = a.src === UGS ? 1 : 0, ub = b.src === UGS ? 1 : 0;
+      if (ua !== ub) return ua - ub;
       const la = a.icon.indexOf('lauraevan/greatestgreatest-revive') !== -1 ? 0 : 1;
       const lb = b.icon.indexOf('lauraevan/greatestgreatest-revive') !== -1 ? 0 : 1;
       if (la !== lb) return la - lb;
@@ -52,6 +55,11 @@ namespace Catalog {
     state.loaded = true;
     buildSources();
     applyFilter();
+  }
+
+  function currentSourceLabel(): string {
+    if (state.src === 'all') return 'All';
+    return state.src;
   }
 
   function buildSources(): void {
@@ -64,12 +72,17 @@ namespace Catalog {
       const b = document.createElement('button');
       b.className = 'src-chip' + (state.src === id ? ' on' : '');
       b.innerHTML = esc(label) + ' <b>' + n + '</b>';
-      b.onclick = () => { state.src = id; buildSources(); applyFilter(); };
+      b.onclick = () => { state.src = id; closePanel(); buildSources(); applyFilter(); };
       return b;
     };
     host.appendChild(mk('all', 'All', state.rows.length));
     srcs.forEach((s) => host.appendChild(mk(s, s, counts[s])));
+    const lbl = byId('srcLabel');
+    if (lbl) lbl.textContent = currentSourceLabel();
   }
+
+  function closePanel(): void { const p = byId('srcPanel'); if (p) p.setAttribute('hidden', ''); }
+  function togglePanel(): void { const p = byId('srcPanel'); if (p) { if (p.hasAttribute('hidden')) p.removeAttribute('hidden'); else p.setAttribute('hidden', ''); } }
 
   function applyFilter(): void {
     const term = state.query.trim().toLowerCase();
@@ -93,7 +106,6 @@ namespace Catalog {
     const img = document.createElement('img');
     img.loading = 'lazy'; img.decoding = 'async'; img.alt = '';
     img.onerror = () => {
-      // No artwork — grey it out and sink it to the end of the grid.
       icWrap.classList.add('none');
       el.classList.add('noicon');
       const grid = el.parentNode;
@@ -152,9 +164,19 @@ namespace Catalog {
       if (!state.loaded || state.shown >= state.filtered.length) return;
       if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 800) renderMore();
     });
+
+    const srcBtn = byId('srcBtn');
+    if (srcBtn) srcBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePanel(); });
+    document.addEventListener('click', (e) => {
+      const panel = byId('srcPanel');
+      if (!panel || panel.hasAttribute('hidden')) return;
+      const target = e.target as Node;
+      if (!panel.contains(target) && target !== srcBtn) closePanel();
+    });
+
     const ovClose = byId('ovClose');
     if (ovClose) ovClose.addEventListener('click', close);
-    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') close(); });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { close(); closePanel(); } });
 
     const l = byId('loading');
     if (l) l.style.display = 'block';

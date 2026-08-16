@@ -1,0 +1,175 @@
+<title>Reading Room — Mastermind Academy</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="assets/css/main.css">
+<style>
+  .rr { padding: 24px 0 50px; }
+  .rr-head { max-width: 680px; margin-bottom: 20px; }
+  .lvl-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 20px; }
+  .lvl-tab { border: 0; background: #fff; box-shadow: var(--sh); border-radius: 999px; padding: 8px 16px; font: inherit; font-weight: 800; color: var(--ink-2); cursor: pointer; }
+  .lvl-tab.on { background: var(--brand); color: #fff; }
+  .books { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .book { display: block; text-align: left; border: 0; background: #fff; border-radius: var(--r2); box-shadow: var(--sh); overflow: hidden; cursor: pointer; font: inherit; color: inherit; }
+  .book:hover { transform: translateY(-3px); box-shadow: var(--sh-2); }
+  .book .spine { height: 8px; }
+  .book .bd { padding: 16px 18px; }
+  .book .genre { font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
+  .book h3 { margin: 8px 0 3px; font-size: 1.15rem; }
+  .book .author { color: var(--muted); font-size: .88rem; font-weight: 700; }
+  .book .meta { color: var(--faint); font-size: .8rem; font-weight: 800; margin-top: 10px; display: flex; gap: 12px; }
+  .book .meta span { display: inline-flex; align-items: center; gap: 4px; }
+
+  .reader { display: none; max-width: 760px; margin: 0 auto; }
+  .reader.on { display: block; }
+  .reader .rmeta { color: var(--faint); font-weight: 700; font-size: .88rem; margin-bottom: 22px; padding-bottom: 18px; border-bottom: 1px solid var(--line); display: flex; gap: 12px; flex-wrap: wrap; }
+  .reader .rtext { font-size: 1.1rem; line-height: 1.85; color: var(--ink-2); font-weight: 600; }
+  .reader .rtext p { margin: 0 0 1.2em; }
+  .reader .rtext p:first-child::first-letter { font-size: 3rem; font-weight: 900; float: left; line-height: .8; padding: 4px 10px 0 0; color: var(--brand-dark); font-family: var(--serif); }
+  .comp { margin-top: 30px; background: #fff; border-radius: var(--r2); box-shadow: var(--sh); padding: 22px; }
+  .comp h2 { margin-top: 0; font-size: 1.2rem; }
+  .cq { margin-bottom: 18px; }
+  .cq .qz { font-weight: 800; margin-bottom: 8px; }
+  .cq .opts { display: grid; gap: 8px; }
+  .cq .opt { border: 0; background: var(--surface-2); border-radius: 10px; padding: 11px 14px; font: inherit; font-weight: 700; text-align: left; cursor: pointer; box-shadow: inset 0 0 0 2px transparent; }
+  .cq .opt:hover { box-shadow: inset 0 0 0 2px var(--blue); }
+  .cq .opt.sel { box-shadow: inset 0 0 0 2px var(--blue); background: var(--blue-soft); }
+  .cq .opt.right { background: var(--ok-soft); box-shadow: inset 0 0 0 2px var(--ok); color: var(--ok); }
+  .cq .opt.wrong { background: var(--danger-soft); box-shadow: inset 0 0 0 2px var(--danger); color: var(--danger); }
+  .rr-score { font-weight: 800; }
+  @media (max-width: 820px){ .books { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px){ .books { grid-template-columns: 1fr; } }
+</style>
+
+<div id="nav"></div>
+
+<main class="rr wrap">
+  <!-- LIBRARY VIEW -->
+  <div id="libraryView">
+    <div class="rr-head">
+      <span class="eyebrow">Reading Room</span>
+      <h1>Read a little, grow a lot</h1>
+      <p class="muted" style="font-weight:700">A shelf of stories, fables and true accounts. Read a passage, then answer a few questions to check your understanding. Great for building vocabulary and comprehension.</p>
+    </div>
+    <div class="lvl-tabs" id="lvlTabs"></div>
+    <div class="books" id="books"></div>
+  </div>
+
+  <!-- READER VIEW -->
+  <div class="reader" id="reader">
+    <button class="btn ghost sm" id="backBtn" style="margin-bottom:16px"><span data-icon="arrow-left" data-size="15"></span> Back to the shelf</button>
+    <h1 id="rTitle"></h1>
+    <div class="rmeta" id="rMeta"></div>
+    <div class="rtext" id="rText"></div>
+
+    <div class="comp" id="comp">
+      <h2>Check your understanding</h2>
+      <div id="compQs"></div>
+      <button class="btn" id="compSubmit"><span data-icon="check" data-size="16"></span> Check answers</button>
+      <div id="compResult" style="margin-top:14px"></div>
+    </div>
+  </div>
+</main>
+
+<div class="toast-host"></div>
+<div id="footer"></div>
+
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/reading.js"></script>
+<script src="assets/js/layout.js"></script>
+<script src="assets/js/hidden.js"></script>
+<script>
+  Layout.mount({ active: 'library' });
+
+  var LEVELS = ['All', 'K-2', '3-5', '6-8', '9-12'];
+  var LVL_COLORS = { 'K-2': 'var(--s-reading)', '3-5': 'var(--s-geometry)', '6-8': 'var(--s-algebra)', '9-12': 'var(--s-calculus)' };
+  var current = 'All';
+
+  var tabs = document.getElementById('lvlTabs');
+  LEVELS.forEach(function (lv) {
+    var b = document.createElement('button');
+    b.className = 'lvl-tab' + (lv === 'All' ? ' on' : '');
+    b.textContent = lv === 'All' ? 'All levels' : 'Grades ' + lv;
+    b.onclick = function () { current = lv; [].forEach.call(tabs.children, function (c) { c.classList.remove('on'); }); b.classList.add('on'); renderBooks(); };
+    tabs.appendChild(b);
+  });
+
+  function renderBooks() {
+    var host = document.getElementById('books'); host.innerHTML = '';
+    READING.filter(function (bk) { return current === 'All' || bk.level === current; }).forEach(function (bk) {
+      var color = LVL_COLORS[bk.level] || 'var(--brand)';
+      var b = document.createElement('button');
+      b.className = 'book';
+      b.innerHTML = '<div class="spine" style="background:' + color + '"></div><div class="bd">' +
+        '<div class="genre" style="color:' + color + '">' + bk.genre + '</div>' +
+        '<h3>' + bk.title + '</h3><div class="author">by ' + bk.author + '</div>' +
+        '<div class="meta"><span>' + Icons.icon('graduation-cap', { size: 14 }) + 'Grades ' + bk.level + '</span>' +
+        '<span>' + Icons.icon('clock', { size: 14 }) + bk.minutes + ' min</span>' +
+        '<span>' + Icons.icon('list-checks', { size: 14 }) + bk.questions.length + ' questions</span></div></div>';
+      b.onclick = function () { openBook(bk); };
+      host.appendChild(b);
+    });
+    Icons.hydrate();
+  }
+
+  var answers = [];
+  function openBook(bk) {
+    document.getElementById('libraryView').style.display = 'none';
+    document.getElementById('reader').classList.add('on');
+    document.getElementById('rTitle').textContent = bk.title;
+    document.getElementById('rMeta').innerHTML =
+      '<span>by <b>' + bk.author + '</b></span><span>' + bk.genre + '</span><span>Grades ' + bk.level + '</span><span>' + bk.minutes + ' min read</span>';
+    document.getElementById('rText').innerHTML = bk.text.map(function (p) { return '<p>' + p + '</p>'; }).join('');
+
+    answers = new Array(bk.questions.length).fill(null);
+    var qHost = document.getElementById('compQs'); qHost.innerHTML = '';
+    bk.questions.forEach(function (q, qi) {
+      var wrap = document.createElement('div'); wrap.className = 'cq';
+      var opts = q.choices.map(function (c, ci) { return '<button class="opt" data-q="' + qi + '" data-c="' + ci + '">' + c + '</button>'; }).join('');
+      wrap.innerHTML = '<div class="qz">' + (qi + 1) + '. ' + q.q + '</div><div class="opts">' + opts + '</div>';
+      qHost.appendChild(wrap);
+    });
+    [].forEach.call(qHost.querySelectorAll('.opt'), function (btn) {
+      btn.onclick = function () {
+        var qi = +btn.dataset.q;
+        answers[qi] = btn.textContent;
+        [].forEach.call(qHost.querySelectorAll('.opt[data-q="' + qi + '"]'), function (o) { o.classList.remove('sel'); });
+        btn.classList.add('sel');
+      };
+    });
+    document.getElementById('compResult').innerHTML = '';
+    document.getElementById('compSubmit').disabled = false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.__curBook = bk;
+    Icons.hydrate();
+  }
+
+  document.getElementById('backBtn').onclick = function () {
+    document.getElementById('reader').classList.remove('on');
+    document.getElementById('libraryView').style.display = 'block';
+    window.scrollTo({ top: 0 });
+  };
+
+  document.getElementById('compSubmit').onclick = function () {
+    var bk = window.__curBook; if (!bk) return;
+    var correct = 0;
+    var qHost = document.getElementById('compQs');
+    bk.questions.forEach(function (q, qi) {
+      var ok = answers[qi] === q.answer;
+      if (ok) correct++;
+      [].forEach.call(qHost.querySelectorAll('.opt[data-q="' + qi + '"]'), function (o) {
+        o.disabled = true;
+        if (o.textContent === q.answer) o.classList.add('right');
+        else if (o.classList.contains('sel')) o.classList.add('wrong');
+      });
+    });
+    this.disabled = true;
+    var pct = Math.round(correct / bk.questions.length * 100);
+    document.getElementById('compResult').innerHTML = '<div class="rr-score" style="color:' + (pct >= 70 ? 'var(--ok)' : 'var(--danger)') + '">' +
+      'You got ' + correct + ' of ' + bk.questions.length + ' correct (' + pct + '%).</div>' +
+      '<div class="muted small" style="margin-top:4px">' + (pct >= 70 ? 'Great reading!' : 'Reread the passage and try the ones you missed.') + '</div>';
+    if (Store.current()) { for (var i = 0; i < correct; i++) Store.record('reading', 'comprehension', true, 8); UI.toast('+' + (correct * 8) + ' XP from reading', 'ok', 'book-open'); }
+  };
+
+  renderBooks();
+</script>

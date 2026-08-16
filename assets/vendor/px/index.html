@@ -1,14 +1,13 @@
-<!-- enrichment -->
-<title>Enrichment</title>
+<!-- px -->
+<title>px</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/vault.css">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vault.css">
 <script>
-  /* Guard: only reachable once the quiet key has been entered elsewhere. */
-  (function () { try { if (localStorage.getItem('lf') !== '1') location.replace('../index.html'); } catch (e) { location.replace('../index.html'); } })();
+  (function () { try { if (localStorage.getItem('lf') !== '1') location.replace('../../../index.html'); } catch (e) { location.replace('../../../index.html'); } })();
 </script>
 
 <div class="top">
@@ -19,9 +18,12 @@
       <input id="search" type="search" spellcheck="false" autocomplete="off" placeholder="Filter">
     </label>
     <span class="count"><span id="count">…</span></span>
-    <a class="back" href="../dashboard.html" title="Back"><span data-icon="arrow-left" data-size="18"></span></a>
+    <span class="src-wrap">
+      <button class="src-btn" id="srcBtn" aria-label="Sources"><span data-icon="filter" data-size="14"></span><span id="srcLabel">All</span><span data-icon="chevron-down" data-size="14"></span></button>
+      <div class="src-panel" id="srcPanel" hidden><div id="sources"></div></div>
+    </span>
+    <a class="back" href="../../../dashboard.html" title="Back"><span data-icon="arrow-left" data-size="18"></span></a>
   </div>
-  <div class="sources" id="sources"></div>
 </div>
 
 <div class="loading" id="loading" style="display:none"><div class="spinner"></div><div>Loading…</div></div>
@@ -36,5 +38,5 @@
   <iframe id="ovFrame" src="about:blank" allow="autoplay; fullscreen; gamepad; microphone; clipboard-write" allowfullscreen referrerpolicy="no-referrer"></iframe>
 </div>
 
-<script src="../assets/js/icons.js"></script>
+<script src="../../js/icons.js"></script>
 <script src="catalog.js"></script>
