@@ -1,96 +1,100 @@
-<title>Dashboard · Mastermind Academy</title>
+<title>Dashboard — Mastermind Academy</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/main.css">
 <style>
-  .dash { padding: 28px 0 60px; }
-  .hello { background: linear-gradient(135deg,#14764f,#1e9e6a 60%,#37c98a); color: #fff; border-radius: 22px; padding: 26px 28px; display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-  .hello .av { width: 68px; height: 68px; border-radius: 18px; background: rgba(255,255,255,.2); display: grid; place-items: center; font-size: 2.2rem; flex: 0 0 auto; }
-  .hello h1 { margin: 0; font-size: 1.7rem; color: #fff; }
-  .hello .lvlbox { margin-left: auto; text-align: right; min-width: 220px; }
-  .hello .lvl-pill { display: inline-flex; gap: 8px; align-items: center; background: rgba(255,255,255,.18); padding: 6px 12px; border-radius: 999px; font-weight: 800; }
-  .hello .bar { background: rgba(255,255,255,.25); }
-  .hello .bar > i { background: #ffd76a; }
-  .tiles { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-top: 20px; }
-  .tile { background: #fff; border: 1px solid var(--line); border-radius: 16px; padding: 18px; box-shadow: var(--shadow-sm); }
-  .tile .tn { font-size: 2rem; font-weight: 900; line-height: 1; }
-  .tile .tl { color: var(--ink-soft); font-weight: 800; font-size: .85rem; margin-top: 6px; }
-  .tile .ts { color: var(--muted); font-weight: 700; font-size: .78rem; margin-top: 2px; }
-  .cols { display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-top: 20px; align-items: start; }
-  .panel { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 22px; box-shadow: var(--shadow-sm); }
-  .panel h2 { font-size: 1.15rem; margin-bottom: 14px; }
-  .ring-wrap { display: flex; align-items: center; gap: 20px; }
-  .rec-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
-  .ach-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 10px; }
-  .sel-inline { font: inherit; font-weight: 800; border: 2px solid var(--line); border-radius: 10px; padding: 6px 10px; background: #fff; }
-  @media (max-width: 900px){ .tiles { grid-template-columns: 1fr 1fr; } .cols { grid-template-columns: 1fr; } .rec-grid { grid-template-columns: 1fr 1fr; } .ach-grid { grid-template-columns: repeat(3,1fr); } .hello .lvlbox { margin-left: 0; text-align: left; } }
+  .dash { padding: 24px 0 56px; }
+  .hello { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r2); padding: 22px 24px; border-left: 3px solid var(--accent); }
+  .avatar { width: 54px; height: 54px; border-radius: var(--r); background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-weight: 700; font-size: 1.2rem; flex: 0 0 auto; border: 1px solid #cdd6e3; }
+  .hello h1 { margin: 0; font-size: 1.5rem; }
+  .hello .sub { margin: 3px 0 0; color: var(--muted); font-size: .92rem; display: flex; align-items: center; gap: 6px; }
+  .hello .sub svg { color: var(--warn); }
+  .hello .lvlbox { margin-left: auto; min-width: 240px; }
+  .lvl-line { display: flex; justify-content: space-between; align-items: center; font-size: .82rem; color: var(--muted); margin-bottom: 6px; font-weight: 600; }
+  .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 18px; }
+  .tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r2); padding: 16px 18px; }
+  .tile .tk { display: flex; align-items: center; gap: 7px; color: var(--muted); font-weight: 600; font-size: .78rem; text-transform: uppercase; letter-spacing: .04em; }
+  .tile .tk svg { color: var(--accent); width: 15px; height: 15px; }
+  .tile .tn { font-size: 1.9rem; font-weight: 700; font-family: var(--serif); line-height: 1.1; margin-top: 6px; }
+  .tile .ts { color: var(--faint); font-size: .78rem; margin-top: 2px; }
+  .cols { display: grid; grid-template-columns: 1.55fr 1fr; gap: 18px; margin-top: 18px; align-items: start; }
+  .panel h2 { font-size: 1.05rem; margin: 0 0 14px; }
+  .rec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .rec { border: 1px solid var(--line); border-radius: var(--r); padding: 13px; display: block; color: inherit; }
+  .rec:hover { border-color: var(--accent); text-decoration: none; background: var(--surface-2); }
+  .rec .rt { display: flex; align-items: center; gap: 7px; color: var(--muted); font-size: .74rem; font-weight: 600; margin-bottom: 8px; }
+  .ach-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .ach { text-align: center; padding: 13px 6px; border: 1px solid var(--line); border-radius: var(--r); }
+  .ach svg { color: var(--accent); }
+  .ach.locked { opacity: .45; }
+  .ach.locked svg { color: var(--faint); }
+  .ach .an { font-weight: 600; font-size: .74rem; margin-top: 6px; }
+  .ring-wrap { display: flex; align-items: center; gap: 18px; }
+  .sub-row { display: flex; align-items: center; gap: 12px; padding: 11px 8px; border-radius: var(--r); color: inherit; }
+  .sub-row:hover { background: var(--surface-2); text-decoration: none; }
+  .sub-row .si { width: 34px; height: 34px; border: 1px solid var(--line); border-radius: var(--r); display: grid; place-items: center; flex: 0 0 auto; }
+  @media (max-width: 900px) { .tiles { grid-template-columns: 1fr 1fr; } .cols { grid-template-columns: 1fr; } .rec-grid { grid-template-columns: 1fr 1fr; } .ach-grid { grid-template-columns: repeat(3, 1fr); } .hello .lvlbox { margin-left: 0; } }
 </style>
 
 <div id="nav"></div>
 
 <main class="dash wrap">
-  <!-- greeting -->
   <section class="hello">
-    <div class="av" id="avatar">🦊</div>
+    <div class="avatar" id="avatar">AJ</div>
     <div>
-      <h1 id="greetTime">Good afternoon!</h1>
-      <p id="greetCheer" style="margin:4px 0 0;opacity:.95;font-weight:700">Keep on going!</p>
-      <span class="lvl-pill" id="gradeTag" style="margin-top:10px">Grade 5</span>
+      <h1 id="greetTime">Welcome back</h1>
+      <p class="sub" id="greetCheer">Keep going.</p>
     </div>
     <div class="lvlbox">
-      <div class="lvl-pill" style="margin-bottom:8px">⭐ Level <span id="levelNum">1</span> <span style="opacity:.7">·</span> 🪙 <span id="coins">0</span></div>
+      <div class="lvl-line"><span>Level <b id="levelNum" style="color:var(--ink)">1</b></span><span id="coins">0 credits</span></div>
       <div class="bar"><i id="xpBar" style="width:0%"></i></div>
-      <div id="xpText" style="font-size:.8rem;margin-top:6px;opacity:.9;font-weight:700">0 / 250 XP</div>
+      <div class="muted small" id="xpText" style="margin-top:5px">0 / 250 XP</div>
     </div>
   </section>
 
-  <!-- stat tiles -->
   <section class="tiles">
-    <div class="tile"><div class="tn" style="color:var(--accent)">🔥 <span id="statStreak">0</span></div><div class="tl">Day streak</div><div class="ts" id="statStreakBest">Best: 0</div></div>
-    <div class="tile"><div class="tn" style="color:var(--brand)"><span id="statXP">0</span></div><div class="tl">Total XP</div><div class="ts">Keep earning!</div></div>
-    <div class="tile"><div class="tn" style="color:var(--sub-math)"><span id="statAcc">0%</span></div><div class="tl">Accuracy</div><div class="ts" id="statAccSub">0 / 0 correct</div></div>
-    <div class="tile"><div class="tn" style="color:var(--sub-algebra)"><span id="statMastered">0</span></div><div class="tl">Skills mastered</div><div class="ts">Aim for 100%</div></div>
+    <div class="tile"><div class="tk"><span data-icon="flame"></span> Streak</div><div class="tn" id="statStreak">0</div><div class="ts" id="statStreakBest">Best: 0 days</div></div>
+    <div class="tile"><div class="tk"><span data-icon="star"></span> Total XP</div><div class="tn" id="statXP">0</div><div class="ts">Keep earning</div></div>
+    <div class="tile"><div class="tk"><span data-icon="target"></span> Accuracy</div><div class="tn" id="statAcc">0%</div><div class="ts" id="statAccSub">0 / 0 correct</div></div>
+    <div class="tile"><div class="tk"><span data-icon="award"></span> Mastered</div><div class="tn" id="statMastered">0</div><div class="ts">skills at 100%</div></div>
   </section>
 
   <div class="cols">
-    <!-- left column -->
     <div>
       <div class="panel">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-          <h2 style="margin:0">Continue learning</h2>
-          <span class="soft" style="font-weight:800;font-size:.85rem">Recommended for Grade <span id="recGrade"></span></span>
+          <h2 style="margin:0">Continue where you left off</h2>
+          <span class="muted small">Grade <span id="recGrade"></span></span>
         </div>
         <div class="rec-grid" id="recommended"></div>
       </div>
 
-      <div class="panel" style="margin-top:20px">
+      <div class="panel" style="margin-top:18px">
         <h2>Subject progress</h2>
         <div id="subjectProgress"></div>
       </div>
 
-      <div class="panel" style="margin-top:20px">
+      <div class="panel" style="margin-top:18px">
         <h2>Achievements</h2>
         <div class="ach-grid" id="achievements"></div>
       </div>
     </div>
 
-    <!-- right column -->
     <div>
       <div class="panel">
-        <h2>Today's goal</h2>
+        <h2>Daily goal</h2>
         <div class="ring-wrap">
-          <svg width="128" height="128" viewBox="0 0 128 128" style="flex:0 0 auto">
-            <circle cx="64" cy="64" r="52" fill="none" stroke="#eaeef5" stroke-width="14"/>
-            <circle id="goalRing" cx="64" cy="64" r="52" fill="none" stroke="url(#gr)" stroke-width="14" stroke-linecap="round" transform="rotate(-90 64 64)"/>
-            <defs><linearGradient id="gr" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#37c98a"/><stop offset="1" stop-color="#1e9e6a"/></linearGradient></defs>
-            <text id="goalText" x="64" y="72" text-anchor="middle" font-size="26" font-weight="900" fill="#1f2733">0/20</text>
+          <svg width="118" height="118" viewBox="0 0 118 118" style="flex:0 0 auto">
+            <circle cx="59" cy="59" r="48" fill="none" stroke="var(--surface-3)" stroke-width="11"/>
+            <circle id="goalRing" cx="59" cy="59" r="48" fill="none" stroke="var(--accent)" stroke-width="11" stroke-linecap="round" transform="rotate(-90 59 59)"/>
+            <text id="goalText" x="59" y="66" text-anchor="middle" font-size="22" font-weight="700" font-family="Georgia, serif" fill="#15181c">0/20</text>
           </svg>
           <div>
-            <p id="goalCaption" style="font-weight:800;margin:0 0 12px">Let's get practicing!</p>
-            <label class="soft" style="font-weight:800;font-size:.82rem">Daily goal
-              <select id="goalSelect" class="sel-inline" style="margin-left:6px">
+            <p id="goalCaption" style="font-weight:600;margin:0 0 10px">Let's begin.</p>
+            <label class="muted small" style="font-weight:600">Target
+              <select id="goalSelect" class="input" style="width:auto;display:inline-block;padding:5px 8px;margin-left:6px">
                 <option>10</option><option>20</option><option>30</option><option>50</option>
               </select>
             </label>
@@ -98,20 +102,19 @@
         </div>
       </div>
 
-      <div class="panel" style="margin-top:20px">
-        <h2>This week</h2>
-        <div id="weekChart" style="display:flex;gap:8px;align-items:flex-end"></div>
+      <div class="panel" style="margin-top:18px">
+        <h2>Activity this week</h2>
+        <div id="weekChart" style="display:flex;gap:7px;align-items:flex-end"></div>
       </div>
 
-      <div class="panel" style="margin-top:20px">
-        <h2>Settings</h2>
-        <label class="soft" style="font-weight:800;font-size:.85rem;display:block;margin-bottom:6px">Grade level</label>
+      <div class="panel" style="margin-top:18px">
+        <h2>Grade level</h2>
         <select id="gradeSelect" class="input">
           <option>K</option><option>1</option><option>2</option><option>3</option><option>4</option>
           <option>5</option><option>6</option><option>7</option><option>8</option><option>9</option>
           <option>10</option><option>11</option><option>12</option>
         </select>
-        <p class="soft" style="font-size:.8rem;margin-top:10px">Changing your grade adjusts every problem's difficulty.</p>
+        <p class="muted small" style="margin-top:9px">Adjusting your grade recalibrates every problem's difficulty.</p>
       </div>
     </div>
   </div>
@@ -120,12 +123,9 @@
 <div class="toast-host"></div>
 <div id="footer"></div>
 
+<script src="assets/js/icons.js"></script>
 <script src="assets/js/store.js"></script>
 <script src="assets/js/problems.js"></script>
 <script src="assets/js/layout.js"></script>
-<script src="assets/js/secret.js"></script>
-<script>
-  Layout.mount({ active: 'dashboard' });
-  if (Store.current()) document.getElementById('recGrade').textContent = Store.current().grade;
-</script>
+<script>Layout.mount({ active: 'dashboard' }); if (Store.current()) document.getElementById('recGrade').textContent = Store.current().grade;</script>
 <script src="assets/js/dashboard.js"></script>

@@ -1,4 +1,4 @@
-/* practice.js — the interactive practice engine (all subjects) */
+/* practice.js — interactive practice engine with adaptive difficulty */
 (function () {
   'use strict';
   if (!UI.requireAuth()) return;
@@ -6,58 +6,86 @@
   var subjectId = window.SUBJECT_ID;
   var subject = Problems.subject(subjectId);
   var user = Store.current();
-  var grade = user.grade;
+  var baseGrade = Problems.gradeNum(user.grade);
 
-  var state = { skill: null, problem: null, answered: false, session: { solved: 0, correct: 0, xp: 0, run: 0 } };
+  var state = {
+    skill: null, problem: null, answered: false,
+    session: { solved: 0, correct: 0, xp: 0, run: 0 },
+    diff: baseGrade,          // adaptive effective grade
+    recent: []                // last few results for this skill
+  };
 
   function el(id) { return document.getElementById(id); }
-  function gradeNum(g) { return Problems.gradeNum(g); }
+  function ic(n, o) { return window.Icons ? Icons.icon(n, o || {}) : ''; }
+  function clampGrade(g) { return Math.max(0, Math.min(12, g)); }
+  function gradeLabel(g) { return g === 0 ? 'K' : String(g); }
 
-  // ---- header ----
-  el('subIcon').textContent = subject.icon;
-  el('subIcon').style.background = subject.color;
   el('subName').textContent = subject.name;
   el('subBlurb').textContent = subject.blurb;
-  document.title = subject.name + ' Practice · Mastermind Academy';
-  el('subGradeTag').textContent = 'Your grade: ' + grade;
+  el('subIcon').innerHTML = ic(subject.icon, { size: 26 });
+  el('subIcon').style.color = subject.color;
+  document.title = subject.name + ' — Mastermind Academy';
+  el('subGradeTag').textContent = 'Grade ' + user.grade;
 
-  // ---- skill list ----
   var listWrap = el('skillList');
   function renderSkillList() {
     var p = Store.progress();
     listWrap.innerHTML = '';
     subject.skills.forEach(function (k) {
-      var inGrade = gradeNum(grade) >= k.grades[0] && gradeNum(grade) <= k.grades[1];
+      var inGrade = baseGrade >= k.grades[0] && baseGrade <= k.grades[1];
       var m = (p.skills[k.id] || {}).mastery || 0;
       var b = document.createElement('button');
       b.className = 'skill-item' + (state.skill && state.skill.id === k.id ? ' on' : '');
       b.innerHTML =
-        '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px">' +
-          '<span style="font-weight:800">' + k.name + '</span>' +
-          (inGrade ? '<span class="chip grey" style="font-size:.68rem">Grade level</span>' : '<span class="soft" style="font-size:.72rem;font-weight:800">G' + (k.grades[0] === 0 ? 'K' : k.grades[0]) + '–' + k.grades[1] + '</span>') +
-        '</div>' +
-        '<div class="bar" style="margin-top:8px;height:7px"><i style="width:' + Math.max(3, m) + '%;background:' + subject.color + '"></i></div>';
+        '<div class="skill-row"><span class="skill-name">' + k.name + '</span>' +
+        (inGrade ? '<span class="tag ok">On level</span>' : '<span class="skill-grade">Gr ' + gradeLabel(k.grades[0]) + '–' + k.grades[1] + '</span>') +
+        '</div><div class="bar" style="margin-top:8px"><i style="width:' + Math.max(3, m) + '%;background:' + subject.color + '"></i></div>';
       b.onclick = function () { startSkill(k); };
       listWrap.appendChild(b);
     });
   }
 
-  // ---- practice flow ----
   function startSkill(k) {
     state.skill = k;
     state.session.run = 0;
+    state.diff = baseGrade;
+    state.recent = [];
     renderSkillList();
     el('practiceEmpty').style.display = 'none';
     el('practiceCard').style.display = 'block';
     el('skillTitle').textContent = k.name;
     el('skillTag').textContent = subject.name;
+    updateAdaptTag();
     nextProblem();
     el('practiceCard').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
 
+  function updateAdaptTag() {
+    var t = el('adaptTag');
+    if (!t) return;
+    var delta = state.diff - baseGrade;
+    var label = 'Adaptive · Grade ' + gradeLabel(state.diff);
+    if (delta > 0) label += ' (harder)';
+    else if (delta < 0) label += ' (support)';
+    t.innerHTML = ic('gauge', { size: 14 }) + '<span>' + label + '</span>';
+  }
+
+  function adapt() {
+    // adjust effective difficulty from recent performance
+    state.recent = state.recent.slice(-4);
+    var r = state.recent;
+    if (r.length >= 3) {
+      var last3 = r.slice(-3);
+      var correctCt = last3.filter(Boolean).length;
+      if (last3.every(Boolean) && state.diff < 12) { state.diff = clampGrade(state.diff + 1); state.recent = []; UI.toast('Stepping up the difficulty', 'ok', 'trending-up'); }
+      else if (correctCt <= 1 && state.diff > 0) { state.diff = clampGrade(state.diff - 1); state.recent = []; UI.toast('Easing off — let\'s rebuild', '', 'gauge'); }
+    }
+    updateAdaptTag();
+  }
+
   function nextProblem() {
     state.answered = false;
-    var prob = Problems.generate(state.skill.id, grade);
+    var prob = Problems.generate(state.skill.id, gradeLabel(state.diff));
     state.problem = prob;
     el('feedback').style.display = 'none';
     el('nextBtn').style.display = 'none';
@@ -79,8 +107,8 @@
     } else {
       var form = document.createElement('form');
       form.className = 'input-answer';
-      form.innerHTML = '<input class="input" id="typedAnswer" autocomplete="off" spellcheck="false" placeholder="Type your answer" style="max-width:260px">' +
-        '<button class="btn" type="submit">Check</button>';
+      form.innerHTML = '<input class="input" id="typedAnswer" autocomplete="off" spellcheck="false" placeholder="Enter your answer">' +
+        '<button class="btn" type="submit">' + ic('check', { size: 16 }) + 'Submit</button>';
       form.onsubmit = function (e) { e.preventDefault(); check(el('typedAnswer').value.trim(), null); };
       ansWrap.appendChild(form);
       setTimeout(function () { var t = el('typedAnswer'); if (t) t.focus(); }, 30);
@@ -95,7 +123,6 @@
     state.answered = true;
     var correct = normalize(given) === normalize(state.problem.answer);
 
-    // lock inputs
     if (state.problem.type === 'mc') {
       [].forEach.call(el('answerArea').querySelectorAll('.choice'), function (b) {
         b.disabled = true;
@@ -107,35 +134,32 @@
       var sb = el('answerArea').querySelector('button'); if (sb) sb.disabled = true;
     }
 
-    // record
     var res = Store.record(subjectId, state.problem.skillId, correct);
     state.session.solved++;
     if (correct) { state.session.correct++; state.session.run++; state.session.xp += 10; }
     else { state.session.run = 0; state.session.xp += 2; }
+    state.recent.push(correct);
 
-    // feedback
     var fb = el('feedback');
-    fb.style.display = 'block';
+    fb.style.display = 'flex';
     fb.className = 'feedback ' + (correct ? 'good' : 'bad');
-    fb.innerHTML = '<b>' + (correct ? '✅ Correct!' : '❌ Not quite.') + '</b>' +
+    fb.innerHTML = (correct ? ic('check', { size: 18 }) : ic('x', { size: 18 })) +
+      '<div><b>' + (correct ? 'Correct.' : 'Incorrect.') + '</b>' +
       (correct ? '' : ' The answer is <b>' + UI.esc(state.problem.answer) + '</b>.') +
-      (state.problem.explain ? '<div class="soft" style="margin-top:6px;font-weight:600">' + UI.esc(state.problem.explain) + '</div>' : '');
+      (state.problem.explain ? '<div class="muted small" style="margin-top:3px">' + UI.esc(state.problem.explain) + '</div>' : '') + '</div>';
 
     el('nextBtn').style.display = 'inline-flex';
     el('nextBtn').focus();
 
-    // session UI
     el('sesSolved').textContent = state.session.solved;
     el('sesAcc').textContent = Math.round(state.session.correct / state.session.solved * 100) + '%';
     el('sesXP').textContent = state.session.xp;
     el('sesRun').textContent = state.session.run;
-    if (state.session.run > 0 && state.session.run % 5 === 0) UI.toast('🔥 ' + state.session.run + ' in a row!', 'good');
 
-    // events
-    if (res.events.leveledUp) UI.toast('⭐ Level up! You reached level ' + res.progress.level, 'good');
-    if (res.events.streakUp && Store.liveStreak() > 1) UI.toast('🔥 ' + Store.liveStreak() + '-day streak!', 'good');
-    res.events.achievements.forEach(function (a) { UI.toast(a.icon + ' Achievement: ' + a.name, 'good'); });
+    if (res.events.leveledUp) UI.toast('Level ' + res.progress.level + ' reached', 'ok', 'trending-up');
+    res.events.achievements.forEach(function (a) { UI.toast('Achievement: ' + a.name, 'ok', a.icon); });
 
+    adapt();
     updateMasteryBar();
     renderSkillList();
   }
@@ -145,18 +169,13 @@
     var m = (p.skills[state.skill.id] || {}).mastery || 0;
     el('masteryBar').style.width = Math.max(3, m) + '%';
     el('masteryBar').style.background = subject.color;
-    el('masteryText').textContent = m >= 100 ? 'Mastered! 🏅' : m + '% mastery';
+    el('masteryText').textContent = m >= 100 ? 'Mastered' : m + '% mastery';
   }
 
   el('nextBtn').onclick = nextProblem;
 
-  // ---- init ----
   renderSkillList();
-  // deep link ?skill=
   var params = new URLSearchParams(location.search);
   var wanted = params.get('skill');
-  if (wanted) {
-    var k = subject.skills.filter(function (x) { return x.id === wanted; })[0];
-    if (k) startSkill(k);
-  }
+  if (wanted) { var k = subject.skills.filter(function (x) { return x.id === wanted; })[0]; if (k) startSkill(k); }
 })();

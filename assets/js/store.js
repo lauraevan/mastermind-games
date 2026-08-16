@@ -185,24 +185,25 @@
 
   // ---------- achievements ----------
   var ACHIEVEMENTS = [
-    { id: 'first', icon: '🌱', name: 'First Steps', desc: 'Answer your first question', test: function (p) { return p.solved >= 1; } },
-    { id: 'ten', icon: '⚡', name: 'Warmed Up', desc: 'Answer 10 questions', test: function (p) { return p.solved >= 10; } },
-    { id: 'fifty', icon: '🔥', name: 'On a Roll', desc: 'Answer 50 questions', test: function (p) { return p.solved >= 50; } },
-    { id: 'hundred', icon: '💯', name: 'Century Club', desc: 'Answer 100 questions', test: function (p) { return p.solved >= 100; } },
-    { id: 'sharp', icon: '🎯', name: 'Sharpshooter', desc: 'Get 25 correct answers', test: function (p) { return p.correct >= 25; } },
-    { id: 'streak3', icon: '📅', name: '3-Day Streak', desc: 'Practice 3 days in a row', test: function (p) { return p.streak.count >= 3; } },
-    { id: 'streak7', icon: '🏅', name: 'Week Warrior', desc: 'Practice 7 days in a row', test: function (p) { return p.streak.count >= 7; } },
-    { id: 'level5', icon: '⭐', name: 'Rising Star', desc: 'Reach level 5', test: function (p) { return p.level >= 5; } },
-    { id: 'explorer', icon: '🧭', name: 'Explorer', desc: 'Practice in 4 subjects', test: function (p) { return Object.keys(p.bySubject).length >= 4; } },
-    { id: 'master', icon: '👑', name: 'Skill Master', desc: 'Fully master any skill', test: function (p) { return Object.keys(p.skills).some(function (k) { return p.skills[k].mastery >= 100; }); } }
+    { id: 'first', icon: 'star', name: 'First Steps', desc: 'Answer your first question', test: function (p) { return p.solved >= 1; } },
+    { id: 'ten', icon: 'zap', name: 'Warmed Up', desc: 'Answer 10 questions', test: function (p) { return p.solved >= 10; } },
+    { id: 'fifty', icon: 'flame', name: 'On a Roll', desc: 'Answer 50 questions', test: function (p) { return p.solved >= 50; } },
+    { id: 'hundred', icon: 'award', name: 'Century Club', desc: 'Answer 100 questions', test: function (p) { return p.solved >= 100; } },
+    { id: 'sharp', icon: 'target', name: 'Sharpshooter', desc: 'Get 25 correct answers', test: function (p) { return p.correct >= 25; } },
+    { id: 'streak3', icon: 'calendar', name: '3-Day Streak', desc: 'Practice 3 days in a row', test: function (p) { return p.streak.count >= 3; } },
+    { id: 'streak7', icon: 'flame', name: 'Week Warrior', desc: 'Practice 7 days in a row', test: function (p) { return p.streak.count >= 7; } },
+    { id: 'level5', icon: 'trending-up', name: 'Steady Climber', desc: 'Reach level 5', test: function (p) { return p.level >= 5; } },
+    { id: 'explorer', icon: 'globe', name: 'Well Rounded', desc: 'Practice in 4 subjects', test: function (p) { return Object.keys(p.bySubject).length >= 4; } },
+    { id: 'master', icon: 'trophy', name: 'Skill Mastery', desc: 'Fully master any skill', test: function (p) { return Object.keys(p.skills).some(function (k) { return p.skills[k].mastery >= 100; }); } }
   ];
   function evalAchievements(p) { return ACHIEVEMENTS.filter(function (a) { return a.test(p); }); }
   Store.ACHIEVEMENTS = ACHIEVEMENTS;
 
-  var AVATARS = ['🦊', '🐼', '🦉', '🐨', '🐧', '🦁', '🐬', '🦄', '🐢', '🦋', '🐝', '🐙'];
   function pickAvatar(name) {
-    var s = 0; for (var i = 0; i < name.length; i++) s += name.charCodeAt(i);
-    return AVATARS[s % AVATARS.length];
+    var parts = name.trim().split(/\s+/);
+    var a = (parts[0] || '')[0] || '';
+    var b = parts.length > 1 ? (parts[parts.length - 1][0] || '') : '';
+    return (a + b).toUpperCase();
   }
 
   // ---------- shared UI helpers ----------
@@ -211,22 +212,27 @@
       if (!Store.current()) { location.href = relBase() + 'login.html'; return false; }
       return true;
     },
-    toast: function (msg, kind) {
+    toast: function (msg, kind, iconName) {
       var host = document.querySelector('.toast-host');
       if (!host) { host = document.createElement('div'); host.className = 'toast-host'; document.body.appendChild(host); }
       var t = document.createElement('div');
       t.className = 'toast ' + (kind || '');
-      t.textContent = msg;
+      var ico = (iconName && global.Icons) ? Icons.icon(iconName, { size: 16 }) : '';
+      t.innerHTML = ico + '<span></span>';
+      t.querySelector('span').textContent = msg;
       host.appendChild(t);
-      setTimeout(function () { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; }, 2200);
-      setTimeout(function () { t.remove(); }, 2600);
+      setTimeout(function () { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; }, 2400);
+      setTimeout(function () { t.remove(); }, 2800);
     },
     esc: function (s) { var d = document.createElement('div'); d.textContent = s == null ? '' : String(s); return d.innerHTML; }
   };
 
-  // figure out relative path prefix (root vs /subjects/)
+  // figure out relative path prefix (root vs one-level subdirectory)
   function relBase() {
-    return location.pathname.indexOf('/subjects/') !== -1 ? '../' : '';
+    var p = location.pathname;
+    var subs = ['/subjects/', '/blog/', '/learnify/'];
+    for (var i = 0; i < subs.length; i++) if (p.indexOf(subs[i]) !== -1) return '../';
+    return '';
   }
   UI.relBase = relBase;
 

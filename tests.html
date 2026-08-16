@@ -1,0 +1,215 @@
+<title>Assessments — Mastermind Academy</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<style>
+  .ts { padding: 26px 0 56px; }
+  .setup-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+  .exam { display: grid; grid-template-columns: 1fr 220px; gap: 18px; align-items: start; }
+  .exam-main { border: 1px solid var(--line); border-radius: var(--r2); background: var(--surface); padding: 26px; }
+  .exam-side { border: 1px solid var(--line); border-radius: var(--r2); background: var(--surface); padding: 16px; position: sticky; top: 74px; }
+  .qnum-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 5px; margin-top: 10px; }
+  .qnum { border: 1px solid var(--line-2); border-radius: var(--r); padding: 7px 0; text-align: center; font-weight: 600; font-size: .8rem; cursor: pointer; background: var(--surface); }
+  .qnum.answered { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+  .qnum.current { outline: 2px solid var(--accent); }
+  .exam-q { font-family: var(--serif); font-size: 1.5rem; font-weight: 600; margin: 12px 0 20px; }
+  .opts { display: grid; gap: 9px; }
+  .opt { border: 1px solid var(--line-2); border-radius: var(--r); padding: 13px 15px; cursor: pointer; font-weight: 500; }
+  .opt:hover { border-color: var(--accent); background: var(--surface-2); }
+  .opt.sel { border-color: var(--accent); background: var(--accent-soft); }
+  .exam-nav { display: flex; justify-content: space-between; margin-top: 24px; }
+  .score-ring { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .review-item { border: 1px solid var(--line); border-radius: var(--r); padding: 14px 16px; margin-bottom: 10px; }
+  .review-item.correct { border-left: 3px solid var(--ok); }
+  .review-item.wrong { border-left: 3px solid var(--danger); }
+  .review-item .rq { font-weight: 600; margin-bottom: 4px; }
+  @media (max-width: 800px) { .setup-grid { grid-template-columns: 1fr; } .exam { grid-template-columns: 1fr; } .exam-side { position: static; } }
+</style>
+
+<div id="nav"></div>
+
+<main class="ts wrap">
+  <div style="margin-bottom:20px">
+    <span class="eyebrow">Assessment</span>
+    <h1>Assessments</h1>
+    <p class="muted">Sit a full-length, 30-question exam. Answer at your own pace, then review every question with worked solutions.</p>
+  </div>
+
+  <!-- SETUP -->
+  <div id="setup" class="panel">
+    <h2 style="margin-top:0">Configure your exam</h2>
+    <div class="setup-grid">
+      <div class="field"><label>Subject</label><select class="input" id="selSubject"></select></div>
+      <div class="field"><label>Grade level</label><select class="input" id="selGrade"></select></div>
+      <div class="field"><label>Questions</label><select class="input" id="selCount"><option>15</option><option selected>30</option><option>45</option></select></div>
+    </div>
+    <button class="btn lg" id="beginBtn"><span data-icon="clipboard-list" data-size="16"></span> Begin assessment</button>
+  </div>
+
+  <!-- EXAM -->
+  <div id="exam" class="exam" style="display:none">
+    <div class="exam-main">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <span class="tag accent" id="examMeta">Question 1</span>
+        <span class="muted small" id="examCount"></span>
+      </div>
+      <div class="exam-q" id="examQ"></div>
+      <div id="examA"></div>
+      <div class="exam-nav">
+        <button class="btn ghost" id="prevBtn"><span data-icon="arrow-left" data-size="16"></span> Previous</button>
+        <button class="btn" id="nextBtn">Next <span data-icon="arrow-right" data-size="16"></span></button>
+      </div>
+    </div>
+    <aside class="exam-side">
+      <b class="small" style="text-transform:uppercase;letter-spacing:.06em;color:var(--muted)">Progress</b>
+      <div class="muted small" id="answeredCount" style="margin:8px 0"></div>
+      <div class="qnum-grid" id="qnumGrid"></div>
+      <button class="btn block" id="submitBtn" style="margin-top:14px"><span data-icon="check" data-size="16"></span> Submit exam</button>
+    </aside>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result" style="display:none">
+    <div class="panel">
+      <div class="score-ring">
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <circle cx="65" cy="65" r="54" fill="none" stroke="var(--surface-3)" stroke-width="12"/>
+          <circle id="scoreRing" cx="65" cy="65" r="54" fill="none" stroke="var(--accent)" stroke-width="12" stroke-linecap="round" transform="rotate(-90 65 65)"/>
+          <text id="scorePct" x="65" y="72" text-anchor="middle" font-size="26" font-weight="700" font-family="Georgia,serif" fill="#15181c">0%</text>
+        </svg>
+        <div>
+          <h2 style="margin:0 0 4px" id="scoreHead">Your result</h2>
+          <p class="muted" id="scoreSub" style="margin:0"></p>
+          <div style="margin-top:14px"><button class="btn" id="retakeBtn"><span data-icon="rotate-ccw" data-size="16"></span> New assessment</button></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:18px">
+      <h2 style="margin-top:0">Question review</h2>
+      <div id="review"></div>
+    </div>
+  </div>
+</main>
+
+<div class="toast-host"></div>
+<div id="footer"></div>
+
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/problems.js"></script>
+<script src="assets/js/layout.js"></script>
+<script src="assets/js/hidden.js"></script>
+<script>
+  Layout.mount({ active: 'tests' });
+
+  var user = Store.current();
+  var selS = document.getElementById('selSubject'), selG = document.getElementById('selGrade'), selC = document.getElementById('selCount');
+  selS.innerHTML = '<option value="all">All subjects</option>' + Problems.SUBJECTS.map(function (s) { return '<option value="' + s.id + '">' + s.name + '</option>'; }).join('');
+  ['K','1','2','3','4','5','6','7','8','9','10','11','12'].forEach(function (g) { selG.innerHTML += '<option>' + g + '</option>'; });
+  selG.value = user ? user.grade : '8';
+
+  var exam = { qs: [], answers: [], idx: 0 };
+
+  function begin() {
+    var n = +selC.value;
+    exam.qs = Problems.buildTest(selS.value, selG.value, n);
+    exam.answers = new Array(exam.qs.length).fill(null);
+    exam.idx = 0;
+    document.getElementById('setup').style.display = 'none';
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('exam').style.display = 'grid';
+    buildQnums();
+    renderQ();
+  }
+
+  function buildQnums() {
+    var g = document.getElementById('qnumGrid'); g.innerHTML = '';
+    exam.qs.forEach(function (q, i) {
+      var d = document.createElement('div'); d.className = 'qnum'; d.textContent = i + 1;
+      d.onclick = function () { exam.idx = i; renderQ(); };
+      g.appendChild(d);
+    });
+  }
+
+  function renderQ() {
+    var q = exam.qs[exam.idx];
+    document.getElementById('examMeta').textContent = 'Question ' + (exam.idx + 1);
+    document.getElementById('examCount').textContent = 'of ' + exam.qs.length;
+    document.getElementById('examQ').textContent = q.q;
+    var A = document.getElementById('examA'); A.innerHTML = '';
+    if (q.type === 'mc') {
+      var wrap = document.createElement('div'); wrap.className = 'opts';
+      q.choices.forEach(function (c) {
+        var o = document.createElement('div'); o.className = 'opt' + (exam.answers[exam.idx] === c ? ' sel' : ''); o.textContent = c;
+        o.onclick = function () { exam.answers[exam.idx] = c; renderQ(); updateProgress(); };
+        wrap.appendChild(o);
+      });
+      A.appendChild(wrap);
+    } else {
+      var inp = document.createElement('input'); inp.className = 'input'; inp.style.maxWidth = '280px'; inp.placeholder = 'Type your answer';
+      inp.value = exam.answers[exam.idx] || '';
+      inp.oninput = function () { exam.answers[exam.idx] = inp.value; updateProgress(); };
+      A.appendChild(inp);
+      setTimeout(function () { inp.focus(); }, 20);
+    }
+    [].forEach.call(document.querySelectorAll('.qnum'), function (el, i) {
+      el.classList.toggle('current', i === exam.idx);
+      el.classList.toggle('answered', exam.answers[i] != null && exam.answers[i] !== '');
+    });
+    document.getElementById('prevBtn').disabled = exam.idx === 0;
+    document.getElementById('nextBtn').disabled = exam.idx === exam.qs.length - 1;
+    Icons.hydrate();
+  }
+
+  function updateProgress() {
+    var done = exam.answers.filter(function (a) { return a != null && a !== ''; }).length;
+    document.getElementById('answeredCount').textContent = done + ' of ' + exam.qs.length + ' answered';
+    [].forEach.call(document.querySelectorAll('.qnum'), function (el, i) { el.classList.toggle('answered', exam.answers[i] != null && exam.answers[i] !== ''); });
+  }
+
+  function norm(s) { return String(s == null ? '' : s).trim().toLowerCase().replace(/\s+/g, ' '); }
+
+  function submit() {
+    var correct = 0;
+    exam.qs.forEach(function (q, i) { if (norm(exam.answers[i]) === norm(q.answer)) correct++; });
+    var pct = Math.round(correct / exam.qs.length * 100);
+    document.getElementById('exam').style.display = 'none';
+    document.getElementById('result').style.display = 'block';
+    var ring = document.getElementById('scoreRing'), C = 2 * Math.PI * 54;
+    ring.style.strokeDasharray = C; ring.style.strokeDashoffset = C * (1 - pct / 100);
+    ring.style.stroke = pct >= 80 ? 'var(--ok)' : pct >= 50 ? 'var(--accent)' : 'var(--danger)';
+    document.getElementById('scorePct').textContent = pct + '%';
+    document.getElementById('scorePct').setAttribute('fill', '#15181c');
+    document.getElementById('scoreHead').textContent = correct + ' of ' + exam.qs.length + ' correct';
+    var grade = pct >= 90 ? 'Excellent — mastery demonstrated.' : pct >= 75 ? 'Solid work. Review the misses below.' : pct >= 50 ? 'Passing. Focus on the flagged topics.' : 'Keep practicing — review every solution below.';
+    document.getElementById('scoreSub').textContent = grade;
+
+    var rev = document.getElementById('review'); rev.innerHTML = '';
+    exam.qs.forEach(function (q, i) {
+      var ok = norm(exam.answers[i]) === norm(q.answer);
+      var your = (exam.answers[i] == null || exam.answers[i] === '') ? '(blank)' : exam.answers[i];
+      var d = document.createElement('div'); d.className = 'review-item ' + (ok ? 'correct' : 'wrong');
+      d.innerHTML = '<div class="rq">' + (i + 1) + '. ' + UI.esc(q.q) + '</div>' +
+        '<div class="small">' + (ok ? Icons.icon('check', { size: 14 }) : Icons.icon('x', { size: 14 })) +
+        ' Your answer: <b>' + UI.esc(your) + '</b>' + (ok ? '' : ' · Correct: <b>' + UI.esc(q.answer) + '</b>') + '</div>' +
+        (q.explain ? '<div class="muted small" style="margin-top:4px">' + UI.esc(q.explain) + '</div>' : '');
+      rev.appendChild(d);
+    });
+
+    if (Store.current()) { for (var i = 0; i < correct; i++) Store.record('math', 'assessment', true, 5); }
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    Icons.hydrate();
+  }
+
+  document.getElementById('beginBtn').onclick = begin;
+  document.getElementById('prevBtn').onclick = function () { if (exam.idx > 0) { exam.idx--; renderQ(); } };
+  document.getElementById('nextBtn').onclick = function () { if (exam.idx < exam.qs.length - 1) { exam.idx++; renderQ(); } };
+  document.getElementById('submitBtn').onclick = function () {
+    var done = exam.answers.filter(function (a) { return a != null && a !== ''; }).length;
+    if (done < exam.qs.length && !confirm((exam.qs.length - done) + ' question(s) are unanswered. Submit anyway?')) return;
+    submit();
+  };
+  document.getElementById('retakeBtn').onclick = function () { document.getElementById('result').style.display = 'none'; document.getElementById('setup').style.display = 'block'; };
+</script>

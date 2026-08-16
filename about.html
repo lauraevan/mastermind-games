@@ -1,0 +1,51 @@
+<title>About — Mastermind Academy</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<style>
+  .faq details { border: 1px solid var(--line); border-radius: var(--r); padding: 2px 18px; background: var(--surface); margin-bottom: 8px; }
+  .faq summary { font-weight: 600; cursor: pointer; padding: 14px 0; list-style: none; }
+  .faq summary::-webkit-details-marker { display: none; }
+  .faq p { color: var(--muted); margin: 0 0 14px; }
+  .val { border: 1px solid var(--line); border-radius: var(--r2); padding: 18px; background: var(--surface); }
+  .val svg { color: var(--accent); margin-bottom: 8px; }
+  .val h3 { font-size: 1.05rem; margin: 0 0 6px; }
+  .val p { color: var(--muted); font-size: .9rem; margin: 0; }
+</style>
+
+<div id="nav"></div>
+
+<main class="wrap" style="padding:34px 0 40px">
+  <div class="narrow" style="margin:0 auto">
+    <span class="eyebrow">About</span>
+    <h1>A practice platform built on how learning actually works</h1>
+    <p class="muted" style="font-size:1.05rem">Mastermind Academy is a free, standards-aligned practice platform for students in kindergarten through grade 12. We do not promise shortcuts. We build the two things research keeps confirming matter most: deliberate, spaced practice and honest feedback.</p>
+  </div>
+
+  <div class="grid g3" style="margin:34px 0">
+    <div class="val"><span data-icon="target" data-size="22"></span><h3>Deliberate practice</h3><p>Every skill is broken into focused problems with immediate, specific feedback — the conditions under which people actually improve.</p></div>
+    <div class="val"><span data-icon="gauge" data-size="22"></span><h3>Adaptive difficulty</h3><p>Problems scale to your grade and adjust as you work, keeping you in the productive zone between boredom and overwhelm.</p></div>
+    <div class="val"><span data-icon="chart-column" data-size="22"></span><h3>Honest measurement</h3><p>Mastery, accuracy, streaks and full assessments show you where you truly stand — not where you hope you stand.</p></div>
+  </div>
+
+  <div class="narrow" style="margin:0 auto" id="faq">
+    <h2>Frequently asked questions</h2>
+    <div class="faq">
+      <details open><summary>Is Mastermind Academy free?</summary><p>Yes. Create an account and use every subject, drill and assessment at no cost.</p></details>
+      <details><summary>What grades and subjects are covered?</summary><p>Kindergarten through grade 12, across mathematics, algebra, geometry, calculus, reading and language, Spanish, science, history and geography.</p></details>
+      <details><summary>How does adaptive difficulty work?</summary><p>You set your grade level, which sets the baseline. As you answer, the system nudges difficulty up after a run of correct answers and eases it back when you struggle, so the work stays challenging but achievable.</p></details>
+      <details><summary>Where is my progress stored?</summary><p>Entirely in your browser, on your device. Nothing is uploaded to a server. Clearing your browser data will reset your account.</p></details>
+      <details><summary>Do I need to install anything?</summary><p>No. The platform runs in any modern browser with no downloads or plugins.</p></details>
+      <details><summary>What are assessments?</summary><p>Full-length exams of 15, 30 or 45 questions drawn from a subject and grade. You answer at your own pace, then receive a score report with every solution explained.</p></details>
+    </div>
+  </div>
+</main>
+
+<div id="footer"></div>
+
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/layout.js"></script>
+<script>Layout.mount({});</script>

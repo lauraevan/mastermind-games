@@ -1,0 +1,46 @@
+<title>Student Journal — Mastermind Academy</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+
+<div id="nav"></div>
+
+<main class="wrap" style="padding:30px 0 40px">
+  <div style="max-width:680px;margin-bottom:28px">
+    <span class="eyebrow">Student Journal</span>
+    <h1>Notes on learning, from the students who do it</h1>
+    <p class="muted">Study strategies, honest reflections, and hard-won advice — written by Mastermind students and reviewed by the academy. Read a few before your next session.</p>
+  </div>
+
+  <div class="grid g2" id="postList"></div>
+</main>
+
+<div id="footer"></div>
+
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/layout.js"></script>
+<script>
+  Layout.mount({ active: 'blog' });
+  var posts = [
+    { slug: 'fifteen-minute-rule', title: 'The Fifteen-Minute Rule: why small daily practice wins', author: 'Priya S., Grade 10', date: 'March 4', read: '6 min', tag: 'Study skills', excerpt: 'I used to cram for hours the night before a test and remember almost nothing a week later. Here is what changed when I stopped.' },
+    { slug: 'understanding-fractions', title: 'How I finally understood fractions', author: 'Marcus T., Grade 6', date: 'February 19', read: '5 min', tag: 'Mathematics', excerpt: 'Fractions felt like a foreign language until a teacher told me to stop memorizing rules and start drawing pictures.' },
+    { slug: 'reading-like-a-detective', title: 'Reading like a detective: a guide to inference', author: 'Elena R., Grade 8', date: 'February 2', read: '7 min', tag: 'Reading', excerpt: 'The answer is rarely written on the page. Good readers gather evidence and draw conclusions, exactly like a detective.' },
+    { slug: 'timed-drills', title: 'Timed drills made me faster at everything', author: 'Devon K., Grade 9', date: 'January 22', read: '5 min', tag: 'Fluency', excerpt: 'Speed is not the enemy of understanding. When the basics become automatic, your brain is free for the hard part.' },
+    { slug: 'test-day-nerves', title: 'Beating test-day nerves', author: 'Aisha M., Grade 11', date: 'January 8', read: '6 min', tag: 'Wellbeing', excerpt: 'My hands used to shake before every exam. A few unglamorous habits fixed most of it. None of them were magic.' },
+    { slug: 'vocabulary-that-sticks', title: 'Learning Spanish vocabulary that actually sticks', author: 'Sofia L., Grade 7', date: 'December 15', read: '5 min', tag: 'Languages', excerpt: 'Flashcards alone never worked for me. Spaced repetition plus real sentences finally made the words stay.' }
+  ];
+  var list = document.getElementById('postList');
+  posts.forEach(function (p) {
+    var a = document.createElement('a');
+    a.className = 'post-card'; a.href = 'blog/' + p.slug + '.html';
+    a.innerHTML = '<span class="tag accent">' + p.tag + '</span>' +
+      '<h3>' + p.title + '</h3>' +
+      '<p>' + p.excerpt + '</p>' +
+      '<div class="post-meta" style="margin-top:12px">' + Icons.icon('user', { size: 14 }) + p.author + ' · ' + p.date + ' · ' + p.read + ' read</div>';
+    list.appendChild(a);
+  });
+  Icons.hydrate();
+</script>

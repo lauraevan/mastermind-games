@@ -1,61 +1,61 @@
-<title>Sign In · Mastermind Academy</title>
+<title>Sign in — Mastermind Academy</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="assets/css/main.css">
 <style>
-  .auth-wrap { display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 66px); }
-  .auth-art { background: linear-gradient(150deg, #14764f, #1e9e6a 55%, #37c98a); color: #fff; padding: 56px; display: flex; flex-direction: column; justify-content: center; }
-  .auth-art h2 { color: #fff; font-size: 2.2rem; }
-  .auth-art li { margin: 10px 0; font-weight: 700; display: flex; gap: 10px; align-items: center; opacity: .95; }
-  .auth-art ul { list-style: none; padding: 0; margin: 20px 0 0; }
-  .auth-form { display: flex; align-items: center; justify-content: center; padding: 40px 24px; }
+  .auth-wrap { display: grid; grid-template-columns: 1fr 1fr; min-height: calc(100vh - 58px); }
+  .auth-art { background: var(--surface); border-right: 1px solid var(--line); padding: 56px; display: flex; flex-direction: column; justify-content: center; }
+  .auth-art h2 { font-size: 1.8rem; }
+  .auth-art ul { list-style: none; padding: 0; margin: 22px 0 0; }
+  .auth-art li { margin: 12px 0; display: flex; gap: 10px; align-items: flex-start; color: var(--ink-2); }
+  .auth-art li svg { color: var(--accent); flex: 0 0 auto; margin-top: 2px; }
+  .auth-form { display: flex; align-items: center; justify-content: center; padding: 40px 24px; background: var(--bg); }
   .auth-card { width: 100%; max-width: 420px; }
-  .tabs { display: flex; background: #eef1f6; border-radius: 12px; padding: 4px; margin-bottom: 22px; }
-  .tabs button { flex: 1; border: none; background: transparent; font: inherit; font-weight: 800; padding: .6em; border-radius: 9px; cursor: pointer; color: var(--ink-soft); }
-  .tabs button.on { background: #fff; color: var(--brand-dark); box-shadow: var(--shadow-sm); }
-  .grade-select { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-  .grade-select button { border: 2px solid var(--line); background: #fff; border-radius: 9px; padding: 8px 0; font-weight: 900; cursor: pointer; color: var(--ink-soft); font: inherit; }
-  .grade-select button.on { border-color: var(--brand); background: var(--brand-light); color: var(--brand-dark); }
-  .err { background: #fff0f0; color: #c0353a; border: 1px solid #f4c7c9; border-radius: 10px; padding: 10px 12px; font-weight: 700; font-size: .9rem; margin-bottom: 14px; display: none; }
-  @media (max-width: 860px){ .auth-wrap { grid-template-columns: 1fr; } .auth-art { display: none; } }
+  .tabs { display: flex; border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; margin-bottom: 20px; }
+  .tabs button { flex: 1; border: none; background: var(--surface); font: inherit; font-weight: 600; padding: 10px; cursor: pointer; color: var(--muted); border-right: 1px solid var(--line); }
+  .tabs button:last-child { border-right: 0; }
+  .tabs button.on { background: var(--accent); color: #fff; }
+  .grade-select { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+  .grade-select button { border: 1px solid var(--line-2); background: var(--surface); border-radius: var(--r); padding: 8px 0; font-weight: 700; cursor: pointer; color: var(--ink-2); font: inherit; }
+  .grade-select button.on { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+  .err { background: var(--danger-soft); color: var(--danger); border: 1px solid #e8cdcb; border-radius: var(--r); padding: 10px 12px; font-weight: 600; font-size: .88rem; margin-bottom: 14px; display: none; }
+  @media (max-width: 860px) { .auth-wrap { grid-template-columns: 1fr; } .auth-art { display: none; } }
 </style>
 
 <div id="nav"></div>
 
 <div class="auth-wrap">
   <div class="auth-art">
-    <div class="chip" style="background:rgba(255,255,255,.18);color:#fff;align-self:flex-start">🎓 Free forever</div>
-    <h2 style="margin-top:16px">Start your streak today</h2>
-    <p style="font-size:1.1rem;opacity:.95;max-width:36ch">Join Mastermind Academy and turn a few minutes a day into real progress.</p>
+    <span class="tag accent">Free for students</span>
+    <h2 style="margin-top:14px">Create your student account</h2>
+    <p class="muted" style="max-width:38ch">Register to save your progress, track mastery across subjects, and sit assessments.</p>
     <ul>
-      <li>⭐ Earn XP and level up</li>
-      <li>🔥 Build daily learning streaks</li>
-      <li>📈 Track mastery across 6 subjects</li>
-      <li>🏅 Unlock achievements as you grow</li>
+      <li><span data-icon="trending-up"></span> Adaptive practice that meets your level</li>
+      <li><span data-icon="flame"></span> Daily streaks and progress tracking</li>
+      <li><span data-icon="clipboard-check"></span> Full-length assessments with score reports</li>
+      <li><span data-icon="award"></span> Skill mastery across nine subjects</li>
     </ul>
   </div>
 
   <div class="auth-form">
     <div class="auth-card card pad">
       <div class="tabs">
-        <button id="tabLogin" class="on">Log in</button>
-        <button id="tabSignup">Sign up</button>
+        <button id="tabLogin" class="on">Sign in</button>
+        <button id="tabSignup">Register</button>
       </div>
       <div class="err" id="err"></div>
 
-      <!-- LOGIN -->
       <form id="loginForm">
         <div class="field"><label>Username</label><input class="input" id="li-user" autocomplete="username" placeholder="yourname"></div>
-        <div class="field"><label>Password</label><input class="input" id="li-pass" type="password" autocomplete="current-password" placeholder="••••••••"></div>
-        <button class="btn block lg" type="submit">Log in</button>
-        <p class="soft center" style="margin:14px 0 0;font-size:.9rem">New here? <a href="#" id="toSignup">Create a free account</a></p>
+        <div class="field"><label>Password</label><input class="input" id="li-pass" type="password" autocomplete="current-password" placeholder="Password"></div>
+        <button class="btn block lg" type="submit">Sign in</button>
+        <p class="muted small center" style="margin:14px 0 0">No account? <a href="#" id="toSignup">Register</a></p>
       </form>
 
-      <!-- SIGNUP -->
       <form id="signupForm" style="display:none">
-        <div class="field"><label>Your name</label><input class="input" id="su-name" autocomplete="name" placeholder="Alex Johnson"></div>
+        <div class="field"><label>Full name</label><input class="input" id="su-name" autocomplete="name" placeholder="Alex Johnson"></div>
         <div class="field"><label>Username</label><input class="input" id="su-user" autocomplete="username" placeholder="alexj"></div>
         <div class="field"><label>Grade level</label>
           <div class="grade-select" id="su-grades"></div>
@@ -63,69 +63,40 @@
         </div>
         <div class="field"><label>Password</label><input class="input" id="su-pass" type="password" autocomplete="new-password" placeholder="Choose a password"></div>
         <button class="btn block lg" type="submit">Create account</button>
-        <p class="soft center" style="margin:14px 0 0;font-size:.9rem">Already have an account? <a href="#" id="toLogin">Log in</a></p>
+        <p class="muted small center" style="margin:14px 0 0">Already registered? <a href="#" id="toLogin">Sign in</a></p>
       </form>
 
-      <p class="soft center" style="margin:18px 0 0;font-size:.78rem">Demo project · accounts are stored only in this browser.</p>
+      <p class="muted small center" style="margin:18px 0 0;font-size:.76rem">Accounts are stored locally in this browser. No data leaves your device.</p>
     </div>
   </div>
 </div>
 
 <div class="toast-host"></div>
 
+<script src="assets/js/icons.js"></script>
 <script src="assets/js/store.js"></script>
 <script src="assets/js/layout.js"></script>
-<script src="assets/js/secret.js"></script>
 <script>
   Layout.mount({});
-  // Already logged in? go to dashboard.
   if (Store.current()) location.href = 'dashboard.html';
-
   var tabLogin = document.getElementById('tabLogin'), tabSignup = document.getElementById('tabSignup');
-  var loginForm = document.getElementById('loginForm'), signupForm = document.getElementById('signupForm');
-  var err = document.getElementById('err');
+  var loginForm = document.getElementById('loginForm'), signupForm = document.getElementById('signupForm'), err = document.getElementById('err');
   function showErr(m) { err.textContent = m; err.style.display = 'block'; }
   function clearErr() { err.style.display = 'none'; }
-
-  function setMode(mode) {
-    clearErr();
-    var signup = mode === 'signup';
-    tabSignup.classList.toggle('on', signup); tabLogin.classList.toggle('on', !signup);
-    signupForm.style.display = signup ? 'block' : 'none';
-    loginForm.style.display = signup ? 'none' : 'block';
-  }
-  tabLogin.onclick = function () { setMode('login'); };
-  tabSignup.onclick = function () { setMode('signup'); };
+  function setMode(m) { clearErr(); var s = m === 'signup'; tabSignup.classList.toggle('on', s); tabLogin.classList.toggle('on', !s); signupForm.style.display = s ? 'block' : 'none'; loginForm.style.display = s ? 'none' : 'block'; }
+  tabLogin.onclick = function () { setMode('login'); }; tabSignup.onclick = function () { setMode('signup'); };
   document.getElementById('toSignup').onclick = function (e) { e.preventDefault(); setMode('signup'); };
   document.getElementById('toLogin').onclick = function (e) { e.preventDefault(); setMode('login'); };
   if (location.hash === '#signup') setMode('signup');
 
-  // grade selector
   var gWrap = document.getElementById('su-grades'), gInput = document.getElementById('su-grade');
   ['K','1','2','3','4','5','6','7','8','9','10','11','12'].forEach(function (g) {
     var b = document.createElement('button'); b.type = 'button'; b.textContent = g;
     if (g === '5') b.classList.add('on');
-    b.onclick = function () {
-      [].forEach.call(gWrap.children, function (c) { c.classList.remove('on'); });
-      b.classList.add('on'); gInput.value = g;
-    };
+    b.onclick = function () { [].forEach.call(gWrap.children, function (c) { c.classList.remove('on'); }); b.classList.add('on'); gInput.value = g; };
     gWrap.appendChild(b);
   });
 
-  loginForm.addEventListener('submit', function (e) {
-    e.preventDefault(); clearErr();
-    var r = Store.login(document.getElementById('li-user').value, document.getElementById('li-pass').value);
-    if (!r.ok) return showErr(r.error);
-    location.href = 'dashboard.html';
-  });
-  signupForm.addEventListener('submit', function (e) {
-    e.preventDefault(); clearErr();
-    var r = Store.signup(
-      document.getElementById('su-name').value,
-      document.getElementById('su-user').value,
-      gInput.value,
-      document.getElementById('su-pass').value);
-    if (!r.ok) return showErr(r.error);
-    location.href = 'dashboard.html';
-  });
+  loginForm.addEventListener('submit', function (e) { e.preventDefault(); clearErr(); var r = Store.login(document.getElementById('li-user').value, document.getElementById('li-pass').value); if (!r.ok) return showErr(r.error); location.href = 'dashboard.html'; });
+  signupForm.addEventListener('submit', function (e) { e.preventDefault(); clearErr(); var r = Store.signup(document.getElementById('su-name').value, document.getElementById('su-user').value, gInput.value, document.getElementById('su-pass').value); if (!r.ok) return showErr(r.error); location.href = 'dashboard.html'; });
 </script>

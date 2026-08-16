@@ -1,87 +1,89 @@
-/* ============================================================
-   layout.js — shared nav + footer, injected into every page.
-   Keeps the header/footer consistent and auth-aware.
-   ============================================================ */
+/* layout.js — shared nav + footer, injected on every page. Auth-aware. */
 (function (global) {
   'use strict';
   var rel = UI.relBase();
 
   function logoSVG() {
-    return '<svg class="logo" viewBox="0 0 48 48" aria-hidden="true">' +
-      '<defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">' +
-      '<stop offset="0" stop-color="#1e9e6a"/><stop offset="1" stop-color="#37c98a"/></linearGradient></defs>' +
-      '<rect x="3" y="3" width="42" height="42" rx="12" fill="url(#lg)"/>' +
-      '<circle cx="16" cy="17" r="4" fill="#fff"/><circle cx="32" cy="17" r="4" fill="#bff3dc"/>' +
-      '<circle cx="16" cy="31" r="4" fill="#bff3dc"/><circle cx="32" cy="31" r="4" fill="#fff"/></svg>';
+    return '<svg class="logo" width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">' +
+      '<rect x="1.5" y="1.5" width="29" height="29" rx="3" fill="none" stroke="#2b3d5c" stroke-width="1.5"/>' +
+      '<path d="M7 22V10l5 7 5-7v12" fill="none" stroke="#2b3d5c" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
+      '<line x1="21" y1="10" x2="21" y2="22" stroke="#2b3d5c" stroke-width="2" stroke-linecap="round"/>' +
+      '<line x1="21" y1="16" x2="25.5" y2="16" stroke="#8b9099" stroke-width="2" stroke-linecap="round"/></svg>';
   }
+  function ic(name) { return (global.Icons ? Icons.icon(name, { size: 15 }) : ''); }
+
+  var NAV = [
+    ['subjects', 'index.html#subjects', 'Subjects', 'book-open'],
+    ['mathlab', 'mathlab.html', 'Math Lab', 'calculator'],
+    ['speed', 'speed.html', 'Speed Drills', 'timer'],
+    ['tests', 'tests.html', 'Assessments', 'clipboard-list'],
+    ['blog', 'blog.html', 'Journal', 'newspaper']
+  ];
 
   var Layout = {
-    mount: function (opts) {
-      opts = opts || {};
-      this.nav(opts.active);
-      this.footer();
-    },
+    mount: function (opts) { opts = opts || {}; this.nav(opts.active); this.footer(); if (global.Icons) Icons.hydrate(); },
 
     nav: function (active) {
-      var host = document.getElementById('nav');
-      if (!host) return;
+      var host = document.getElementById('nav'); if (!host) return;
       var user = Store.current();
-      var links = [
-        ['home', rel + 'index.html', 'Home'],
-        ['subjects', rel + 'index.html#subjects', 'Subjects'],
-        ['grades', rel + 'index.html#grades', 'Grade Levels'],
-        ['about', rel + 'index.html#how', 'How It Works']
-      ];
-      var linkHTML = links.map(function (l) {
-        return '<a href="' + l[1] + '"' + (active === l[0] ? ' style="color:var(--brand-dark);background:var(--brand-light)"' : '') + '>' + l[2] + '</a>';
-      }).join('');
+      var links = NAV.map(function (l) {
+        return '<a href="' + rel + l[1] + '" class="' + (active === l[0] ? 'on' : '') + '">' + ic(l[3]) + l[2] + '</a>';
+      });
+      if (user) links.unshift('<a href="' + rel + 'dashboard.html" class="' + (active === 'dashboard' ? 'on' : '') + '">' + ic('layout-dashboard') + 'Dashboard</a>');
+      var linkHTML = links.join('');
 
       var right;
       if (user) {
-        right = '<a class="pill" href="' + rel + 'dashboard.html" style="text-decoration:none">' +
-          '<span style="font-size:1.15rem">' + user.avatar + '</span> ' + UI.esc(user.name.split(' ')[0]) + '</a>' +
-          '<button class="btn ghost" id="logoutBtn">Log out</button>';
+        right = '<a class="btn subtle sm" href="' + rel + 'dashboard.html">' + ic('user') + UI.esc(user.name.split(' ')[0]) + '</a>' +
+          '<button class="btn ghost sm" id="logoutBtn">' + ic('log-out') + 'Sign out</button>';
       } else {
-        right = '<a class="btn ghost" href="' + rel + 'login.html">Log in</a>' +
-          '<a class="btn" href="' + rel + 'login.html#signup">Sign up free</a>';
+        right = '<a class="btn ghost sm" href="' + rel + 'login.html">Log in</a>' +
+          '<a class="btn sm" href="' + rel + 'login.html#signup">Create account</a>';
       }
 
       host.className = 'nav';
       host.innerHTML = '<div class="wrap nav-in">' +
-        '<a class="brand" href="' + rel + 'index.html" id="brandLink">' + logoSVG() + 'Master<b>mind</b></a>' +
-        '<nav class="nav-links">' + linkHTML + '</nav>' +
+        '<a class="brand" href="' + rel + 'index.html">' + logoSVG() + 'Mastermind<span style="color:var(--muted);font-weight:400">&nbsp;Academy</span></a>' +
+        '<button class="nav-toggle" id="navToggle" aria-label="Menu">' + ic('menu') + '</button>' +
+        '<nav class="nav-links" id="navLinks">' + linkHTML + '</nav>' +
         '<div class="nav-spacer"></div>' +
         '<div class="nav-right">' + right + '</div>' +
         '</div>';
 
       var lo = document.getElementById('logoutBtn');
       if (lo) lo.addEventListener('click', function () { Store.logout(); location.href = rel + 'index.html'; });
+      var tg = document.getElementById('navToggle');
+      if (tg) tg.addEventListener('click', function () { document.getElementById('navLinks').classList.toggle('open'); });
+      if (global.Icons) Icons.hydrate(host);
     },
 
     footer: function () {
-      var host = document.getElementById('footer');
-      if (!host) return;
+      var host = document.getElementById('footer'); if (!host) return;
       var year = new Date().getFullYear();
       host.className = 'footer';
       host.innerHTML = '<div class="wrap"><div class="foot-grid">' +
-        '<div><div class="brand" style="font-size:1.15rem;margin-bottom:10px">' + logoSVG() + 'Master<b>mind</b></div>' +
-        '<p class="soft" style="max-width:34ch">Personalized K-12 practice in math, reading, languages and science. Learn a little every day.</p></div>' +
-        '<div><h5>Learn</h5><ul>' +
+        '<div><div class="brand" style="font-size:1.05rem;margin-bottom:10px">' + logoSVG() + 'Mastermind Academy</div>' +
+        '<p class="muted small" style="max-width:38ch">A standards-aligned practice platform for students in kindergarten through grade 12. Diagnostic practice, timed drills, and assessments across core subjects.</p></div>' +
+        '<div><h5>Practice</h5><ul>' +
         '<li><a href="' + rel + 'index.html#subjects">Subjects</a></li>' +
+        '<li><a href="' + rel + 'mathlab.html">Math Lab</a></li>' +
+        '<li><a href="' + rel + 'speed.html">Speed Drills</a></li>' +
+        '<li><a href="' + rel + 'tests.html">Assessments</a></li></ul></div>' +
+        '<div><h5>Academy</h5><ul>' +
+        '<li><a href="' + rel + 'blog.html">Student Journal</a></li>' +
+        '<li><a href="' + rel + 'about.html">About</a></li>' +
         '<li><a href="' + rel + 'index.html#grades">Grade levels</a></li>' +
         '<li><a href="' + rel + 'dashboard.html">Dashboard</a></li></ul></div>' +
-        '<div><h5>Company</h5><ul>' +
-        '<li><a href="' + rel + 'index.html#how">How it works</a></li>' +
-        '<li><a href="' + rel + 'index.html#families">For families</a></li>' +
-        '<li><a href="' + rel + 'login.html">Sign in</a></li></ul></div>' +
         '<div><h5>Support</h5><ul>' +
-        '<li><a href="' + rel + 'index.html#faq">Help center</a></li>' +
-        '<li><a href="' + rel + 'index.html">Privacy</a></li>' +
-        '<li><a href="' + rel + 'index.html">Terms</a></li></ul></div>' +
+        '<li><a href="' + rel + 'about.html#faq">Help &amp; FAQ</a></li>' +
+        '<li><a href="' + rel + 'index.html">Accessibility</a></li>' +
+        '<li><a href="' + rel + 'index.html">Privacy policy</a></li>' +
+        '<li><a href="' + rel + 'index.html">Terms of use</a></li></ul></div>' +
         '</div><div class="foot-bottom">' +
-        '<span>© ' + year + ' Mastermind Academy. Practice makes progress.<span id="mm-seal" aria-hidden="true"></span></span>' +
-        '<span>Made for curious learners everywhere.</span>' +
+        '<span>&copy; ' + year + ' Mastermind Academy. All rights reserved.</span>' +
+        '<span>Student progress is stored locally on this device.</span>' +
         '</div></div>';
+      if (global.Icons) Icons.hydrate(host);
     }
   };
 

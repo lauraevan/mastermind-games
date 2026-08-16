@@ -1,47 +1,61 @@
-/* practice.css — subject practice pages */
-.prac { padding: 26px 0 60px; }
-.prac-head { display: flex; align-items: center; gap: 16px; margin-bottom: 22px; flex-wrap: wrap; }
-.prac-head .ic { width: 58px; height: 58px; border-radius: 16px; display: grid; place-items: center; color: #fff; font-size: 1.8rem; flex: 0 0 auto; }
-.prac-head h1 { margin: 0; font-size: 1.8rem; }
-.prac-head p { margin: 2px 0 0; color: var(--ink-soft); }
+/* practice.css — subject practice pages (v2, institutional) */
+.prac { padding: 26px 0 56px; }
+.prac-head { display: flex; align-items: center; gap: 14px; margin-bottom: 22px; flex-wrap: wrap; }
+.prac-head .ic { width: 46px; height: 46px; border-radius: var(--r); display: grid; place-items: center; flex: 0 0 auto; border: 1px solid var(--line); background: var(--surface); }
+.prac-head h1 { margin: 0; font-size: 1.55rem; }
+.prac-head p { margin: 2px 0 0; color: var(--muted); font-size: .92rem; }
 .prac-head .spacer { flex: 1; }
 
-.prac-cols { display: grid; grid-template-columns: 300px 1fr; gap: 22px; align-items: start; }
-.skill-panel { background: #fff; border: 1px solid var(--line); border-radius: 18px; padding: 16px; box-shadow: var(--shadow-sm); position: sticky; top: 82px; max-height: calc(100vh - 100px); overflow: auto; }
-.skill-panel h3 { font-size: .8rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 4px 4px 12px; }
-.skill-item { display: block; width: 100%; text-align: left; background: #fff; border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; margin-bottom: 8px; cursor: pointer; font: inherit; transition: border-color .12s, background .12s; }
-.skill-item:hover { border-color: var(--brand); background: #f9fefb; }
-.skill-item.on { border-color: var(--brand); background: var(--brand-light); box-shadow: 0 0 0 3px var(--ring); }
+.prac-cols { display: grid; grid-template-columns: 288px 1fr; gap: 20px; align-items: start; }
+.skill-panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r2); padding: 12px; position: sticky; top: 74px; max-height: calc(100vh - 92px); overflow: auto; }
+.skill-panel h3 { font-family: var(--sans); font-size: .68rem; text-transform: uppercase; letter-spacing: .09em; color: var(--faint); margin: 6px 6px 10px; font-weight: 700; }
+.skill-item { display: block; width: 100%; text-align: left; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 10px 12px; margin-bottom: 6px; cursor: pointer; font: inherit; }
+.skill-item:hover { background: var(--surface-2); border-color: var(--line-2); }
+.skill-item.on { border-color: var(--accent); background: var(--accent-soft); }
+.skill-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.skill-name { font-weight: 600; font-size: .9rem; }
+.skill-grade { font-size: .72rem; font-weight: 600; color: var(--faint); }
 
-.practice-card { background: #fff; border: 1px solid var(--line); border-radius: 20px; padding: 30px; box-shadow: var(--shadow); }
-.practice-empty { background: #fff; border: 2px dashed var(--line); border-radius: 20px; padding: 60px 30px; text-align: center; color: var(--ink-soft); }
-.practice-empty .big { font-size: 3rem; margin-bottom: 10px; }
+.practice-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r2); padding: 26px; }
+.practice-empty { background: var(--surface); border: 1px dashed var(--line-2); border-radius: var(--r2); padding: 56px 30px; text-align: center; color: var(--muted); }
+.practice-empty .big { color: var(--faint); margin-bottom: 8px; }
 
-.q-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 6px; flex-wrap: wrap; }
-.mastery { display: flex; align-items: center; gap: 10px; min-width: 200px; }
-.mastery .bar { flex: 1; height: 8px; }
-.question { font-size: 1.7rem; font-weight: 900; margin: 18px 0 22px; line-height: 1.3; letter-spacing: -.01em; }
+.q-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 4px; flex-wrap: wrap; }
+.q-top h2 { font-size: 1.15rem; margin: 6px 0 0; }
+.mastery { display: flex; align-items: center; gap: 9px; min-width: 190px; }
+.mastery .bar { flex: 1; }
+.adapt-tag { display: inline-flex; align-items: center; gap: 6px; font-size: .74rem; font-weight: 600; color: var(--muted); background: var(--surface-2); border: 1px solid var(--line); border-radius: var(--r); padding: 4px 9px; margin-top: 10px; }
+.adapt-tag svg { color: var(--accent); }
 
-.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.choice { font: inherit; font-weight: 800; font-size: 1.15rem; padding: 18px; border-radius: 14px; border: 2px solid var(--line); background: #fbfdff; cursor: pointer; text-align: center; transition: transform .08s, border-color .12s; }
-.choice:hover:not(:disabled) { border-color: var(--brand); transform: translateY(-2px); }
+.question { font-family: var(--serif); font-size: 1.7rem; font-weight: 600; margin: 20px 0 22px; line-height: 1.3; }
+
+.choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.choice { font: inherit; font-weight: 600; font-size: 1.05rem; padding: 15px; border-radius: var(--r); border: 1px solid var(--line-2); background: var(--surface); cursor: pointer; text-align: left; }
+.choice:hover:not(:disabled) { border-color: var(--accent); background: var(--surface-2); }
 .choice:disabled { cursor: default; }
-.choice.right { border-color: var(--brand); background: var(--brand-light); color: var(--brand-dark); }
-.choice.wrong { border-color: #e5484d; background: #fff0f0; color: #c0353a; }
+.choice.right { border-color: var(--ok); background: var(--ok-soft); color: var(--ok); }
+.choice.wrong { border-color: var(--danger); background: var(--danger-soft); color: var(--danger); }
 
 .input-answer { display: flex; gap: 10px; align-items: center; }
-.input-answer .input.ok { border-color: var(--brand); background: var(--brand-light); }
-.input-answer .input.no { border-color: #e5484d; background: #fff0f0; }
+.input-answer .input { max-width: 260px; }
+.input-answer .input.ok { border-color: var(--ok); background: var(--ok-soft); }
+.input-answer .input.no { border-color: var(--danger); background: var(--danger-soft); }
 
-.feedback { margin-top: 20px; padding: 16px 18px; border-radius: 14px; font-weight: 700; }
-.feedback.good { background: var(--brand-light); color: var(--brand-dark); border: 1px solid #bfe9d4; }
-.feedback.bad { background: #fff0f0; color: #c0353a; border: 1px solid #f4c7c9; }
+.feedback { margin-top: 20px; padding: 14px 16px; border-radius: var(--r); font-weight: 600; display: flex; gap: 10px; align-items: flex-start; }
+.feedback svg { flex: 0 0 auto; margin-top: 1px; }
+.feedback.good { background: var(--ok-soft); color: var(--ok); border: 1px solid #cfe2d6; }
+.feedback.bad { background: var(--danger-soft); color: var(--danger); border: 1px solid #e8cdcb; }
 
-.session-bar { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-top: 22px; }
-.session-bar .sc { text-align: center; background: #f6f8fc; border-radius: 12px; padding: 12px 6px; }
-.session-bar .sc b { display: block; font-size: 1.4rem; }
-.session-bar .sc span { color: var(--ink-soft); font-weight: 800; font-size: .78rem; }
+.session-bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-top: 24px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+.session-bar .sc { text-align: center; background: var(--surface); padding: 12px 6px; }
+.session-bar .sc b { display: block; font-size: 1.35rem; font-family: var(--serif); }
+.session-bar .sc span { color: var(--muted); font-weight: 600; font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; }
 
 .prac-actions { margin-top: 22px; display: flex; justify-content: flex-end; }
 
-@media (max-width: 860px){ .prac-cols { grid-template-columns: 1fr; } .skill-panel { position: static; max-height: none; } .choices { grid-template-columns: 1fr; } .question { font-size: 1.4rem; } }
+@media (max-width: 860px) {
+  .prac-cols { grid-template-columns: 1fr; }
+  .skill-panel { position: static; max-height: none; }
+  .choices { grid-template-columns: 1fr; }
+  .question { font-size: 1.4rem; }
+}

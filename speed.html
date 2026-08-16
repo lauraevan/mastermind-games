@@ -1,0 +1,177 @@
+<title>Speed Drills — Mastermind Academy</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<style>
+  .sp { padding: 26px 0 56px; }
+  .sp-head { margin-bottom: 20px; }
+  .sp-setup { display: grid; grid-template-columns: 1.4fr 1fr; gap: 18px; }
+  .drill-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .drill { border: 1px solid var(--line-2); border-radius: var(--r); padding: 14px; background: var(--surface); cursor: pointer; text-align: left; font: inherit; display: flex; align-items: center; gap: 10px; }
+  .drill:hover { border-color: var(--accent); background: var(--surface-2); }
+  .drill.on { border-color: var(--accent); background: var(--accent-soft); }
+  .drill svg { color: var(--accent); }
+  .drill b { font-size: .95rem; }
+  .run { border: 1px solid var(--line); border-radius: var(--r2); background: var(--surface); padding: 30px; text-align: center; }
+  .run-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+  .run-stat { text-align: center; }
+  .run-stat b { display: block; font-family: var(--serif); font-size: 1.6rem; }
+  .run-stat span { color: var(--muted); font-size: .74rem; text-transform: uppercase; letter-spacing: .05em; font-weight: 600; }
+  .run-q { font-family: var(--serif); font-size: 3rem; font-weight: 600; margin: 10px 0 20px; }
+  .run-input { font-family: var(--serif); font-size: 2rem; text-align: center; width: 220px; padding: 10px; border: 1px solid var(--line-2); border-radius: var(--r); }
+  .run-input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+  .run-input.flash-bad { border-color: var(--danger); background: var(--danger-soft); }
+  .timerbar { height: 6px; background: var(--surface-3); border-radius: 2px; overflow: hidden; margin-bottom: 22px; }
+  .timerbar > i { display: block; height: 100%; background: var(--accent); transition: width 1s linear; }
+  .result-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; margin: 20px 0; }
+  .result-grid .rc { background: var(--surface); padding: 16px; text-align: center; }
+  .result-grid .rc b { display: block; font-family: var(--serif); font-size: 1.7rem; }
+  .result-grid .rc span { color: var(--muted); font-size: .72rem; text-transform: uppercase; letter-spacing: .04em; font-weight: 600; }
+  @media (max-width: 800px) { .sp-setup { grid-template-columns: 1fr; } .drill-grid { grid-template-columns: 1fr 1fr; } .result-grid { grid-template-columns: 1fr 1fr; } }
+</style>
+
+<div id="nav"></div>
+
+<main class="sp wrap">
+  <div class="sp-head">
+    <span class="eyebrow">Fluency</span>
+    <h1>Speed Drills</h1>
+    <p class="muted">Answer as many as you can before the clock runs out. The level rises as your streak grows.</p>
+  </div>
+
+  <!-- SETUP -->
+  <div id="setup" class="sp-setup">
+    <div class="panel">
+      <h2 style="margin-top:0">Choose a drill</h2>
+      <div class="drill-grid" id="drillGrid"></div>
+    </div>
+    <div class="panel">
+      <h2 style="margin-top:0">Length</h2>
+      <div class="drill-grid" style="grid-template-columns:1fr 1fr 1fr">
+        <button class="drill" data-dur="30"><b>30s</b></button>
+        <button class="drill on" data-dur="60"><b>60s</b></button>
+        <button class="drill" data-dur="120"><b>120s</b></button>
+      </div>
+      <button class="btn block lg" id="startBtn" style="margin-top:16px"><span data-icon="play" data-size="16"></span> Start drill</button>
+      <div class="muted small" style="margin-top:12px" id="bestNote"></div>
+    </div>
+  </div>
+
+  <!-- RUN -->
+  <div id="run" class="run" style="display:none">
+    <div class="timerbar"><i id="timerFill" style="width:100%"></i></div>
+    <div class="run-top">
+      <div class="run-stat"><b id="rScore">0</b><span>Correct</span></div>
+      <div class="run-stat"><b id="rStreak">0</b><span>Streak</span></div>
+      <div class="run-stat"><b id="rTime">60</b><span>Seconds</span></div>
+    </div>
+    <div class="run-q" id="rq">—</div>
+    <input class="run-input" id="rInput" inputmode="text" autocomplete="off" spellcheck="false">
+    <p class="muted small" style="margin-top:16px">Press Enter to submit. Correct answers advance automatically.</p>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result" class="run" style="display:none">
+    <h2 style="margin-top:0">Drill complete</h2>
+    <div class="result-grid">
+      <div class="rc"><b id="fScore">0</b><span>Correct</span></div>
+      <div class="rc"><b id="fAcc">0%</b><span>Accuracy</span></div>
+      <div class="rc"><b id="fRate">0</b><span>Per minute</span></div>
+      <div class="rc"><b id="fBest">0</b><span>Best</span></div>
+    </div>
+    <button class="btn lg" id="againBtn"><span data-icon="rotate-ccw" data-size="16"></span> Run again</button>
+    <a class="btn ghost lg" href="dashboard.html" style="margin-left:8px">Dashboard</a>
+  </div>
+</main>
+
+<div class="toast-host"></div>
+<div id="footer"></div>
+
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/problems.js"></script>
+<script src="assets/js/layout.js"></script>
+<script src="assets/js/hidden.js"></script>
+<script>
+  Layout.mount({ active: 'speed' });
+
+  var cfg = { kind: 'add', dur: 60 };
+  var grid = document.getElementById('drillGrid');
+  Problems.SPEED.forEach(function (s, i) {
+    var b = document.createElement('button');
+    b.className = 'drill' + (i === 0 ? ' on' : '');
+    b.dataset.kind = s.id;
+    b.innerHTML = Icons.icon(s.icon, { size: 18 }) + '<b>' + s.name + '</b>';
+    b.onclick = function () { [].forEach.call(grid.children, function (c) { c.classList.remove('on'); }); b.classList.add('on'); cfg.kind = s.id; updateBest(); };
+    grid.appendChild(b);
+  });
+  var durBtns = document.querySelectorAll('[data-dur]');
+  [].forEach.call(durBtns, function (b) { b.onclick = function () { [].forEach.call(durBtns, function (c) { c.classList.remove('on'); }); b.classList.add('on'); cfg.dur = +b.dataset.dur; }; });
+
+  function bestKey() { return 'mm_speed_' + cfg.kind; }
+  function updateBest() { var best = +(localStorage.getItem(bestKey()) || 0); document.getElementById('bestNote').textContent = best ? ('Your best ' + kindName() + ' score: ' + best) : ''; }
+  function kindName() { for (var i = 0; i < Problems.SPEED.length; i++) if (Problems.SPEED[i].id === cfg.kind) return Problems.SPEED[i].name; return ''; }
+  updateBest();
+
+  var run = { score: 0, attempts: 0, streak: 0, level: 1, timeLeft: 60, timer: null, current: null };
+  function show(id) { ['setup', 'run', 'result'].forEach(function (s) { document.getElementById(s).style.display = s === id ? (id === 'setup' ? 'grid' : 'block') : 'none'; }); }
+
+  function nextQ() {
+    run.level = 1 + Math.floor(run.score / 10);
+    run.current = Problems.speed(cfg.kind, run.level);
+    document.getElementById('rq').textContent = run.current.q + ' =';
+    var inp = document.getElementById('rInput'); inp.value = ''; inp.classList.remove('flash-bad'); inp.focus();
+  }
+
+  function tick() {
+    run.timeLeft--;
+    document.getElementById('rTime').textContent = run.timeLeft;
+    document.getElementById('timerFill').style.width = (run.timeLeft / cfg.dur * 100) + '%';
+    if (run.timeLeft <= 0) finish();
+  }
+
+  function start() {
+    run.score = 0; run.attempts = 0; run.streak = 0; run.level = 1; run.timeLeft = cfg.dur;
+    document.getElementById('rScore').textContent = '0'; document.getElementById('rStreak').textContent = '0';
+    document.getElementById('rTime').textContent = cfg.dur; document.getElementById('timerFill').style.width = '100%';
+    show('run'); nextQ();
+    run.timer = setInterval(tick, 1000);
+  }
+
+  function submit() {
+    if (!run.current) return;
+    var val = document.getElementById('rInput').value.trim().toLowerCase();
+    if (!val) return;
+    run.attempts++;
+    if (val === String(run.current.answer).toLowerCase()) {
+      run.score++; run.streak++;
+      document.getElementById('rScore').textContent = run.score;
+      document.getElementById('rStreak').textContent = run.streak;
+      nextQ();
+    } else {
+      run.streak = 0; document.getElementById('rStreak').textContent = '0';
+      var inp = document.getElementById('rInput'); inp.classList.add('flash-bad');
+      setTimeout(function () { inp.classList.remove('flash-bad'); inp.value = ''; }, 260);
+    }
+  }
+
+  function finish() {
+    clearInterval(run.timer);
+    var acc = run.attempts ? Math.round(run.score / run.attempts * 100) : 0;
+    var rate = Math.round(run.score / cfg.dur * 60);
+    document.getElementById('fScore').textContent = run.score;
+    document.getElementById('fAcc').textContent = acc + '%';
+    document.getElementById('fRate').textContent = rate;
+    var best = +(localStorage.getItem(bestKey()) || 0);
+    if (run.score > best) { best = run.score; localStorage.setItem(bestKey(), best); }
+    document.getElementById('fBest').textContent = best;
+    if (Store.current() && run.score > 0) { for (var i = 0; i < Math.min(run.score, 30); i++) Store.record('math', 'speed', true, 3); }
+    show('result'); Icons.hydrate();
+  }
+
+  document.getElementById('rInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); submit(); } });
+  document.getElementById('startBtn').onclick = start;
+  document.getElementById('againBtn').onclick = function () { show('setup'); updateBest(); };
+</script>

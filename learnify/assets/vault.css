@@ -1,0 +1,60 @@
+/* learnify — pitch black. A dense wall of tiles; the label only
+   shows when you hover a tile. No decoration, no chrome. */
+* { box-sizing: border-box; }
+html, body { margin: 0; background: #000; color: #d8d8d8;
+  font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; min-height: 100%; }
+::selection { background: #222; }
+[hidden] { display: none !important; }
+
+.top { position: sticky; top: 0; z-index: 20; background: rgba(0,0,0,.92);
+  backdrop-filter: blur(6px); border-bottom: 1px solid #141414; }
+.top-in { max-width: 1400px; margin: 0 auto; padding: 12px 18px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.mark { width: 24px; height: 24px; border-radius: 5px; background: #161616; border: 1px solid #262626; flex: 0 0 auto; }
+.search { flex: 1; min-width: 160px; display: flex; align-items: center; gap: 8px; background: #0c0c0c; border: 1px solid #1c1c1c; border-radius: 6px; padding: 0 10px; }
+.search svg { color: #555; flex: 0 0 auto; }
+.search input { flex: 1; background: transparent; border: 0; color: #ddd; font: inherit; padding: 8px 0; outline: none; }
+.count { color: #666; font-size: .8rem; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.back { color: #555; display: inline-flex; padding: 6px; border-radius: 6px; }
+.back:hover { color: #aaa; background: #101010; }
+
+.sources { max-width: 1400px; margin: 0 auto; padding: 10px 18px 0; display: flex; gap: 6px; flex-wrap: wrap; }
+.src-chip { font: inherit; font-size: .74rem; font-weight: 500; padding: 4px 9px; border-radius: 5px;
+  background: #0c0c0c; border: 1px solid #1c1c1c; color: #777; cursor: pointer; }
+.src-chip b { color: #444; font-weight: 600; margin-left: 3px; }
+.src-chip.on { background: #1a1a1a; color: #e6e6e6; border-color: #333; }
+.src-chip.on b { color: #888; }
+
+.grid { max-width: 1400px; margin: 0 auto; padding: 14px 18px 60px;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: 6px; }
+.tile { position: relative; background: #090909; border: 1px solid #151515; border-radius: 7px;
+  padding: 0; cursor: pointer; overflow: hidden; aspect-ratio: 1 / 1; display: block; }
+.tile:hover { border-color: #3a3a3a; }
+.tile .ic { position: absolute; inset: 0; display: block; }
+.tile .ic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tile .ic.none { background: repeating-linear-gradient(45deg, #0d0d0d, #0d0d0d 6px, #111 6px, #111 12px); }
+/* label hidden until hover */
+.tile .label { position: absolute; left: 0; right: 0; bottom: 0; padding: 14px 6px 5px;
+  font-size: .66rem; line-height: 1.15; color: #fff; text-align: center;
+  background: linear-gradient(to top, rgba(0,0,0,.92) 40%, rgba(0,0,0,0));
+  opacity: 0; transition: opacity .12s; pointer-events: none;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tile:hover .label { opacity: 1; }
+
+.loading { max-width: 1400px; margin: 0 auto; padding: 70px 18px; text-align: center; color: #555; }
+.spinner { width: 26px; height: 26px; border: 2px solid #1a1a1a; border-top-color: #666; border-radius: 50%; margin: 0 auto 12px; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.more-wrap { max-width: 1400px; margin: 0 auto; padding: 0 18px 70px; text-align: center; }
+#more { font: inherit; font-size: .82rem; padding: 8px 22px; border-radius: 6px; cursor: pointer;
+  background: #0c0c0c; border: 1px solid #1c1c1c; color: #999; }
+#more:hover { border-color: #333; color: #ddd; }
+
+.ov { position: fixed; inset: 0; z-index: 100; background: #000; display: none; flex-direction: column; }
+.ov.on { display: flex; }
+.ov-bar { display: flex; align-items: center; gap: 12px; padding: 9px 14px; border-bottom: 1px solid #141414; }
+.ov-bar .t { flex: 1; font-size: .85rem; color: #bbb; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ov-bar button { font: inherit; font-size: .8rem; border: 1px solid #1f1f1f; background: #0c0c0c; color: #bbb; border-radius: 6px; padding: 6px 12px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+.ov-bar button:hover { border-color: #333; color: #fff; }
+.ov iframe { flex: 1; width: 100%; border: 0; background: #000; }
+
+@media (max-width: 560px) { .grid { grid-template-columns: repeat(auto-fill, minmax(72px, 1fr)); } }

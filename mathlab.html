@@ -1,0 +1,182 @@
+<title>Math Lab — Mastermind Academy</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/main.css">
+<style>
+  .lab { padding: 26px 0 56px; }
+  .lab-tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 18px 0 22px; flex-wrap: wrap; }
+  .lab-tab { border: none; background: none; font: inherit; font-weight: 600; color: var(--muted); padding: 10px 14px; cursor: pointer; border-bottom: 2px solid transparent; display: inline-flex; align-items: center; gap: 7px; }
+  .lab-tab svg { width: 16px; height: 16px; }
+  .lab-tab.on { color: var(--accent); border-bottom-color: var(--accent); }
+  .tool { display: none; }
+  .tool.on { display: block; }
+  canvas { border: 1px solid var(--line); border-radius: var(--r); background: var(--surface); max-width: 100%; }
+  .grapher-controls { display: flex; gap: 8px; margin-bottom: 14px; flex-wrap: wrap; align-items: center; }
+  .grapher-controls .input { max-width: 320px; font-family: var(--mono); }
+  .preset { border: 1px solid var(--line-2); border-radius: var(--r); background: var(--surface); padding: 5px 10px; font: inherit; font-size: .82rem; cursor: pointer; font-family: var(--mono); }
+  .preset:hover { border-color: var(--accent); }
+  .tt-wrap { overflow-x: auto; }
+  table.tt { border-collapse: collapse; font-variant-numeric: tabular-nums; }
+  table.tt td, table.tt th { border: 1px solid var(--line); width: 42px; height: 34px; text-align: center; font-size: .82rem; }
+  table.tt th { background: var(--surface-2); font-weight: 700; color: var(--muted); }
+  table.tt td.hl { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+  table.tt td.hlx { background: var(--accent); color: #fff; font-weight: 700; }
+  .fact-out { margin-top: 16px; }
+  .fact-out .row { display: flex; gap: 10px; padding: 9px 0; border-bottom: 1px solid var(--line); }
+  .fact-out .row b { min-width: 180px; color: var(--muted); font-weight: 600; }
+  .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chips span { border: 1px solid var(--line-2); border-radius: var(--r); padding: 2px 8px; font-family: var(--mono); font-size: .82rem; }
+</style>
+
+<div id="nav"></div>
+
+<main class="lab wrap">
+  <span class="eyebrow">Tools</span>
+  <h1>Math Lab</h1>
+  <p class="muted">Explore, don't just drill. A function grapher, a multiplication matrix, and a factor engine.</p>
+
+  <div class="lab-tabs">
+    <button class="lab-tab on" data-tool="grapher"><span data-icon="spline"></span> Function Grapher</button>
+    <button class="lab-tab" data-tool="times"><span data-icon="calculator"></span> Times-Table Matrix</button>
+    <button class="lab-tab" data-tool="factor"><span data-icon="binary"></span> Factor Explorer</button>
+  </div>
+
+  <!-- GRAPHER -->
+  <section class="tool on" id="grapher">
+    <div class="panel">
+      <div class="grapher-controls">
+        <span class="mono muted">y =</span>
+        <input class="input" id="fnInput" value="x^2 - 3" spellcheck="false">
+        <button class="btn" id="plotBtn">Plot</button>
+      </div>
+      <div class="grapher-controls">
+        <span class="muted small">Try:</span>
+        <button class="preset">x^2 - 3</button>
+        <button class="preset">2*x + 1</button>
+        <button class="preset">sin(x)</button>
+        <button class="preset">x^3 - 4*x</button>
+        <button class="preset">1/x</button>
+        <button class="preset">abs(x) - 2</button>
+      </div>
+      <canvas id="graph" width="760" height="440"></canvas>
+      <p class="muted small" id="graphNote" style="margin-top:10px">Use <span class="mono">x</span>, operators <span class="mono">+ - * / ^</span>, and functions like <span class="mono">sin, cos, sqrt, abs, log</span>. Domain shown: −10 to 10.</p>
+    </div>
+  </section>
+
+  <!-- TIMES TABLE -->
+  <section class="tool" id="times">
+    <div class="panel">
+      <p class="muted small">Hover a cell to highlight its factors and product.</p>
+      <div class="tt-wrap"><table class="tt" id="ttTable"></table></div>
+    </div>
+  </section>
+
+  <!-- FACTOR -->
+  <section class="tool" id="factor">
+    <div class="panel">
+      <div class="grapher-controls">
+        <input class="input" id="numInput" type="number" value="360" style="max-width:200px">
+        <button class="btn" id="factorBtn">Analyze</button>
+      </div>
+      <div class="fact-out" id="factOut"></div>
+    </div>
+  </section>
+</main>
+
+<div id="footer"></div>
+
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/layout.js"></script>
+<script src="assets/js/hidden.js"></script>
+<script>
+  Layout.mount({ active: 'mathlab' });
+
+  // tabs
+  [].forEach.call(document.querySelectorAll('.lab-tab'), function (t) {
+    t.onclick = function () {
+      [].forEach.call(document.querySelectorAll('.lab-tab'), function (x) { x.classList.remove('on'); });
+      [].forEach.call(document.querySelectorAll('.tool'), function (x) { x.classList.remove('on'); });
+      t.classList.add('on'); document.getElementById(t.dataset.tool).classList.add('on');
+    };
+  });
+
+  /* ---- grapher ---- */
+  var cv = document.getElementById('graph'), ctx = cv.getContext('2d');
+  function compile(src) {
+    var expr = src.replace(/\^/g, '**');
+    if (/[^0-9x+\-*/^(). ,a-z]/i.test(src.replace(/\s/g, ''))) throw new Error('bad chars');
+    return new Function('x', 'with (Math) { return (' + expr + '); }');
+  }
+  function css(v) { return getComputedStyle(document.documentElement).getPropertyValue(v).trim() || '#000'; }
+  function plot(src) {
+    var W = cv.width, H = cv.height, cx = W / 2, cy = H / 2, scale = W / 20; // x in [-10,10]
+    ctx.clearRect(0, 0, W, H);
+    // grid
+    ctx.strokeStyle = css('--line'); ctx.lineWidth = 1;
+    for (var gx = -10; gx <= 10; gx++) { var px = cx + gx * scale; ctx.beginPath(); ctx.moveTo(px, 0); ctx.lineTo(px, H); ctx.stroke(); }
+    for (var gy = -Math.floor(cy / scale); gy <= Math.floor(cy / scale); gy++) { var py = cy + gy * scale; ctx.beginPath(); ctx.moveTo(0, py); ctx.lineTo(W, py); ctx.stroke(); }
+    // axes
+    ctx.strokeStyle = css('--line-2'); ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(W, cy); ctx.moveTo(cx, 0); ctx.lineTo(cx, H); ctx.stroke();
+    // curve
+    var f; try { f = compile(src); f(0); } catch (e) { document.getElementById('graphNote').textContent = 'Could not parse that expression.'; return; }
+    document.getElementById('graphNote').textContent = 'y = ' + src;
+    ctx.strokeStyle = css('--accent'); ctx.lineWidth = 2; ctx.beginPath();
+    var started = false;
+    for (var px2 = 0; px2 <= W; px2++) {
+      var xv = (px2 - cx) / scale, yv;
+      try { yv = f(xv); } catch (e) { started = false; continue; }
+      if (typeof yv !== 'number' || !isFinite(yv)) { started = false; continue; }
+      var py2 = cy - yv * scale;
+      if (py2 < -H || py2 > 2 * H) { started = false; continue; }
+      if (!started) { ctx.moveTo(px2, py2); started = true; } else ctx.lineTo(px2, py2);
+    }
+    ctx.stroke();
+  }
+  document.getElementById('plotBtn').onclick = function () { plot(document.getElementById('fnInput').value); };
+  document.getElementById('fnInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') plot(this.value); });
+  [].forEach.call(document.querySelectorAll('.preset'), function (p) { p.onclick = function () { document.getElementById('fnInput').value = p.textContent; plot(p.textContent); }; });
+  plot('x^2 - 3');
+
+  /* ---- times table ---- */
+  var tt = document.getElementById('ttTable'); var html = '<tr><th>×</th>';
+  for (var c = 1; c <= 12; c++) html += '<th>' + c + '</th>'; html += '</tr>';
+  for (var r = 1; r <= 12; r++) { html += '<tr><th>' + r + '</th>'; for (var c2 = 1; c2 <= 12; c2++) html += '<td data-r="' + r + '" data-c="' + c2 + '">' + (r * c2) + '</td>'; html += '</tr>'; }
+  tt.innerHTML = html;
+  tt.addEventListener('mouseover', function (e) {
+    var td = e.target.closest('td'); if (!td) return;
+    var r = +td.dataset.r, c = +td.dataset.c;
+    [].forEach.call(tt.querySelectorAll('td'), function (x) {
+      var xr = +x.dataset.r, xc = +x.dataset.c;
+      x.classList.remove('hl', 'hlx');
+      if (xr === r && xc === c) x.classList.add('hlx');
+      else if (xr === r || xc === c) x.classList.add('hl');
+    });
+  });
+
+  /* ---- factor explorer ---- */
+  function analyze(n) {
+    n = Math.abs(Math.floor(n)); if (n < 1) n = 1;
+    var factors = []; for (var i = 1; i <= n; i++) if (n % i === 0) factors.push(i);
+    var pf = [], m = n, d = 2; while (m > 1) { while (m % d === 0) { pf.push(d); m /= d; } d++; if (d * d > m && m > 1) { pf.push(m); break; } }
+    var prime = n > 1 && factors.length === 2;
+    var sq = Math.sqrt(n) % 1 === 0;
+    function isP(x) { if (x < 2) return false; for (var k = 2; k * k <= x; k++) if (x % k === 0) return false; return true; }
+    var expForm = {}; pf.forEach(function (p) { expForm[p] = (expForm[p] || 0) + 1; });
+    var pfStr = Object.keys(expForm).map(function (p) { return expForm[p] > 1 ? p + '^' + expForm[p] : p; }).join(' × ') || String(n);
+    var out = document.getElementById('factOut');
+    out.innerHTML =
+      '<div class="row"><b>Number</b><span class="mono">' + n + '</span></div>' +
+      '<div class="row"><b>Prime or composite</b><span>' + (n === 1 ? 'neither (unit)' : prime ? 'Prime' : 'Composite') + '</span></div>' +
+      '<div class="row"><b>Perfect square?</b><span>' + (sq ? 'Yes — √' + n + ' = ' + Math.sqrt(n) : 'No') + '</span></div>' +
+      '<div class="row"><b>Prime factorization</b><span class="mono">' + pfStr + '</span></div>' +
+      '<div class="row" style="align-items:flex-start"><b>All factors (' + factors.length + ')</b><div class="chips">' + factors.map(function (f) { return '<span' + (isP(f) ? ' style="border-color:var(--accent);color:var(--accent)"' : '') + '>' + f + '</span>'; }).join('') + '</div></div>' +
+      '<p class="muted small" style="margin-top:10px">Blue chips are prime factors.</p>';
+  }
+  document.getElementById('factorBtn').onclick = function () { analyze(+document.getElementById('numInput').value); };
+  document.getElementById('numInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') analyze(+this.value); });
+  analyze(360);
+</script>
