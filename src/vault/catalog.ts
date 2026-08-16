@@ -40,6 +40,15 @@ namespace Catalog {
   function ingest(): void {
     const data = window.__VAULT_DATA || [];
     state.rows = data.map((e) => ({ title: e[0], url: e[1], icon: e[2], src: e[3] }));
+    // Entries whose icons come from the local library CDN are guaranteed to have
+    // artwork; float them to the top so the "with icon" tiles lead and the
+    // riskier remote ones sink to the bottom.
+    state.rows.sort((a, b) => {
+      const la = a.icon.indexOf('lauraevan/greatestgreatest-revive') !== -1 ? 0 : 1;
+      const lb = b.icon.indexOf('lauraevan/greatestgreatest-revive') !== -1 ? 0 : 1;
+      if (la !== lb) return la - lb;
+      return a.title.toLowerCase() < b.title.toLowerCase() ? -1 : 1;
+    });
     state.loaded = true;
     buildSources();
     applyFilter();
@@ -79,12 +88,24 @@ namespace Catalog {
   function card(r: Row): HTMLElement {
     const el = document.createElement('button');
     el.className = 'tile';
-    el.title = '';
-    el.innerHTML =
-      '<span class="ic"><img loading="lazy" decoding="async" alt="" ' +
-      'onerror="this.parentNode.classList.add(&quot;none&quot;)" ' +
-      'src="' + encodeURI(r.icon) + '"></span>' +
-      '<span class="label">' + esc(r.title) + '</span>';
+    const icWrap = document.createElement('span');
+    icWrap.className = 'ic';
+    const img = document.createElement('img');
+    img.loading = 'lazy'; img.decoding = 'async'; img.alt = '';
+    img.onerror = () => {
+      // No artwork — grey it out and sink it to the end of the grid.
+      icWrap.classList.add('none');
+      el.classList.add('noicon');
+      const grid = el.parentNode;
+      if (grid) grid.appendChild(el);
+    };
+    img.src = encodeURI(r.icon);
+    icWrap.appendChild(img);
+    const label = document.createElement('span');
+    label.className = 'label';
+    label.textContent = r.title;
+    el.appendChild(icWrap);
+    el.appendChild(label);
     el.addEventListener('click', () => open(r));
     return el;
   }

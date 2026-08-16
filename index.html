@@ -1,175 +1,117 @@
 <title>Mastermind Academy</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="Mastermind Academy — a standards-aligned K-12 practice platform. Diagnostic practice, timed drills, and assessments across mathematics, language, science and social studies.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="description" content="Mastermind Academy — master K-12 skills at your own pace with fun, interactive questions, built-in support, and motivating awards across math, language arts, science, social studies and Spanish.">
 <link rel="stylesheet" href="assets/css/main.css">
 <style>
-  .hero { border-bottom: 1px solid var(--line); background: var(--surface); }
-  .hero-in { display: grid; grid-template-columns: 1.1fr .9fr; gap: 44px; align-items: center; padding: 56px 0; }
-  .hero h1 { font-size: clamp(2rem, 4vw, 2.9rem); line-height: 1.12; }
-  .hero .lead { font-size: 1.08rem; color: var(--ink-2); max-width: 48ch; margin: 14px 0 22px; }
-  .hero-cta { display: flex; gap: 10px; flex-wrap: wrap; }
-  .trust { display: flex; gap: 22px; margin-top: 22px; flex-wrap: wrap; color: var(--muted); }
-  .trust span { display: inline-flex; align-items: center; gap: 7px; font-size: .86rem; font-weight: 500; }
-  .trust svg { color: var(--accent); width: 16px; height: 16px; }
+  .hero { position: relative; overflow: hidden; background: linear-gradient(180deg,#dcf0fb 0%, #e9f6ef 55%, #eef8e6 100%); }
+  .hero-in { position: relative; z-index: 2; display: grid; grid-template-columns: 1.15fr .85fr; gap: 30px; align-items: center; padding: 40px 0 48px; }
+  .hero h1 { font-size: clamp(2.1rem,4.5vw,3.1rem); color: var(--blue-dark); }
+  .hero p.lead { font-size: 1.12rem; color: #55606b; max-width: 46ch; margin: 12px 0 22px; font-weight: 700; }
+  .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
+  .hero-scene { position: absolute; inset: 0; z-index: 1; }
+  .mascot-wrap { display: flex; justify-content: center; }
+  .mascot { width: 260px; max-width: 80%; filter: drop-shadow(0 12px 18px rgba(40,80,60,.22)); animation: bob 4s ease-in-out infinite; }
+  @keyframes bob { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-8px) } }
 
-  .mock { border: 1px solid var(--line); border-radius: var(--r2); background: var(--surface); overflow: hidden; }
-  .mock-h { display: flex; justify-content: space-between; align-items: center; padding: 11px 15px; border-bottom: 1px solid var(--line); background: var(--surface-2); font-size: .8rem; color: var(--muted); font-weight: 600; }
-  .mock-b { padding: 20px; }
-  .mock-q { font-family: var(--serif); font-size: 1.3rem; font-weight: 600; margin-bottom: 16px; }
-  .mock-opts { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-  .mock-opt { border: 1px solid var(--line-2); border-radius: var(--r); padding: 11px; font-weight: 600; font-size: .95rem; }
-  .mock-opt.ok { border-color: var(--ok); background: var(--ok-soft); color: var(--ok); }
+  .grade-list { display: flex; flex-direction: column; gap: 14px; }
+  .grade-row { display: flex; align-items: center; gap: 18px; background: #fff; border-radius: var(--r2); box-shadow: var(--sh); padding: 16px 18px; }
+  .grade-badge { width: 58px; height: 58px; flex: 0 0 auto; border-radius: 14px; display: grid; place-items: center; color: #fff; font-family: var(--serif); font-weight: 900; font-size: 1.5rem; box-shadow: inset 0 -3px 0 rgba(0,0,0,.12); }
+  .grade-main { flex: 1; min-width: 0; }
+  .grade-main h3 { margin: 0 0 3px; font-size: 1.2rem; color: #343a42; }
+  .grade-main .inc { color: var(--muted); font-size: .9rem; font-weight: 700; }
+  .grade-main .inc b { color: var(--ink-2); font-weight: 800; }
+  .see-btn { flex: 0 0 auto; border: 0; border-radius: 999px; color: #fff; font-weight: 800; padding: 11px 18px; font-size: .9rem; cursor: pointer; box-shadow: 0 2px 0 rgba(0,0,0,.12); display: inline-flex; align-items: center; gap: 6px; }
+  .see-btn:hover { filter: brightness(1.06); text-decoration: none; }
 
-  .stripe { border-bottom: 1px solid var(--line); background: var(--surface); }
-  .stripe-in { display: grid; grid-template-columns: repeat(4, 1fr); }
-  .stat { padding: 22px 24px; border-left: 1px solid var(--line); }
-  .stat:first-child { border-left: 0; }
-  .stat .n { font-family: var(--serif); font-size: 1.9rem; font-weight: 700; }
-  .stat .l { color: var(--muted); font-weight: 500; font-size: .85rem; }
+  .subj-strip { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+  .subj-card { display: block; border-radius: var(--r2); background: #fff; box-shadow: var(--sh); overflow: hidden; color: inherit; }
+  .subj-card:hover { transform: translateY(-3px); box-shadow: var(--sh-2); text-decoration: none; }
+  .subj-card .cap { padding: 14px 16px; color: #fff; display: flex; align-items: center; gap: 10px; }
+  .subj-card .cap h3 { margin: 0; color: #fff; font-size: 1.1rem; }
+  .subj-card .bd { padding: 14px 16px; }
+  .subj-card .bd p { color: var(--muted); font-size: .9rem; margin: 0 0 8px; font-weight: 700; }
+  .subj-card .bd .meta { color: var(--faint); font-weight: 800; font-size: .82rem; display: inline-flex; align-items: center; gap: 5px; }
 
-  .subj-card { border: 1px solid var(--line); border-radius: var(--r2); background: var(--surface); padding: 18px; display: block; color: inherit; border-top: 3px solid var(--sc, var(--accent)); }
-  .subj-card:hover { text-decoration: none; border-color: var(--line-2); background: var(--surface-2); }
-  .subj-card .sh { display: flex; align-items: center; gap: 9px; margin-bottom: 8px; }
-  .subj-card .sh svg { color: var(--sc, var(--accent)); }
-  .subj-card h3 { margin: 0; font-size: 1.05rem; }
-  .subj-card p { color: var(--muted); font-size: .88rem; margin: 0 0 10px; }
-  .subj-card .meta { color: var(--faint); font-weight: 600; font-size: .8rem; display: flex; align-items: center; gap: 5px; }
+  .prog-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
+  .prog { display: block; border-radius: var(--r2); background: #fff; box-shadow: var(--sh); padding: 18px; color: inherit; }
+  .prog:hover { transform: translateY(-3px); box-shadow: var(--sh-2); text-decoration: none; }
+  .prog .pi { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; color: #fff; margin-bottom: 10px; }
+  .prog h3 { margin: 0 0 4px; font-size: 1.02rem; }
+  .prog p { color: var(--muted); font-size: .86rem; margin: 0; font-weight: 700; }
 
-  .grades { display: flex; flex-wrap: wrap; gap: 6px; }
-  .gbtn { border: 1px solid var(--line-2); background: var(--surface); border-radius: var(--r); padding: 10px 0; width: 54px; text-align: center; font-weight: 700; color: var(--ink-2); }
-  .gbtn:hover { border-color: var(--accent); color: var(--accent); text-decoration: none; }
+  .cta-band { border-radius: var(--r2); background: linear-gradient(120deg,#57ad2b,#6bbf3a); box-shadow: var(--sh); padding: 34px; text-align: center; color: #fff; }
+  .cta-band h2 { color: #fff; }
 
-  .prog-card { border: 1px solid var(--line); border-radius: var(--r2); padding: 18px; background: var(--surface); display: block; color: inherit; }
-  .prog-card:hover { text-decoration: none; border-color: var(--accent); background: var(--surface-2); }
-  .prog-card .ph { display: flex; align-items: center; gap: 8px; font-weight: 600; margin-bottom: 6px; }
-  .prog-card .ph svg { color: var(--accent); }
-  .prog-card p { color: var(--muted); font-size: .87rem; margin: 0; }
-
-  .how { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; counter-reset: step; }
-  .step { border-top: 2px solid var(--accent); padding-top: 14px; }
-  .step .n { font-family: var(--serif); color: var(--faint); font-size: .85rem; font-weight: 700; letter-spacing: .1em; }
-  .step h3 { font-size: 1.05rem; margin: 4px 0 6px; }
-  .step p { color: var(--muted); font-size: .9rem; margin: 0; }
-
-  .cta { border: 1px solid var(--line); border-radius: var(--r2); background: var(--surface); padding: 36px; text-align: center; }
-  .quote { border-left: 3px solid var(--line-2); padding: 6px 0 6px 20px; }
-  .quote p { font-family: var(--serif); font-size: 1.2rem; font-style: italic; color: var(--ink-2); }
-
-  @media (max-width: 900px) { .hero-in { grid-template-columns: 1fr; } .stripe-in { grid-template-columns: 1fr 1fr; } .stat:nth-child(3) { border-left: 0; } .how { grid-template-columns: 1fr; } }
+  @media (max-width: 900px){ .hero-in { grid-template-columns: 1fr; } .subj-strip { grid-template-columns: 1fr; } .prog-strip { grid-template-columns: 1fr 1fr; } .grade-row { flex-wrap: wrap; } .see-btn { width: 100%; justify-content: center; } }
 </style>
 
 <div id="nav"></div>
 
 <header class="hero">
+  <svg class="hero-scene" preserveAspectRatio="none" viewBox="0 0 1200 420" aria-hidden="true">
+    <circle cx="1050" cy="90" r="46" fill="#ffe08a" opacity=".85"/>
+    <ellipse cx="230" cy="120" rx="60" ry="20" fill="#ffffff" opacity=".7"/>
+    <ellipse cx="300" cy="132" rx="42" ry="16" fill="#ffffff" opacity=".7"/>
+    <ellipse cx="860" cy="80" rx="55" ry="18" fill="#ffffff" opacity=".6"/>
+    <path d="M0 360 Q 300 300 600 350 T 1200 340 V420 H0 Z" fill="#bfe6a6" opacity=".7"/>
+    <path d="M0 390 Q 350 340 700 385 T 1200 380 V420 H0 Z" fill="#a4d98a" opacity=".8"/>
+  </svg>
   <div class="wrap hero-in">
     <div>
-      <span class="tag accent"><span data-icon="graduation-cap" data-size="13"></span> Kindergarten through Grade 12</span>
-      <h1 style="margin-top:14px">A serious practice platform for students who want to get better.</h1>
-      <p class="lead">Mastermind Academy provides standards-aligned practice across mathematics, language, science and social studies — with adaptive difficulty, timed drills, and full-length assessments. No gimmicks. Just work that moves you forward.</p>
+      <span class="tag accent"><span data-icon="graduation-cap" data-size="13"></span> Kindergarten &ndash; Grade 12</span>
+      <h1 style="margin-top:12px">Gain fluency and confidence in every subject.</h1>
+      <p class="lead">Mastermind helps students master essential skills at their own pace through fun, interactive questions, built-in support, and motivating awards.</p>
       <div class="hero-cta">
-        <a class="btn lg" href="login.html#signup">Create a free account</a>
-        <a class="btn ghost lg" href="#subjects">Browse subjects</a>
+        <a class="btn lg" href="login.html#signup">Join for free</a>
+        <a class="btn ghost lg" href="#grades">Browse by grade</a>
       </div>
-      <div class="trust">
-        <span><span data-icon="check"></span> <b id="tSkills">100</b>&nbsp;skills</span>
-        <span><span data-icon="check"></span> <b id="tProblems">3,000</b>+ problems</span>
-        <span><span data-icon="check"></span> Adaptive difficulty</span>
-        <span><span data-icon="check"></span> Progress tracking</span>
-      </div>
+      <div class="tag" style="margin-top:18px;background:#fff;box-shadow:var(--sh)"><span data-icon="check" data-size="13" style="color:var(--brand)"></span> <span id="tStats">100 skills · 3,000+ problems</span></div>
     </div>
-    <div class="mock">
-      <div class="mock-h"><span>Grade 8 · Algebra</span><span>Question 4 of 12</span></div>
-      <div class="mock-b">
-        <div class="mock-q">Solve for x:&nbsp; 3x − 7 = 20</div>
-        <div class="mock-opts">
-          <div class="mock-opt">x = 6</div>
-          <div class="mock-opt ok">x = 9</div>
-          <div class="mock-opt">x = 4</div>
-          <div class="mock-opt">x = 13</div>
-        </div>
-        <div style="margin-top:16px" class="bar"><i style="width:33%"></i></div>
-        <div class="muted small" style="margin-top:7px;font-weight:600">Skill mastery · 33%</div>
-      </div>
-    </div>
+    <div class="mascot-wrap" id="mascotWrap"></div>
   </div>
 </header>
 
-<section class="stripe"><div class="wrap"><div class="stripe-in">
-  <div class="stat"><div class="n" id="sSubjects">9</div><div class="l">Subjects</div></div>
-  <div class="stat"><div class="n" id="sSkills">100</div><div class="l">Practice skills</div></div>
-  <div class="stat"><div class="n">K–12</div><div class="l">Grade levels</div></div>
-  <div class="stat"><div class="n" id="sProblems">3,000+</div><div class="l">Problems</div></div>
-</div></div></section>
-
-<section class="section" id="subjects">
-  <div class="wrap">
-    <div style="max-width:640px;margin-bottom:26px">
-      <span class="eyebrow">Curriculum</span>
-      <h2>Nine subjects, aligned to grade level</h2>
-      <p class="muted">Every subject scales to the grade you set — from early number sense to calculus, from phonics to Spanish conjugation.</p>
-    </div>
-    <div class="grid g3" id="subjectGrid"></div>
-  </div>
-</section>
-
-<section class="section" id="programs" style="background:var(--surface);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
-  <div class="wrap">
-    <div style="max-width:640px;margin-bottom:26px">
-      <span class="eyebrow">Beyond practice</span>
-      <h2>Programs that build real fluency</h2>
-    </div>
-    <div class="grid g4">
-      <a class="prog-card" href="speed.html"><div class="ph"><span data-icon="timer"></span> Speed Drills</div><p>Timed arithmetic: addition, subtraction, multiplication, division, fractions, square roots.</p></a>
-      <a class="prog-card" href="tests.html"><div class="ph"><span data-icon="clipboard-list"></span> Assessments</div><p>Full-length, 30-question exams with a score report and question review.</p></a>
-      <a class="prog-card" href="mathlab.html"><div class="ph"><span data-icon="calculator"></span> Math Lab</div><p>Interactive tools: a grapher, a times-table matrix, factor and prime explorers.</p></a>
-      <a class="prog-card" href="blog.html"><div class="ph"><span data-icon="newspaper"></span> Student Journal</div><p>Study strategy essays and reflections written for students, by the academy.</p></a>
-    </div>
-  </div>
-</section>
-
 <section class="section" id="grades">
-  <div class="wrap grid g2" style="align-items:center;gap:40px">
-    <div>
-      <span class="eyebrow">Placement</span>
-      <h2>Set a grade. The work adjusts.</h2>
-      <p class="muted">Choose your grade and every problem recalibrates. As you answer, adaptive difficulty nudges the level up when you're ready and eases back when you're not.</p>
-      <div class="grades" id="gradeRow" style="margin-top:16px"></div>
-    </div>
-    <div class="panel">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><b>Difficulty by grade band</b><span class="tag">Adaptive</span></div>
-      <div style="display:flex;flex-direction:column;gap:13px">
-        <div><div class="muted small" style="font-weight:600;margin-bottom:5px">Kindergarten · counting &amp; number sense</div><div class="bar"><i style="width:18%"></i></div></div>
-        <div><div class="muted small" style="font-weight:600;margin-bottom:5px">Grade 5 · fractions, decimals, geometry</div><div class="bar"><i style="width:48%"></i></div></div>
-        <div><div class="muted small" style="font-weight:600;margin-bottom:5px">Grade 8 · pre-algebra &amp; statistics</div><div class="bar"><i style="width:70%"></i></div></div>
-        <div><div class="muted small" style="font-weight:600;margin-bottom:5px">Grade 12 · calculus &amp; precalculus</div><div class="bar"><i style="width:96%"></i></div></div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<section class="section" id="how" style="background:var(--surface);border-top:1px solid var(--line)">
   <div class="wrap">
-    <div style="max-width:600px;margin-bottom:28px"><span class="eyebrow">Method</span><h2>How it works</h2></div>
-    <div class="how">
-      <div class="step"><div class="n">STEP 01</div><h3>Create a profile</h3><p>Register and set your grade level. Your progress is stored on your device.</p></div>
-      <div class="step"><div class="n">STEP 02</div><h3>Practice deliberately</h3><p>Work through skills with immediate feedback, worked explanations, and adaptive difficulty.</p></div>
-      <div class="step"><div class="n">STEP 03</div><h3>Measure progress</h3><p>Track accuracy, mastery, and streaks. Sit assessments to confirm what you've learned.</p></div>
+    <div style="text-align:center;max-width:640px;margin:0 auto 26px">
+      <span class="eyebrow">Learning</span>
+      <h2>Pick your grade to get started</h2>
+      <p class="muted" style="font-weight:700">Every grade scales the difficulty of all nine subjects, from counting to calculus.</p>
+    </div>
+    <div class="grade-list" id="gradeList"></div>
+  </div>
+</section>
+
+<section class="section" style="background:#fff" >
+  <div class="wrap">
+    <div style="text-align:center;max-width:640px;margin:0 auto 26px">
+      <span class="eyebrow">Curriculum</span>
+      <h2>Nine colorful subjects</h2>
+    </div>
+    <div class="subj-strip" id="subjStrip"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap">
+    <div style="text-align:center;max-width:640px;margin:0 auto 26px">
+      <span class="eyebrow">More ways to practice</span>
+      <h2>Drills, exams, tools and reading</h2>
+    </div>
+    <div class="prog-strip">
+      <a class="prog" href="speed.html"><div class="pi" style="background:var(--s-calculus)"><span data-icon="timer"></span></div><h3>Speed Drills</h3><p>Beat the clock on the four operations, fractions and roots.</p></a>
+      <a class="prog" href="tests.html"><div class="pi" style="background:var(--s-algebra)"><span data-icon="clipboard-list"></span></div><h3>Assessments</h3><p>Full-length exams with a score report and worked review.</p></a>
+      <a class="prog" href="mathlab.html"><div class="pi" style="background:var(--s-science)"><span data-icon="spline"></span></div><h3>Math Lab</h3><p>A grapher, a times-table matrix and a factor explorer.</p></a>
+      <a class="prog" href="blog.html"><div class="pi" style="background:var(--s-reading)"><span data-icon="newspaper"></span></div><h3>Student Journal</h3><p>Study strategies written by students, for students.</p></a>
     </div>
   </div>
 </section>
 
-<section class="section"><div class="wrap"><div class="quote">
-  <p>"Consistency beats intensity. Fifteen focused minutes a day, tracked honestly, is how skills are built."</p>
-  <div class="muted small" style="font-weight:600">— Mastermind Academy, on deliberate practice</div>
-</div></div></section>
-
-<section class="section" style="background:var(--surface);border-top:1px solid var(--line)"><div class="wrap"><div class="cta">
-  <h2 style="margin-bottom:8px">Begin today.</h2>
-  <p class="muted" style="max-width:52ch;margin:0 auto 20px">Create an account, choose your grade, and start your first practice set. It takes less than a minute.</p>
-  <a class="btn lg" href="login.html#signup">Create a free account</a>
+<section class="section"><div class="wrap"><div class="cta-band">
+  <h2 style="font-size:clamp(1.6rem,3vw,2.2rem)">Ready to become a Mastermind?</h2>
+  <p style="opacity:.95;max-width:52ch;margin:6px auto 18px;font-weight:700">Create a free account, choose your grade, and start earning awards today.</p>
+  <a class="btn blue lg" href="login.html#signup">Join for free</a>
 </div></div></section>
 
 <div id="footer"></div>
@@ -179,27 +121,74 @@
 <script src="assets/js/problems.js"></script>
 <script src="assets/js/layout.js"></script>
 <script>
-  Layout.mount({ active: 'subjects' });
-  var skills = Problems.totalSkills();
-  var pool = Problems.estimatedProblems();
-  var poolLabel = Math.floor(pool / 1000) * 1000;
-  function set(id, v) { var e = document.getElementById(id); if (e) e.textContent = v; }
-  set('tSkills', skills); set('sSkills', skills);
-  set('tProblems', poolLabel.toLocaleString()); set('sProblems', poolLabel.toLocaleString() + '+');
-  set('sSubjects', Problems.SUBJECTS.length);
+  Layout.mount({ active: 'home' });
 
-  var grid = document.getElementById('subjectGrid');
+  // ---- mascot: Newton the owl ----
+  document.getElementById('mascotWrap').innerHTML =
+    '<svg class="mascot" viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">' +
+    '<defs><linearGradient id="body" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5fbfd6"/><stop offset="1" stop-color="#3a97b8"/></linearGradient>' +
+    '<linearGradient id="belly" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#eaf6fb"/><stop offset="1" stop-color="#cfeaf3"/></linearGradient></defs>' +
+    '<ellipse cx="120" cy="212" rx="66" ry="12" fill="#000" opacity=".08"/>' +
+    // feet
+    '<path d="M96 196 l-8 16 M104 198 l0 18 M112 198 l8 16" stroke="#f2a13a" stroke-width="6" stroke-linecap="round" fill="none"/>' +
+    '<path d="M128 196 l-8 16 M136 198 l0 18 M144 198 l8 16" stroke="#f2a13a" stroke-width="6" stroke-linecap="round" fill="none"/>' +
+    // ear tufts
+    '<path d="M74 66 L60 34 L96 56 Z" fill="#3a97b8"/><path d="M166 66 L180 34 L144 56 Z" fill="#3a97b8"/>' +
+    // body
+    '<ellipse cx="120" cy="132" rx="74" ry="80" fill="url(#body)"/>' +
+    // wings
+    '<path d="M52 120 q-10 40 18 66 q6 -40 4 -70 Z" fill="#348aa8"/>' +
+    '<path d="M188 120 q10 40 -18 66 q-6 -40 -4 -70 Z" fill="#348aa8"/>' +
+    // belly
+    '<ellipse cx="120" cy="150" rx="46" ry="54" fill="url(#belly)"/>' +
+    // eyes
+    '<circle cx="96" cy="112" r="30" fill="#fff"/><circle cx="144" cy="112" r="30" fill="#fff"/>' +
+    '<circle cx="99" cy="114" r="15" fill="#3a3f47"/><circle cx="141" cy="114" r="15" fill="#3a3f47"/>' +
+    '<circle cx="104" cy="109" r="5" fill="#fff"/><circle cx="146" cy="109" r="5" fill="#fff"/>' +
+    // beak
+    '<path d="M120 126 l-11 14 h22 Z" fill="#f2a13a"/>' +
+    // grad cap
+    '<g transform="rotate(-8 120 60)"><rect x="86" y="52" width="68" height="14" rx="3" fill="#3a3f47"/>' +
+    '<polygon points="120,34 168,50 120,66 72,50" fill="#2f343b"/>' +
+    '<circle cx="168" cy="50" r="4" fill="#ffd76a"/><path d="M168 50 v20" stroke="#ffd76a" stroke-width="3"/><circle cx="168" cy="72" r="5" fill="#ffd76a"/></g>' +
+    '</svg>';
+
+  var pool = Problems.estimatedProblems();
+  document.getElementById('tStats').textContent = Problems.totalSkills() + ' skills · ' + (Math.floor(pool / 1000) * 1000).toLocaleString() + '+ problems';
+
+  // ---- grade rows ----
+  var GRADES = ['K','1','2','3','4','5','6','7','8','9','10','11','12'];
+  var GNAMES = { K:'Kindergarten','1':'First grade','2':'Second grade','3':'Third grade','4':'Fourth grade','5':'Fifth grade','6':'Sixth grade','7':'Seventh grade','8':'Eighth grade','9':'Ninth grade','10':'Tenth grade','11':'Eleventh grade','12':'Twelfth grade' };
+  var COLORS = ['var(--s-reading)','var(--s-geometry)','var(--s-algebra)','var(--s-science)','var(--s-calculus)','var(--s-math)','var(--s-spanish)','var(--s-history)','var(--s-geography)'];
+  var list = document.getElementById('gradeList');
+  GRADES.forEach(function (g, i) {
+    var skills = [];
+    Problems.SUBJECTS.forEach(function (s) { Problems.skillsForGrade(s.id, g).forEach(function (k) { skills.push(k.name); }); });
+    // sample up to 5 distinct
+    var sample = [];
+    var shuffled = skills.slice().sort(function () { return Math.random() - .5; });
+    for (var j = 0; j < shuffled.length && sample.length < 5; j++) if (sample.indexOf(shuffled[j]) === -1) sample.push(shuffled[j]);
+    var color = COLORS[i % COLORS.length];
+    var badge = g === 'K' ? 'K' : g;
+    var row = document.createElement('div');
+    row.className = 'grade-row';
+    row.innerHTML =
+      '<div class="grade-badge" style="background:' + color + '">' + badge + '</div>' +
+      '<div class="grade-main"><h3>' + GNAMES[g] + '</h3>' +
+      '<div class="inc"><b>Includes:</b> ' + sample.join('&nbsp; · &nbsp;') + '</div></div>' +
+      '<a class="see-btn" href="login.html#signup" style="background:' + color + '">See all ' + skills.length + ' skills ' + Icons.icon('chevron-right', { size: 15 }) + '</a>';
+    list.appendChild(row);
+  });
+
+  // ---- subject strip ----
+  var strip = document.getElementById('subjStrip');
   Problems.SUBJECTS.forEach(function (s) {
     var a = document.createElement('a');
-    a.className = 'subj-card'; a.href = 'subjects/' + s.id + '.html'; a.style.setProperty('--sc', s.color);
-    a.innerHTML = '<div class="sh">' + Icons.icon(s.icon, { size: 20 }) + '<h3>' + s.name + '</h3></div>' +
-      '<p>' + s.blurb + '</p><div class="meta">' + s.skills.length + (s.skills.length === 1 ? ' skill ' : ' skills ') + Icons.icon('arrow-right', { size: 14 }) + '</div>';
-    grid.appendChild(a);
+    a.className = 'subj-card'; a.href = 'subjects/' + s.id + '.html';
+    a.innerHTML = '<div class="cap" style="background:' + s.color + '">' + Icons.icon(s.icon, { size: 22 }) + '<h3>' + s.name + '</h3></div>' +
+      '<div class="bd"><p>' + s.blurb + '</p><span class="meta">' + s.skills.length + (s.skills.length === 1 ? ' skill ' : ' skills ') + Icons.icon('arrow-right', { size: 14 }) + '</span></div>';
+    strip.appendChild(a);
   });
 
-  var gr = document.getElementById('gradeRow');
-  ['K','1','2','3','4','5','6','7','8','9','10','11','12'].forEach(function (g) {
-    var a = document.createElement('a'); a.className = 'gbtn'; a.href = 'login.html#signup'; a.textContent = g; gr.appendChild(a);
-  });
   Icons.hydrate();
 </script>

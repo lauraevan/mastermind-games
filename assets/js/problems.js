@@ -121,6 +121,25 @@
   G.tangent = function () { var a = rnd(1, 4), x = rnd(1, 4); return mcNum('For f(x) = ' + a + 'x², slope of the tangent at x = ' + x + '?', 2 * a * x, { explain: "f'(x)=" + 2 * a + 'x.' }); };
   G.logEval = function () { var b = pick([2, 3, 5, 10]), e = rnd(1, 3); return mcNum('log base ' + b + ' of ' + Math.pow(b, e) + ' =', e, { nonneg: true, spread: 2, explain: b + '^' + e + ' = ' + Math.pow(b, e) + '.' }); };
 
+  /* ---------------- WORD PROBLEMS (real-world) ---------------- */
+  var NAMES = ['Maya', 'Leo', 'Aisha', 'Diego', 'Priya', 'Noah', 'Zoe', 'Marcus', 'Sofia', 'Devon'];
+  var WP = [
+    function () { var r = rnd(3, 9), c = rnd(3, 9); return inp('A classroom has ' + r + ' rows of ' + c + ' desks. How many desks are there in all?', r * c, r + ' rows × ' + c + ' desks = ' + (r * c) + '.'); },
+    function () { var b = rnd(4, 9), boxes = rnd(3, 9), extra = rnd(0, b - 1), total = b * boxes + extra; return inp('A baker packs ' + total + ' muffins into trays that hold ' + b + '. How many full trays can she fill?', boxes, Math.floor(total / b) + ' full trays, with ' + extra + ' left over.'); },
+    function () { var n = rnd(3, 8), total = n * rnd(2, 9); return inp(n + ' friends share ' + total + ' marbles equally. How many does each friend get?', total / n, total + ' ÷ ' + n + ' = ' + (total / n) + '.'); },
+    function () { var p = rnd(2, 9), n = rnd(2, 6), bill = Math.ceil((p * n + 1) / 5) * 5; return mcNum('You buy ' + n + ' notebooks at $' + p + ' each and pay with a $' + bill + ' bill. How much change do you get?', bill - p * n, { nonneg: true, spread: 4, explain: 'Cost is $' + (p * n) + ', so change is $' + (bill - p * n) + '.' }); },
+    function () { var a = rnd(20, 90), pOff = pick([10, 20, 25, 50]); return mcNum('A $' + a + ' jacket is ' + pOff + '% off. What is the sale price?', a - a * pOff / 100, { nonneg: true, spread: 6, explain: pOff + '% of $' + a + ' is $' + (a * pOff / 100) + ' off.' }); },
+    function () { var speed = rnd(30, 70), h = rnd(2, 5); return inp('A train travels ' + (speed * h) + ' miles in ' + h + ' hours. What is its average speed, in miles per hour?', speed, 'Distance ÷ time = ' + (speed * h) + ' ÷ ' + h + '.'); },
+    function () { var d = pick([4, 5, 6, 8]), eaten = rnd(1, d - 1); return mcStr('A pizza is cut into ' + d + ' equal slices. ' + eaten + ' slices are eaten. What fraction is LEFT?', (d - eaten) + '/' + d, [eaten + '/' + d, (d - eaten) + '/' + (d + 1), d + '/' + eaten], (d - eaten) + ' of the ' + d + ' slices remain.'); },
+    function () { var arr = [], sum = 0, n = 4; for (var i = 0; i < n; i++) { var v = rnd(60, 100); arr.push(v); sum += v; } while (sum % n) { arr[0]++; sum++; } return mcNum(pick(NAMES) + '\'s test scores were ' + arr.join(', ') + '. What is the average score?', sum / n, { spread: 5, explain: 'Add them (' + sum + ') and divide by ' + n + '.' }); },
+    function () { var start = rnd(2, 6), rate = rnd(2, 5), weeks = rnd(3, 6); return inp('A plant is ' + start + ' cm tall and grows ' + rate + ' cm each week. How tall will it be after ' + weeks + ' weeks?', start + rate * weeks, start + ' + ' + rate + ' × ' + weeks + ' = ' + (start + rate * weeks) + '.'); },
+    function () { var total = rnd(30, 90), boys = rnd(10, total - 10); return mcNum('A school has ' + total + ' students, and ' + boys + ' of them are boys. How many are girls?', total - boys, { nonneg: true, spread: 6, explain: total + ' − ' + boys + ' = ' + (total - boys) + '.' }); },
+    function () { var hrs = rnd(2, 8), wage = rnd(8, 16); return inp(pick(NAMES) + ' earns $' + wage + ' per hour and works ' + hrs + ' hours. How much does ' + (hrs > 4 ? 'she' : 'he') + ' earn?', wage * hrs, wage + ' × ' + hrs + ' = ' + (wage * hrs) + '.'); }
+  ];
+  G.word = function () { return WP[rnd(0, WP.length - 1)](); };
+  G.wpConsec = function () { var n = rnd(3, 25); return inp('Two consecutive whole numbers add up to ' + (2 * n + 1) + '. What is the smaller number?', n, 'n + (n + 1) = ' + (2 * n + 1) + ', so 2n + 1 = ' + (2 * n + 1) + '.'); };
+  G.wpAge = function () { var y = rnd(3, 12), now = rnd(15, 40); return inp('In ' + y + ' years, ' + pick(NAMES) + ' will be ' + (now + y) + ' years old. How old is she now?', now, 'Subtract ' + y + ' from ' + (now + y) + '.'); };
+
   /* ---------------- STATIC BANKS ---------------- */
   function bankMC(item, bank) { var others = bank.filter(function (b) { return b.a !== item.a; }).map(function (b) { return b.a; }); return mcStr(item.q, item.a, shuffle(others).slice(0, 3), item.e || ''); }
   function bankGen(id) { return function () { var b = BANKS[id]; return bankMC(pick(b), b); }; }
@@ -259,6 +278,31 @@
       { q: 'The U.S. Civil War ended in', a: '1865' }, { q: 'Who explored and reached the Americas in 1492?', a: 'Columbus' },
       { q: 'The document limiting the English king\'s power (1215) was the', a: 'Magna Carta' }
     ],
+    idioms: [
+      { q: '"Break the ice" means to', a: 'start a conversation' }, { q: '"A piece of cake" means something', a: 'very easy' },
+      { q: '"Under the weather" means feeling', a: 'sick' }, { q: '"Hit the books" means to', a: 'study hard' },
+      { q: '"Once in a blue moon" means', a: 'very rarely' }, { q: '"Bite the bullet" means to', a: 'face something hard' },
+      { q: '"Spill the beans" means to', a: 'reveal a secret' }, { q: '"Cost an arm and a leg" means', a: 'very expensive' },
+      { q: '"Hit the nail on the head" means to be', a: 'exactly right' }, { q: '"Let the cat out of the bag" means to', a: 'reveal a secret' }
+    ],
+    homophones: [
+      { q: 'Choose: "I ate ___ apples."', a: 'two' }, { q: 'Choose: "___ going home now."', a: "They're" },
+      { q: 'Choose: "The dog wagged ___ tail."', a: 'its' }, { q: 'Choose: "___ book is this?"', a: 'Whose' },
+      { q: 'Choose: "Please come ___."', a: 'here' }, { q: 'Choose: "I need a ___ of shoes."', a: 'pair' },
+      { q: 'Choose: "The wind ___ hard."', a: 'blew' }, { q: 'Choose: "She ___ the race."', a: 'won' }
+    ],
+    sciEco: [
+      { q: 'A group of the same species living together is a', a: 'population' }, { q: 'All the living and nonliving things in an area make an', a: 'ecosystem' },
+      { q: 'An animal that hunts others is a', a: 'predator' }, { q: 'The animal that is hunted is the', a: 'prey' },
+      { q: 'Organisms that break down dead matter are', a: 'decomposers' }, { q: 'An animal that eats both plants and meat is an', a: 'omnivore' },
+      { q: 'The role an organism plays in its habitat is its', a: 'niche' }, { q: 'A relationship where both species benefit is', a: 'mutualism' }
+    ],
+    weather: [
+      { q: 'Frozen rain is called', a: 'sleet' }, { q: 'A scientist who studies weather is a', a: 'meteorologist' },
+      { q: 'Tiny water droplets in the sky form', a: 'clouds' }, { q: 'A violent spinning windstorm is a', a: 'tornado' },
+      { q: 'The amount of water vapor in the air is', a: 'humidity' }, { q: 'A long period with no rain is a', a: 'drought' },
+      { q: 'A huge ocean storm with strong winds is a', a: 'hurricane' }, { q: 'The tool that measures temperature is a', a: 'thermometer' }
+    ],
     geography: [
       { q: 'Largest ocean?', a: 'Pacific' }, { q: 'Longest river?', a: 'Nile' }, { q: 'Largest desert?', a: 'Sahara' },
       { q: 'Tallest mountain?', a: 'Everest' }, { q: 'Capital of France?', a: 'Paris' }, { q: 'Capital of Japan?', a: 'Tokyo' },
@@ -306,7 +350,8 @@
       { id: 'unitRate', name: 'Unit rates', grades: [6, 8], gen: G.unitRate },
       { id: 'proportion', name: 'Proportions', grades: [6, 8], gen: G.proportion },
       { id: 'money', name: 'Money problems', grades: [1, 5], gen: G.money },
-      { id: 'time', name: 'Elapsed time', grades: [2, 5], gen: G.time }
+      { id: 'time', name: 'Elapsed time', grades: [2, 5], gen: G.time },
+      { id: 'word', name: 'Word problems', grades: [2, 8], gen: G.word }
     ] },
     { id: 'algebra', name: 'Algebra', color: 'var(--s-algebra)', icon: 'variable', blurb: 'Expressions, equations, functions and inequalities.', skills: [
       { id: 'evalExpr', name: 'Evaluating expressions', grades: [6, 9], gen: G.evalExpr },
@@ -328,7 +373,9 @@
       { id: 'funcComp', name: 'Composite functions', grades: [10, 12], gen: G.funcComp },
       { id: 'arithSeq', name: 'Arithmetic sequences', grades: [9, 12], gen: G.arithSeq },
       { id: 'geoSeq', name: 'Geometric sequences', grades: [9, 12], gen: G.geoSeq },
-      { id: 'radical', name: 'Simplifying radicals', grades: [9, 12], gen: G.radical }
+      { id: 'radical', name: 'Simplifying radicals', grades: [9, 12], gen: G.radical },
+      { id: 'wpConsec', name: 'Word problems: consecutive integers', grades: [7, 10], gen: G.wpConsec },
+      { id: 'wpAge', name: 'Word problems: ages', grades: [6, 9], gen: G.wpAge }
     ] },
     { id: 'geometry', name: 'Geometry', color: 'var(--s-science)', icon: 'shapes', blurb: 'Area, perimeter, volume, angles and the Pythagorean theorem.', skills: [
       { id: 'perimRect', name: 'Perimeter of rectangles', grades: [3, 5], gen: G.perimRect },
@@ -364,7 +411,9 @@
       { id: 'inference', name: 'Making inferences', grades: [3, 9], gen: bankGen('inference') },
       { id: 'mainidea', name: 'Main idea', grades: [3, 9], gen: bankGen('mainidea') },
       { id: 'prefixes', name: 'Prefixes & suffixes', grades: [3, 8], gen: bankGen('prefixes') },
-      { id: 'analogies', name: 'Analogies', grades: [4, 10], gen: bankGen('analogies') }
+      { id: 'analogies', name: 'Analogies', grades: [4, 10], gen: bankGen('analogies') },
+      { id: 'idioms', name: 'Idioms', grades: [4, 10], gen: bankGen('idioms') },
+      { id: 'homophones', name: 'Homophones', grades: [3, 8], gen: bankGen('homophones') }
     ] },
     { id: 'spanish', name: 'Spanish', color: 'var(--s-spanish)', icon: 'globe', blurb: 'Vocabulary, numbers, articles and verb conjugation.', skills: [
       { id: 'esVocab', name: 'Vocabulary', grades: [1, 12], gen: bankGen('esVocab') },
@@ -380,7 +429,9 @@
       { id: 'sciLife', name: 'Life science', grades: [3, 9], gen: bankGen('sciLife') },
       { id: 'sciBody', name: 'Human body', grades: [3, 9], gen: bankGen('sciBody') },
       { id: 'sciForces', name: 'Forces & energy', grades: [4, 10], gen: bankGen('sciForces') },
-      { id: 'sciChem', name: 'Chemistry basics', grades: [6, 11], gen: bankGen('sciChem') }
+      { id: 'sciChem', name: 'Chemistry basics', grades: [6, 11], gen: bankGen('sciChem') },
+      { id: 'sciEco', name: 'Ecosystems', grades: [4, 9], gen: bankGen('sciEco') },
+      { id: 'weather', name: 'Weather', grades: [3, 8], gen: bankGen('weather') }
     ] },
     { id: 'history', name: 'History', color: 'var(--s-reading)', icon: 'library', blurb: 'People, events and turning points that shaped the world.', skills: [
       { id: 'history', name: 'World & U.S. history', grades: [4, 12], gen: bankGen('history') }

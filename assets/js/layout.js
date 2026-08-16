@@ -1,24 +1,33 @@
-/* layout.js — shared nav + footer, injected on every page. Auth-aware. */
+/* layout.js — green IXL-style top bar + subject icon row + footer. */
 (function (global) {
   'use strict';
   var rel = UI.relBase();
 
   function logoSVG() {
-    return '<svg class="logo" width="30" height="30" viewBox="0 0 32 32" aria-hidden="true">' +
-      '<rect x="1.5" y="1.5" width="29" height="29" rx="3" fill="none" stroke="#2b3d5c" stroke-width="1.5"/>' +
-      '<path d="M7 22V10l5 7 5-7v12" fill="none" stroke="#2b3d5c" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>' +
-      '<line x1="21" y1="10" x2="21" y2="22" stroke="#2b3d5c" stroke-width="2" stroke-linecap="round"/>' +
-      '<line x1="21" y1="16" x2="25.5" y2="16" stroke="#8b9099" stroke-width="2" stroke-linecap="round"/></svg>';
+    return '<svg class="logo" width="24" height="24" viewBox="0 0 32 32" aria-hidden="true">' +
+      '<rect x="2" y="2" width="28" height="28" rx="8" fill="#57ad2b"/>' +
+      '<path d="M8 23V10l8 8 8-8v13" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/></svg>';
   }
-  function ic(name) { return (global.Icons ? Icons.icon(name, { size: 15 }) : ''); }
+  function ic(name, size) { return global.Icons ? Icons.icon(name, { size: size || 20 }) : ''; }
 
-  var NAV = [
-    ['subjects', 'index.html#subjects', 'Subjects', 'book-open'],
-    ['mathlab', 'mathlab.html', 'Math Lab', 'calculator'],
-    ['speed', 'speed.html', 'Speed Drills', 'timer'],
-    ['tests', 'tests.html', 'Assessments', 'clipboard-list'],
-    ['blog', 'blog.html', 'Journal', 'newspaper']
+  // subject/section row — [key, href, label, icon, matchFiles]
+  var SUB = [
+    ['math', 'subjects/math.html', 'Math', 'calculator', ['math', 'algebra', 'geometry', 'calculus']],
+    ['reading', 'subjects/reading.html', 'Language arts', 'book-open', ['reading']],
+    ['science', 'subjects/science.html', 'Science', 'flask-conical', ['science']],
+    ['social', 'subjects/history.html', 'Social studies', 'library', ['history', 'geography']],
+    ['spanish', 'subjects/spanish.html', 'Spanish', 'globe', ['spanish']],
+    ['mathlab', 'mathlab.html', 'Math Lab', 'spline', ['mathlab']],
+    ['speed', 'speed.html', 'Speed', 'timer', ['speed']],
+    ['tests', 'tests.html', 'Assessments', 'clipboard-list', ['tests']],
+    ['blog', 'blog.html', 'Journal', 'newspaper', ['blog']],
+    ['awards', 'dashboard.html', 'Awards', 'award', []]
   ];
+
+  function currentFile() {
+    var p = location.pathname; var f = p.substring(p.lastIndexOf('/') + 1);
+    return f.replace('.html', '') || 'index';
+  }
 
   var Layout = {
     mount: function (opts) { opts = opts || {}; this.nav(opts.active); this.footer(); if (global.Icons) Icons.hydrate(); },
@@ -26,34 +35,43 @@
     nav: function (active) {
       var host = document.getElementById('nav'); if (!host) return;
       var user = Store.current();
-      var links = NAV.map(function (l) {
-        return '<a href="' + rel + l[1] + '" class="' + (active === l[0] ? 'on' : '') + '">' + ic(l[3]) + l[2] + '</a>';
-      });
-      if (user) links.unshift('<a href="' + rel + 'dashboard.html" class="' + (active === 'dashboard' ? 'on' : '') + '">' + ic('layout-dashboard') + 'Dashboard</a>');
-      var linkHTML = links.join('');
+      var cur = currentFile();
+      var subj = global.SUBJECT_ID || null;
+
+      var subHTML = SUB.map(function (s) {
+        var on = (subj && s[4].indexOf(subj) !== -1) || s[4].indexOf(cur) !== -1 || (s[0] === active);
+        return '<a href="' + rel + s[1] + '" class="' + (on ? 'on' : '') + '">' + ic(s[3], 20) + s[2] + '</a>';
+      }).join('');
 
       var right;
       if (user) {
-        right = '<a class="btn subtle sm" href="' + rel + 'dashboard.html">' + ic('user') + UI.esc(user.name.split(' ')[0]) + '</a>' +
-          '<button class="btn ghost sm" id="logoutBtn">' + ic('log-out') + 'Sign out</button>';
+        right = '<a class="pilluser" href="' + rel + 'dashboard.html" style="text-decoration:none"><span class="av">' + UI.esc(user.avatar) + '</span>' + UI.esc(user.name.split(' ')[0]) + '</a>' +
+          '<button class="btn ghost sm" id="logoutBtn">Sign out</button>';
       } else {
-        right = '<a class="btn ghost sm" href="' + rel + 'login.html">Log in</a>' +
-          '<a class="btn sm" href="' + rel + 'login.html#signup">Create account</a>';
+        right = '<a class="btn blue sm" href="' + rel + 'login.html">Sign in</a>' +
+          '<a class="btn sm" href="' + rel + 'login.html#signup">Membership</a>';
       }
 
       host.className = 'nav';
-      host.innerHTML = '<div class="wrap nav-in">' +
-        '<a class="brand" href="' + rel + 'index.html">' + logoSVG() + 'Mastermind<span style="color:var(--muted);font-weight:400">&nbsp;Academy</span></a>' +
-        '<button class="nav-toggle" id="navToggle" aria-label="Menu">' + ic('menu') + '</button>' +
-        '<nav class="nav-links" id="navLinks">' + linkHTML + '</nav>' +
-        '<div class="nav-spacer"></div>' +
-        '<div class="nav-right">' + right + '</div>' +
-        '</div>';
+      host.innerHTML =
+        '<div class="nav-top"><div class="wrap nav-in">' +
+          '<a class="brand" href="' + rel + 'index.html">' + logoSVG() + 'Master<b>mind</b></a>' +
+          '<form class="navsearch" id="navSearch"><span class="mag">' + ic('search', 16) + '</span>' +
+          '<input id="navQ" placeholder="Search topics, skills, and more" spellcheck="false" autocomplete="off">' +
+          '<button class="go" type="submit" aria-label="Search">' + ic('arrow-right', 16) + '</button></form>' +
+          '<button class="nav-toggle" id="navToggle" aria-label="Menu">' + ic('menu', 18) + '</button>' +
+          '<div class="nav-right">' + right + '</div>' +
+        '</div></div>' +
+        '<div class="subnav"><div class="wrap subnav-in" id="subnav">' + subHTML + '</div></div>';
 
       var lo = document.getElementById('logoutBtn');
       if (lo) lo.addEventListener('click', function () { Store.logout(); location.href = rel + 'index.html'; });
       var tg = document.getElementById('navToggle');
-      if (tg) tg.addEventListener('click', function () { document.getElementById('navLinks').classList.toggle('open'); });
+      if (tg) tg.addEventListener('click', function () { var sn = document.getElementById('subnav'); sn.style.flexWrap = sn.style.flexWrap === 'wrap' ? 'nowrap' : 'wrap'; });
+
+      var form = document.getElementById('navSearch');
+      if (form) form.addEventListener('submit', function (e) { e.preventDefault(); doSearch(document.getElementById('navQ').value); });
+
       if (global.Icons) Icons.hydrate(host);
     },
 
@@ -62,30 +80,46 @@
       var year = new Date().getFullYear();
       host.className = 'footer';
       host.innerHTML = '<div class="wrap"><div class="foot-grid">' +
-        '<div><div class="brand" style="font-size:1.05rem;margin-bottom:10px">' + logoSVG() + 'Mastermind Academy</div>' +
-        '<p class="muted small" style="max-width:38ch">A standards-aligned practice platform for students in kindergarten through grade 12. Diagnostic practice, timed drills, and assessments across core subjects.</p></div>' +
+        '<div><div class="brand" style="box-shadow:none;padding:0;background:none;color:var(--brand-dark)">' + logoSVG() + 'Mastermind Academy</div>' +
+        '<p class="muted small" style="max-width:38ch;margin-top:8px">A standards-aligned K-12 practice platform. Master skills at your own pace with interactive questions, helpful explanations, and motivating awards.</p></div>' +
+        '<div><h5>Learn</h5><ul>' +
+        '<li><a href="' + rel + 'subjects/math.html">Math</a></li>' +
+        '<li><a href="' + rel + 'subjects/reading.html">Language arts</a></li>' +
+        '<li><a href="' + rel + 'subjects/science.html">Science</a></li>' +
+        '<li><a href="' + rel + 'mathlab.html">Math Lab</a></li></ul></div>' +
         '<div><h5>Practice</h5><ul>' +
-        '<li><a href="' + rel + 'index.html#subjects">Subjects</a></li>' +
-        '<li><a href="' + rel + 'mathlab.html">Math Lab</a></li>' +
         '<li><a href="' + rel + 'speed.html">Speed Drills</a></li>' +
-        '<li><a href="' + rel + 'tests.html">Assessments</a></li></ul></div>' +
+        '<li><a href="' + rel + 'tests.html">Assessments</a></li>' +
+        '<li><a href="' + rel + 'dashboard.html">Dashboard</a></li>' +
+        '<li><a href="' + rel + 'blog.html">Student Journal</a></li></ul></div>' +
         '<div><h5>Academy</h5><ul>' +
-        '<li><a href="' + rel + 'blog.html">Student Journal</a></li>' +
         '<li><a href="' + rel + 'about.html">About</a></li>' +
-        '<li><a href="' + rel + 'index.html#grades">Grade levels</a></li>' +
-        '<li><a href="' + rel + 'dashboard.html">Dashboard</a></li></ul></div>' +
-        '<div><h5>Support</h5><ul>' +
         '<li><a href="' + rel + 'about.html#faq">Help &amp; FAQ</a></li>' +
-        '<li><a href="' + rel + 'index.html">Accessibility</a></li>' +
-        '<li><a href="' + rel + 'index.html">Privacy policy</a></li>' +
-        '<li><a href="' + rel + 'index.html">Terms of use</a></li></ul></div>' +
+        '<li><a href="' + rel + 'index.html">Privacy</a></li>' +
+        '<li><a href="' + rel + 'index.html">Terms</a></li></ul></div>' +
         '</div><div class="foot-bottom">' +
-        '<span>&copy; ' + year + ' Mastermind Academy. All rights reserved.</span>' +
-        '<span>Student progress is stored locally on this device.</span>' +
+        '<span>&copy; ' + year + ' Mastermind Academy. Practice makes progress.</span>' +
+        '<span>Progress is saved on this device.</span>' +
         '</div></div>';
       if (global.Icons) Icons.hydrate(host);
     }
   };
+
+  function doSearch(q) {
+    q = (q || '').trim().toLowerCase();
+    if (!q) return;
+    if (global.Problems) {
+      // match a skill first, then a subject
+      var hitSkill = null, hitSub = null;
+      Problems.SUBJECTS.forEach(function (s) {
+        if (!hitSub && s.name.toLowerCase().indexOf(q) !== -1) hitSub = s;
+        s.skills.forEach(function (k) { if (!hitSkill && k.name.toLowerCase().indexOf(q) !== -1) hitSkill = { s: s, k: k }; });
+      });
+      if (hitSkill) { location.href = rel + 'subjects/' + hitSkill.s.id + '.html?skill=' + hitSkill.k.id; return; }
+      if (hitSub) { location.href = rel + 'subjects/' + hitSub.id + '.html'; return; }
+    }
+    location.href = rel + 'index.html#subjects';
+  }
 
   global.Layout = Layout;
 })(window);
