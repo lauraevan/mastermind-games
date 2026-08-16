@@ -10,9 +10,11 @@
   .hero p.lead { font-size: 1.12rem; color: #55606b; max-width: 46ch; margin: 12px 0 22px; font-weight: 700; }
   .hero-cta { display: flex; gap: 12px; flex-wrap: wrap; }
   .hero-scene { position: absolute; inset: 0; z-index: 1; }
-  .mascot-wrap { display: flex; justify-content: center; }
-  .mascot { width: 260px; max-width: 80%; filter: drop-shadow(0 12px 18px rgba(40,80,60,.22)); animation: bob 4s ease-in-out infinite; }
+  .mascot-wrap { position: relative; display: flex; justify-content: center; align-items: flex-end; min-height: 300px; }
+  .mascot { width: 240px; max-width: 70%; filter: drop-shadow(0 12px 18px rgba(40,80,60,.22)); animation: bob 4s ease-in-out infinite; }
+  .mascot2 { position: absolute; left: 4%; bottom: 6px; width: 130px; filter: drop-shadow(0 10px 14px rgba(40,80,60,.22)); animation: bob 4s ease-in-out .8s infinite; }
   @keyframes bob { 0%,100%{ transform: translateY(0) } 50%{ transform: translateY(-8px) } }
+  @media (max-width: 900px){ .mascot2 { left: 12%; width: 110px; } }
 
   .grade-list { display: flex; flex-direction: column; gap: 14px; }
   .grade-row { display: flex; align-items: center; gap: 18px; background: #fff; border-radius: var(--r2); box-shadow: var(--sh); padding: 16px 18px; }
@@ -151,6 +153,28 @@
     '<g transform="rotate(-8 120 60)"><rect x="86" y="52" width="68" height="14" rx="3" fill="#3a3f47"/>' +
     '<polygon points="120,34 168,50 120,66 72,50" fill="#2f343b"/>' +
     '<circle cx="168" cy="50" r="4" fill="#ffd76a"/><path d="M168 50 v20" stroke="#ffd76a" stroke-width="3"/><circle cx="168" cy="72" r="5" fill="#ffd76a"/></g>' +
+    '</svg>' +
+    // ---- Bit the robot ----
+    '<svg class="mascot2" viewBox="0 0 200 220" xmlns="http://www.w3.org/2000/svg">' +
+    '<defs><linearGradient id="rbody" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f4b64a"/><stop offset="1" stop-color="#e59a2b"/></linearGradient></defs>' +
+    '<ellipse cx="100" cy="204" rx="52" ry="10" fill="#000" opacity=".08"/>' +
+    // antenna
+    '<path d="M100 44 v-18" stroke="#c9822a" stroke-width="5" stroke-linecap="round"/><circle cx="100" cy="22" r="8" fill="#57c7ff"/>' +
+    // head
+    '<rect x="52" y="42" width="96" height="70" rx="18" fill="url(#rbody)"/>' +
+    '<rect x="62" y="54" width="76" height="46" rx="12" fill="#20303f"/>' +
+    '<circle cx="86" cy="76" r="8" fill="#7be3ff"/><circle cx="114" cy="76" r="8" fill="#7be3ff"/>' +
+    '<circle cx="88" cy="74" r="2.5" fill="#0b1720"/><circle cx="116" cy="74" r="2.5" fill="#0b1720"/>' +
+    '<path d="M84 90 q16 10 32 0" stroke="#7be3ff" stroke-width="3" fill="none" stroke-linecap="round"/>' +
+    // body
+    '<rect x="60" y="116" width="80" height="70" rx="16" fill="url(#rbody)"/>' +
+    '<rect x="74" y="130" width="52" height="30" rx="8" fill="#fbe6bf"/>' +
+    '<circle cx="88" cy="145" r="4" fill="#e59a2b"/><circle cx="112" cy="145" r="4" fill="#e59a2b"/>' +
+    // arms (one waving up)
+    '<path d="M60 130 q-22 -6 -26 -28" stroke="#e59a2b" stroke-width="9" fill="none" stroke-linecap="round"/><circle cx="33" cy="100" r="8" fill="#f4b64a"/>' +
+    '<path d="M140 132 q20 6 22 26" stroke="#e59a2b" stroke-width="9" fill="none" stroke-linecap="round"/><circle cx="163" cy="160" r="8" fill="#f4b64a"/>' +
+    // feet
+    '<rect x="72" y="184" width="22" height="14" rx="5" fill="#c9822a"/><rect x="106" y="184" width="22" height="14" rx="5" fill="#c9822a"/>' +
     '</svg>';
 
   var pool = Problems.estimatedProblems();

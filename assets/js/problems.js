@@ -137,12 +137,27 @@
     function () { var hrs = rnd(2, 8), wage = rnd(8, 16); return inp(pick(NAMES) + ' earns $' + wage + ' per hour and works ' + hrs + ' hours. How much does ' + (hrs > 4 ? 'she' : 'he') + ' earn?', wage * hrs, wage + ' × ' + hrs + ' = ' + (wage * hrs) + '.'); }
   ];
   G.word = function () { return WP[rnd(0, WP.length - 1)](); };
+
+  // ---- longer, multi-step CHALLENGE problems (harder) ----
+  var CHAL = [
+    function () { var b = rnd(8, 14), n = rnd(18, 26), c = rnd(6, 10), m = rnd(20, 34), sold = rnd(150, 260); var total = b * n + c * m; return inp('A bookstore received ' + b + ' boxes of novels with ' + n + ' books in each box, and ' + c + ' boxes of comics with ' + m + ' in each box. During the first week they sold ' + sold + ' books. How many books remain in stock?', total - sold, 'Novels: ' + b + '×' + n + ' = ' + b * n + '. Comics: ' + c + '×' + m + ' = ' + c * m + '. Total ' + total + ', minus ' + sold + ' sold.'); },
+    function () { var s = rnd(2, 4), d = rnd(2, 3), days = 5; var terms = [], sum = 0; for (var i = 0; i < days; i++) { var t = s + i * d; terms.push(t); sum += t; } return inp('An athlete runs ' + s + ' miles on Monday, and each day runs ' + d + ' more miles than the day before. How many total miles does she run from Monday through Friday?', sum, 'Miles each day: ' + terms.join(' + ') + ' = ' + sum + '.'); },
+    function () { var L = rnd(12, 18), W = rnd(8, 12); var inner = (L - 2) * (W - 2); return inp('A rectangular garden is ' + L + ' m long and ' + W + ' m wide. A path 1 m wide is built inside along all four edges. What is the area of the remaining inner rectangle, in square meters?', inner, 'The inner rectangle is (' + (L - 2) + ') by (' + (W - 2) + '): ' + inner + ' m².'); },
+    function () { var a = pick([40, 50, 60]), b = pick([40, 50, 60]), t = rnd(2, 5); var d = (a + b) * t; return inp('Two trains leave stations ' + d + ' miles apart and travel toward each other, one at ' + a + ' mph and the other at ' + b + ' mph. After how many hours do they meet?', t, 'Their closing speed is ' + (a + b) + ' mph, so ' + d + ' ÷ ' + (a + b) + ' = ' + t + ' hours.'); },
+    function () { var base = rnd(30, 60), up = pick([20, 25, 50]), off = pick([10, 20, 25]); var marked = base * (1 + up / 100); var fin = marked * (1 - off / 100); return mcNum('A store marks up a $' + base + ' item by ' + up + '%, then takes ' + off + '% off the marked price. What is the final price?', Math.round(fin * 100) / 100, { spread: 6, explain: 'Marked: $' + marked + '. Then ' + off + '% off → $' + (Math.round(fin * 100) / 100) + '.' }); },
+    function () { var n = rnd(2, 9), mult = rnd(2, 4), add = rnd(3, 12); return inp('A number is multiplied by ' + mult + ', then ' + add + ' is added, giving ' + (n * mult + add) + '. What is the original number?', n, 'Reverse it: (' + (n * mult + add) + ' − ' + add + ') ÷ ' + mult + ' = ' + n + '.'); },
+    function () { var art = rnd(4, 8), neither = rnd(2, 6), math = 3 * art; var total = art + math + neither; return inp('A class of ' + total + ' students has three times as many who prefer math as prefer art, and ' + neither + ' who prefer neither. How many students prefer math?', math, 'If art = a, then math = 3a, and a + 3a + ' + neither + ' = ' + total + ', so a = ' + art + ' and math = ' + math + '.'); },
+    function () { var g = rnd(4, 6), mi = rnd(28, 40) * g, tank = rnd(10, 14); return inp('A car uses ' + g + ' gallons of gas to travel ' + mi + ' miles. How many miles can it travel on a full ' + tank + '-gallon tank?', mi / g * tank, 'Miles per gallon: ' + mi + ' ÷ ' + g + ' = ' + (mi / g) + '. Then × ' + tank + '.'); },
+    function () { var ppl = pick([2, 4, 5]), cups = rnd(2, 6), want = ppl * rnd(2, 4); var need = cups / ppl * want; return inp('A recipe for ' + ppl + ' people needs ' + cups + ' cups of flour. How many cups are needed to make it for ' + want + ' people?', need, cups + ' ÷ ' + ppl + ' × ' + want + ' = ' + need + ' cups.'); },
+    function () { var pencil = 50, penC = 120, np = rnd(4, 8), pens = rnd(3, 7); var totalC = np * pencil + pens * penC; return inp('Pencils cost $0.50 and pens cost $1.20. A student buys ' + np + ' pencils and some pens for a total of $' + (totalC / 100).toFixed(2) + '. How many pens did they buy?', pens, 'Pencils cost $' + (np * pencil / 100).toFixed(2) + '. The rest, $' + (pens * penC / 100).toFixed(2) + ', ÷ $1.20 = ' + pens + ' pens.'); }
+  ];
+  G.challenge = function () { return CHAL[rnd(0, CHAL.length - 1)](); };
   G.wpConsec = function () { var n = rnd(3, 25); return inp('Two consecutive whole numbers add up to ' + (2 * n + 1) + '. What is the smaller number?', n, 'n + (n + 1) = ' + (2 * n + 1) + ', so 2n + 1 = ' + (2 * n + 1) + '.'); };
   G.wpAge = function () { var y = rnd(3, 12), now = rnd(15, 40); return inp('In ' + y + ' years, ' + pick(NAMES) + ' will be ' + (now + y) + ' years old. How old is she now?', now, 'Subtract ' + y + ' from ' + (now + y) + '.'); };
 
   /* ---------------- STATIC BANKS ---------------- */
   function bankMC(item, bank) { var others = bank.filter(function (b) { return b.a !== item.a; }).map(function (b) { return b.a; }); return mcStr(item.q, item.a, shuffle(others).slice(0, 3), item.e || ''); }
-  function bankGen(id) { return function () { var b = BANKS[id]; return bankMC(pick(b), b); }; }
+  function bankGen(id) { var f = function () { var b = BANKS[id]; return bankMC(pick(b), b); }; f.isBank = true; return f; }
 
   var BANKS = {
     synonyms: [
@@ -270,6 +285,76 @@
       { q: 'Water\'s chemical formula', a: 'H2O' }, { q: 'pH below 7 is', a: 'acidic' }, { q: 'pH above 7 is', a: 'basic' },
       { q: 'Table salt is sodium', a: 'chloride' }, { q: 'The center of an atom is the', a: 'nucleus' }
     ],
+    civics: [
+      { q: 'How many branches does the U.S. federal government have?', a: 'three' },
+      { q: 'Which branch of government makes the laws?', a: 'legislative' },
+      { q: 'Which branch of government enforces the laws?', a: 'executive' },
+      { q: 'Which branch of government interprets the laws?', a: 'judicial' },
+      { q: 'The first ten amendments to the Constitution are called the', a: 'Bill of Rights' },
+      { q: 'How many U.S. senators does each state elect?', a: 'two' },
+      { q: 'The highest court in the United States is the', a: 'Supreme Court' },
+      { q: 'A formal change to the Constitution is called an', a: 'amendment' },
+      { q: 'Citizens choose their leaders by', a: 'voting' },
+      { q: 'The leader of the executive branch is the', a: 'President' },
+      { q: 'The two houses of Congress are the Senate and the House of', a: 'Representatives' },
+      { q: 'The system that lets each branch limit the others is checks and', a: 'balances' }
+    ],
+    economics: [
+      { q: 'When supply is low and demand is high, the price tends to', a: 'rise' },
+      { q: 'Money earned from working is called', a: 'income' },
+      { q: 'Setting money aside to use later is called', a: 'saving' },
+      { q: 'Goods brought into a country from abroad are', a: 'imports' },
+      { q: 'Goods sold to other countries are', a: 'exports' },
+      { q: 'A steady rise in prices across an economy is', a: 'inflation' },
+      { q: 'Trading goods directly without money is called', a: 'bartering' },
+      { q: 'A person who starts and runs a business is an', a: 'entrepreneur' },
+      { q: 'The value of the next best choice you give up is the ___ cost', a: 'opportunity' },
+      { q: 'Things people buy that are physical objects are called', a: 'goods' },
+      { q: 'Work performed for others, like a haircut, is a', a: 'service' },
+      { q: 'Money that is owed to someone else is', a: 'debt' }
+    ],
+    usHistory: [
+      { q: 'The United States declared independence from', a: 'Britain' },
+      { q: 'The main author of the Declaration of Independence was', a: 'Thomas Jefferson' },
+      { q: 'The 1803 land deal that doubled U.S. size was the', a: 'Louisiana Purchase' },
+      { q: 'Martin Luther King Jr. led the movement for', a: 'civil rights' },
+      { q: 'The U.S. entered World War II after the attack on', a: 'Pearl Harbor' },
+      { q: 'The 19th Amendment gave women the right to', a: 'vote' },
+      { q: 'The Civil War was fought partly to end', a: 'slavery' },
+      { q: 'The document that begins "We the People" is the', a: 'Constitution' },
+      { q: 'Abraham Lincoln issued the Emancipation', a: 'Proclamation' },
+      { q: 'The 1849 rush to California was for', a: 'gold' }
+    ],
+    worldHistory: [
+      { q: 'Democracy first developed in ancient', a: 'Greece' },
+      { q: 'The Renaissance began in', a: 'Italy' },
+      { q: 'The printing press in Europe was developed by', a: 'Gutenberg' },
+      { q: 'Ancient Egyptians wrote using picture symbols called', a: 'hieroglyphics' },
+      { q: 'The Roman state was governed in part by a', a: 'Senate' },
+      { q: 'The deadly 14th-century pandemic was the Black', a: 'Death' },
+      { q: 'The huge wall built to defend a northern border is in', a: 'China' },
+      { q: 'The French Revolution began in the year', a: '1789' },
+      { q: 'The exchange of goods along Asia was the Silk', a: 'Road' },
+      { q: 'Mummies and pyramids come from ancient', a: 'Egypt' }
+    ],
+    usStates: [
+      { q: 'How many states are in the United States?', a: '50' },
+      { q: 'Capital of California?', a: 'Sacramento' },
+      { q: 'Capital of Texas?', a: 'Austin' },
+      { q: 'Capital of New York State?', a: 'Albany' },
+      { q: 'Capital of Florida?', a: 'Tallahassee' },
+      { q: 'Mount Rushmore is carved in South', a: 'Dakota' },
+      { q: 'The Grand Canyon is in the state of', a: 'Arizona' },
+      { q: 'The Statue of Liberty stands in the harbor of', a: 'New York' }
+    ],
+    worldCapitals: [
+      { q: 'Capital of Canada?', a: 'Ottawa' }, { q: 'Capital of Australia?', a: 'Canberra' },
+      { q: 'Capital of Brazil?', a: 'Brasília' }, { q: 'Capital of Egypt?', a: 'Cairo' },
+      { q: 'Capital of Germany?', a: 'Berlin' }, { q: 'Capital of Russia?', a: 'Moscow' },
+      { q: 'Capital of China?', a: 'Beijing' }, { q: 'Capital of India?', a: 'New Delhi' },
+      { q: 'Capital of Mexico?', a: 'Mexico City' }, { q: 'Capital of Spain?', a: 'Madrid' },
+      { q: 'Capital of Kenya?', a: 'Nairobi' }, { q: 'Capital of Argentina?', a: 'Buenos Aires' }
+    ],
     history: [
       { q: 'Who was the first U.S. president?', a: 'George Washington' }, { q: 'The Declaration of Independence was signed in', a: '1776' },
       { q: 'Who wrote the Emancipation Proclamation?', a: 'Abraham Lincoln' }, { q: 'Ancient pyramids were built by the', a: 'Egyptians' },
@@ -351,7 +436,8 @@
       { id: 'proportion', name: 'Proportions', grades: [6, 8], gen: G.proportion },
       { id: 'money', name: 'Money problems', grades: [1, 5], gen: G.money },
       { id: 'time', name: 'Elapsed time', grades: [2, 5], gen: G.time },
-      { id: 'word', name: 'Word problems', grades: [2, 8], gen: G.word }
+      { id: 'word', name: 'Word problems', grades: [2, 8], gen: G.word },
+      { id: 'challenge', name: 'Challenge word problems', grades: [5, 10], gen: G.challenge }
     ] },
     { id: 'algebra', name: 'Algebra', color: 'var(--s-algebra)', icon: 'variable', blurb: 'Expressions, equations, functions and inequalities.', skills: [
       { id: 'evalExpr', name: 'Evaluating expressions', grades: [6, 9], gen: G.evalExpr },
@@ -433,11 +519,21 @@
       { id: 'sciEco', name: 'Ecosystems', grades: [4, 9], gen: bankGen('sciEco') },
       { id: 'weather', name: 'Weather', grades: [3, 8], gen: bankGen('weather') }
     ] },
-    { id: 'history', name: 'History', color: 'var(--s-reading)', icon: 'library', blurb: 'People, events and turning points that shaped the world.', skills: [
-      { id: 'history', name: 'World & U.S. history', grades: [4, 12], gen: bankGen('history') }
+    { id: 'history', name: 'History', color: 'var(--s-history)', icon: 'library', blurb: 'People, events and turning points that shaped the world.', skills: [
+      { id: 'history', name: 'History overview', grades: [4, 12], gen: bankGen('history') },
+      { id: 'usHistory', name: 'U.S. history', grades: [5, 12], gen: bankGen('usHistory') },
+      { id: 'worldHistory', name: 'World history', grades: [6, 12], gen: bankGen('worldHistory') }
     ] },
-    { id: 'geography', name: 'Geography', color: 'var(--s-math)', icon: 'globe', blurb: 'Continents, capitals, landforms and the physical world.', skills: [
-      { id: 'geography', name: 'World geography', grades: [3, 12], gen: bankGen('geography') }
+    { id: 'geography', name: 'Geography', color: 'var(--s-geography)', icon: 'globe', blurb: 'Continents, capitals, landforms and the physical world.', skills: [
+      { id: 'geography', name: 'World geography', grades: [3, 12], gen: bankGen('geography') },
+      { id: 'worldCapitals', name: 'World capitals', grades: [4, 12], gen: bankGen('worldCapitals') },
+      { id: 'usStates', name: 'U.S. states & capitals', grades: [4, 12], gen: bankGen('usStates') }
+    ] },
+    { id: 'civics', name: 'Civics', color: 'var(--s-algebra)', icon: 'file-text', blurb: 'Government, the Constitution, rights and citizenship.', skills: [
+      { id: 'civics', name: 'U.S. government & civics', grades: [4, 12], gen: bankGen('civics') }
+    ] },
+    { id: 'economics', name: 'Economics', color: 'var(--s-science)', icon: 'chart-column', blurb: 'Money, trade, supply and demand, and everyday economics.', skills: [
+      { id: 'economics', name: 'Economics basics', grades: [6, 12], gen: bankGen('economics') }
     ] }
   ];
 
@@ -494,12 +590,13 @@
     },
     totalSkills: function () { var n = 0; SUBJECTS.forEach(function (s) { n += s.skills.length; }); return n; },
     estimatedProblems: function () {
-      // count generator skills at a conservative 25 distinct variants each,
-      // plus every static bank item, plus speed drills.
-      var n = 0, banks = 0;
-      SUBJECTS.forEach(function (s) { s.skills.forEach(function (k) { n += 25; }); });
+      // Procedural (generator) skills each produce far more than 120 distinct
+      // problems across grades — count them conservatively at 120. Static bank
+      // skills are counted by their real item count. Speed drills are generators.
+      var gen = 0, banks = 0;
+      SUBJECTS.forEach(function (s) { s.skills.forEach(function (k) { if (!(k.gen && k.gen.isBank)) gen += 120; }); });
       Object.keys(BANKS).forEach(function (b) { banks += BANKS[b].length; });
-      return n + banks + SPEED.length * 40;
+      return gen + banks + SPEED.length * 120;
     },
     gradeNum: gradeNum
   };

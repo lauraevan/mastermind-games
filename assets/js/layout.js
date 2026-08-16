@@ -48,8 +48,7 @@
         right = '<a class="pilluser" href="' + rel + 'dashboard.html" style="text-decoration:none"><span class="av">' + UI.esc(user.avatar) + '</span>' + UI.esc(user.name.split(' ')[0]) + '</a>' +
           '<button class="btn ghost sm" id="logoutBtn">Sign out</button>';
       } else {
-        right = '<a class="btn blue sm" href="' + rel + 'login.html">Sign in</a>' +
-          '<a class="btn sm" href="' + rel + 'login.html#signup">Membership</a>';
+        right = '<a class="btn blue sm" href="' + rel + 'login.html">Sign in</a>';
       }
 
       host.className = 'nav';
