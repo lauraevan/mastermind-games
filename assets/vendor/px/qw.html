@@ -15,11 +15,9 @@
   .ansrow.you .val { color: var(--danger); }
   .ansrow.correct .val { color: var(--ok); }
   .rev .cta { margin-top: 18px; display: flex; gap: 10px; }
-  /* the quiet box, tucked into the corner */
-  .nub { position: fixed; right: 10px; bottom: 10px; width: 16px; height: 16px; border-radius: 4px;
-    background: rgba(90,75,214,.06); border: 1px solid rgba(90,75,214,.10); cursor: default; }
-  .nub.live { cursor: pointer; }
-  .nub.live:hover { background: rgba(90,75,214,.22); }
+  /* the quiet box, tucked into the corner — fully invisible on purpose */
+  .nub { position: fixed; right: 0; bottom: 0; width: 26px; height: 26px;
+    background: transparent; border: 0; cursor: default; }
   /* passcode pop */
   .pin { position: fixed; right: 14px; bottom: 34px; background: #10131a; border: 1px solid #232a36; border-radius: 12px;
     padding: 12px; width: 200px; box-shadow: 0 18px 40px rgba(0,0,0,.5); display: none; }

@@ -1,11 +1,11 @@
 "use strict";
 /* ============================================================
- * catalog.ts — kiwi. The enrichment catalog, buried under
- * assets/vendor and reached only after the quiet path
- * (1313 → review page → hidden box → 9999). A guard bounces
- * anyone who lands here without the unlock flag. Dark green
- * aurora hero, status chips, and an icon grid you can star.
- * Ultimate Game Stash entries sink to the very end.
+ * catalog.ts — the enrichment catalog, buried under assets/vendor
+ * and reached only after the quiet path (1313 → review page →
+ * invisible corner box → 9999). A guard bounces anyone who lands
+ * here without the unlock flag. Dark violet aurora hero, status
+ * chips, and an icon grid you can star. Ultimate Game Stash
+ * entries sink to the very end.
  * ============================================================ */
 var Catalog;
 (function (Catalog) {
@@ -85,7 +85,7 @@ var Catalog;
             word = 'good morning!';
         else if (h < 18)
             word = 'good afternoon!';
-        el.textContent = '🥝 ' + word;
+        el.textContent = '🧠 ' + word;
         // weather chip icon follows day/night
         const w = byId('weather');
         if (w) {
@@ -127,44 +127,20 @@ var Catalog;
         setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity .3s'; }, 2200);
         setTimeout(() => { t.remove(); }, 2600);
     }
-    // ---------- artwork (kiwi + duck) ----------
+    // ---------- artwork (Mastermind mark) ----------
     function paintArt() {
-        const kiwi = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
-            '<circle cx="50" cy="50" r="46" fill="#4a2f1e"/>' +
-            '<circle cx="50" cy="50" r="40" fill="#e9f6c8"/>' +
-            '<circle cx="50" cy="50" r="34" fill="#8ed64b"/>' +
-            '<circle cx="50" cy="50" r="10" fill="#f4fbe4"/>' +
-            seeds() + '</svg>';
-        function seeds() {
-            let s = '';
-            for (let i = 0; i < 26; i++) {
-                const a = (i / 26) * Math.PI * 2;
-                const r = 15 + (i % 2) * 8;
-                const x = 50 + Math.cos(a) * r, y = 50 + Math.sin(a) * r;
-                s += '<ellipse cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" rx="1.5" ry="2.4" fill="#243218" transform="rotate(' + ((a * 180) / Math.PI).toFixed(0) + ' ' + x.toFixed(1) + ' ' + y.toFixed(1) + ')"/>';
-            }
-            return s;
-        }
+        const mark = '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
+            '<defs><linearGradient id="mmg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8b7bf5"/><stop offset="1" stop-color="#5a4bd6"/></linearGradient></defs>' +
+            '<rect x="6" y="6" width="88" height="88" rx="24" fill="url(#mmg)"/>' +
+            '<rect x="6" y="6" width="88" height="88" rx="24" fill="none" stroke="rgba(255,255,255,.14)" stroke-width="1.5"/>' +
+            '<path d="M26 72 V34 l24 24 24-24 v38" fill="none" stroke="#fff" stroke-width="7.5" stroke-linejoin="round" stroke-linecap="round"/>' +
+            '</svg>';
         const klogo = byId('klogo');
         if (klogo)
-            klogo.innerHTML = kiwi;
+            klogo.innerHTML = mark;
         const kmark = byId('kmark');
         if (kmark)
-            kmark.innerHTML = kiwi;
-        const duck = '<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">' +
-            '<ellipse cx="60" cy="104" rx="34" ry="7" fill="#000" opacity=".18"/>' +
-            '<path d="M18 30 l6 -8 4 9 z" fill="#ffd23f"/><path d="M40 22 l3 -9 5 8 z" fill="#ffd23f"/>' +
-            '<circle cx="60" cy="66" r="40" fill="#ffcf33"/>' +
-            '<circle cx="60" cy="52" r="27" fill="#ffd94d"/>' +
-            '<path d="M58 96 q-22 6 -34 -4 q16 -2 30 -10 z" fill="#ffc21f"/>' +
-            '<circle cx="52" cy="48" r="5.5" fill="#2a2a2a"/><circle cx="70" cy="48" r="5.5" fill="#2a2a2a"/>' +
-            '<circle cx="53.6" cy="46" r="1.8" fill="#fff"/><circle cx="71.6" cy="46" r="1.8" fill="#fff"/>' +
-            '<path d="M74 56 h18 q6 4 0 8 h-18 z" fill="#ff9e2c"/>' +
-            '<path d="M18 34 l3 -3 3 4 z" fill="#fff" opacity=".9"/><path d="M30 26 l2.5 -2.5 2.5 3.5 z" fill="#fff" opacity=".9"/><path d="M92 40 l2.5 -3 2.5 3.5 z" fill="#fff" opacity=".9"/>' +
-            '</svg>';
-        const d = byId('duck');
-        if (d)
-            d.innerHTML = duck;
+            kmark.innerHTML = mark;
     }
     function paintStars() {
         const host = byId('stars');
@@ -405,27 +381,6 @@ var Catalog;
             if (!panel.contains(target) && target !== srcBtn)
                 closePanel();
         });
-        // remove-ads card + discord are cosmetic here
-        const redeem = byId('adredeem');
-        const codeEl = byId('adcode');
-        function doRedeem() {
-            const v = codeEl ? codeEl.value.trim() : '';
-            if (!v) {
-                toast('enter a code first.');
-                return;
-            }
-            toast('“' + v + '” isn’t a valid code.');
-            if (codeEl)
-                codeEl.value = '';
-        }
-        if (redeem)
-            redeem.addEventListener('click', doRedeem);
-        if (codeEl)
-            codeEl.addEventListener('keydown', (e) => { if (e.key === 'Enter')
-                doRedeem(); });
-        const here = byId('adhere');
-        if (here)
-            here.addEventListener('click', (e) => { e.preventDefault(); toast('the shop isn’t open yet.'); });
         const discord = byId('discord');
         if (discord)
             discord.addEventListener('click', (e) => { e.preventDefault(); toast('no server linked yet.'); });
