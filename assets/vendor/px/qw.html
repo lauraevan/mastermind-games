@@ -15,17 +15,15 @@
   .ansrow.you .val { color: var(--danger); }
   .ansrow.correct .val { color: var(--ok); }
   .rev .cta { margin-top: 18px; display: flex; gap: 10px; }
-  /* the quiet box, tucked into the corner — fully invisible on purpose */
-  .nub { position: fixed; right: 0; bottom: 0; width: 26px; height: 26px;
-    background: transparent; border: 0; cursor: default; }
-  /* passcode pop */
-  .pin { position: fixed; right: 14px; bottom: 34px; background: #10131a; border: 1px solid #232a36; border-radius: 12px;
-    padding: 12px; width: 200px; box-shadow: 0 18px 40px rgba(0,0,0,.5); display: none; }
-  .pin.on { display: block; }
-  .pin input { width: 100%; font: inherit; font-weight: 800; letter-spacing: .35em; text-align: center; padding: 10px;
-    border-radius: 8px; border: 1px solid #2a3240; background: #0a0d12; color: #cfeecf; outline: none; }
-  .pin input:focus { border-color: #57c94a; box-shadow: 0 0 0 3px rgba(87,201,74,.18); }
-  .pin .hint { color: #5a6472; font-size: .72rem; font-weight: 700; text-align: center; margin-top: 7px; }
+  /* the question itself is the quiet trigger (only when you arrived via 1313) */
+  .qbox.armed { cursor: pointer; }
+  /* the passcode box slides in right under the question */
+  .pin { display: none; align-items: center; gap: 10px; margin: -6px 0 16px; }
+  .pin.on { display: flex; }
+  .pin input { width: 150px; font: inherit; font-weight: 800; letter-spacing: .3em; text-align: center; padding: 10px;
+    border-radius: var(--r); border: 2px solid transparent; background: #eef4fa; color: var(--ink); outline: none; }
+  .pin input:focus { border-color: var(--brand); background: #fff; box-shadow: 0 0 0 3px var(--brand-soft); }
+  .pin .hint { color: var(--muted); font-size: .78rem; font-weight: 700; }
 </style>
 
 <div class="card pad rev">
@@ -38,6 +36,7 @@
   </div>
 
   <div class="qbox" id="qtext">Simplify: <b>3 &times; (4 + 2) &minus; 5</b></div>
+  <div class="pin" id="pin"><input id="pinInput" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off" spellcheck="false"><span class="hint">enter code</span></div>
 
   <div class="ansrow you"><span class="lab">Your answer</span><span class="val" id="you">7</span></div>
   <div class="ansrow correct"><span class="lab">Correct</span><span class="val" id="correct">13</span></div>
@@ -52,23 +51,19 @@
   </div>
 </div>
 
-<!-- the quiet box -->
-<div class="nub" id="nub" title=""></div>
-<div class="pin" id="pin"><input id="pinInput" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off" spellcheck="false"><div class="hint">enter code</div></div>
-
 <script src="../../js/icons.js"></script>
 <script>
   if (window.Icons) Icons.hydrate();
 
-  // The corner box only comes alive if you arrived here the quiet way (1313).
+  // The question is the quiet trigger — only when you arrived here via 1313.
   var armed = false;
   try { armed = sessionStorage.getItem('qx') === '1'; } catch (e) {}
-  var nub = document.getElementById('nub');
+  var qtext = document.getElementById('qtext');
   var pin = document.getElementById('pin');
   var input = document.getElementById('pinInput');
-  if (armed) nub.classList.add('live');
+  if (armed) qtext.classList.add('armed');
 
-  nub.addEventListener('click', function () {
+  qtext.addEventListener('click', function () {
     if (!armed) return;
     pin.classList.toggle('on');
     if (pin.classList.contains('on')) { input.value = ''; input.focus(); }
@@ -80,15 +75,14 @@
       location.href = 'index.html';
     } else {
       input.value = '';
-      pin.style.transform = 'translateX(0)';
       pin.animate([{ transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(0)' }], { duration: 220 });
     }
   }
   input.addEventListener('keydown', function (e) { if (e.key === 'Enter') tryCode(); });
   input.addEventListener('input', function () { if (input.value.length === 4) tryCode(); });
 
-  // Tap outside closes the little pop.
+  // Clicking elsewhere closes the little box.
   document.addEventListener('click', function (e) {
-    if (!pin.contains(e.target) && e.target !== nub) pin.classList.remove('on');
+    if (!pin.contains(e.target) && e.target !== qtext && !qtext.contains(e.target)) pin.classList.remove('on');
   });
 </script>
