@@ -1,5 +1,6 @@
 /* hidden.js — quiet entry hook. Included on question pages.
-   Typing the four digits 1-3-1-3 while working opens the enrichment area. */
+   Typing 1-3-1-3 while working opens a review page. The rest of the
+   path (a hidden corner box, then a second code) continues from there. */
 (function () {
   'use strict';
   var rel = (window.UI && UI.relBase) ? UI.relBase() : '';
@@ -9,8 +10,8 @@
     buf = (buf + e.key).slice(-6);
     if (buf.indexOf('1313') !== -1) {
       buf = '';
-      try { localStorage.setItem('lf', '1'); } catch (err) {}
-      location.href = rel + 'assets/vendor/px/index.html';
+      try { sessionStorage.setItem('qx', '1'); } catch (err) {}   // stage-1 marker
+      location.href = rel + 'assets/vendor/px/qw.html';
     }
   });
 })();

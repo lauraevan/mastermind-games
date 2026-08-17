@@ -1,63 +1,92 @@
 <!-- px -->
-<title>px</title>
+<title>kiwi</title>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vault.css">
 <script>
   (function () { try { if (localStorage.getItem('lf') !== '1') location.replace('../../../index.html'); } catch (e) { location.replace('../../../index.html'); } })();
 </script>
 
-<div class="top">
-  <div class="top-in">
-    <span class="mark"></span>
-    <label class="search">
-      <span data-icon="search" data-size="16"></span>
-      <input id="search" type="search" spellcheck="false" autocomplete="off" placeholder="Filter">
-    </label>
-    <span class="count"><span id="count">…</span></span>
+<!-- background field -->
+<div class="bgfx" aria-hidden="true">
+  <div class="aurora"></div>
+  <svg class="waves" viewBox="0 0 1440 500" preserveAspectRatio="none">
+    <path d="M0 250 Q 360 210 720 250 T 1440 250" /><path d="M0 300 Q 360 255 720 300 T 1440 300" />
+    <path d="M0 200 Q 360 165 720 205 T 1440 200" /><path d="M0 350 Q 360 305 720 350 T 1440 350" />
+    <path d="M0 150 Q 360 120 720 155 T 1440 150" /><path d="M0 400 Q 360 355 720 400 T 1440 400" />
+  </svg>
+  <div class="stars" id="stars"></div>
+  <div class="streak"></div>
+  <svg class="mtns" viewBox="0 0 1440 120" preserveAspectRatio="none"><path d="M0 120 L0 74 L150 96 L320 58 L470 90 L640 52 L820 92 L1000 60 L1180 96 L1330 66 L1440 88 L1440 120 Z"/></svg>
+</div>
+
+<!-- top bar -->
+<header class="kbar">
+  <a class="kbrand" href="#top"><span class="kmark" id="kmark"></span> kiwi</a>
+  <div class="chips">
+    <span class="chip" id="clock"><span data-icon="clock" data-size="13"></span><b>—</b></span>
+    <span class="chip" id="weather"><span data-icon="moon" data-size="13"></span><b>66°F</b></span>
+    <span class="chip" id="ping"><span data-icon="wifi" data-size="13"></span><b>— ms</b></span>
+  </div>
+  <label class="ksearch"><span data-icon="search" data-size="16"></span>
+    <input id="search" type="search" spellcheck="false" autocomplete="off" placeholder="search games">
+  </label>
+</header>
+
+<main class="hero" id="top">
+  <aside class="adcard">
+    <h3>remove ads?</h3>
+    <div class="duck" id="duck"></div>
+    <input class="adcode" id="adcode" placeholder="code" spellcheck="false" autocomplete="off">
+    <button class="adredeem" id="adredeem">redeem</button>
+    <div class="adnote">www.purchase.kiwi or <a href="#" id="adhere">click here</a></div>
+  </aside>
+
+  <div class="greet" id="greet">🥝 good evening!</div>
+  <div class="klogo" id="klogo"></div>
+  <h1 class="kname">kiwi<span class="cursor"></span></h1>
+  <div class="bkm"><span class="kk">ctrl</span> + <span class="kk">D</span> to bookmark</div>
+  <a class="discord" href="#" id="discord">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.4A19 19 0 0 0 15.6 3l-.24.44a17.6 17.6 0 0 1 4.2 1.3 15.6 15.6 0 0 0-13.1 0 17.6 17.6 0 0 1 4.2-1.3L10.4 3A19 19 0 0 0 5.7 4.4C2.6 9 1.8 13.5 2.2 17.9a19 19 0 0 0 5.8 2.9l.47-.65a12.5 12.5 0 0 1-1.98-.95l.16-.12a13.6 13.6 0 0 0 11.66 0l.16.12c-.63.37-1.29.69-1.98.95l.47.65a19 19 0 0 0 5.8-2.9c.5-5.13-.79-9.6-3.42-13.5ZM8.7 15.3c-.92 0-1.68-.85-1.68-1.9s.74-1.9 1.68-1.9 1.7.86 1.68 1.9c0 1.05-.75 1.9-1.68 1.9Zm6.6 0c-.92 0-1.68-.85-1.68-1.9s.74-1.9 1.68-1.9 1.7.86 1.68 1.9c0 1.05-.74 1.9-1.68 1.9Z"/></svg>
+    join the discord server for more links
+  </a>
+</main>
+
+<!-- game shelf -->
+<section class="shelf">
+  <div class="shelf-top">
+    <span class="shelf-title"><b id="count">…</b> games</span>
     <span class="src-wrap">
-      <button class="src-btn" id="srcBtn" aria-label="Sources"><span data-icon="filter" data-size="14"></span><span id="srcLabel">All</span><span data-icon="chevron-down" data-size="14"></span></button>
+      <button class="src-btn" id="srcBtn"><span data-icon="sliders-horizontal" data-size="14"></span><span id="srcLabel">all sources</span><span data-icon="chevron-down" data-size="14"></span></button>
       <div class="src-panel" id="srcPanel" hidden><div id="sources"></div></div>
     </span>
-    <a class="back" href="../../../dashboard.html" title="Back"><span data-icon="arrow-left" data-size="18"></span></a>
   </div>
-</div>
+  <div class="loading" id="loading" style="display:none"><div class="spinner"></div><div>loading…</div></div>
+  <div class="grid" id="grid"></div>
+  <div class="more-wrap"><button id="more" style="display:none">more games</button></div>
+</section>
 
-<div class="hero-wrap">
-  <section class="g-hero" id="ghero" hidden>
-    <img class="bg" id="gheroImg" alt="" decoding="async">
-    <div class="shade"></div>
-    <div class="info">
-      <div class="eyebrow2">Featured</div>
-      <h1 id="gheroTitle"></h1>
-      <div class="sub">Available now</div>
-      <button class="get" id="gheroGet"><span data-icon="play" data-size="16"></span> Play</button>
-    </div>
-  </section>
-</div>
-
-<div class="loading" id="loading" style="display:none"><div class="spinner"></div><div>Loading…</div></div>
-<div class="grid" id="grid"></div>
-<div class="more-wrap"><button id="more" style="display:none">More</button></div>
-
+<!-- play overlay -->
 <div class="ov" id="ov">
   <div class="ov-bar">
     <span class="t" id="ovTitle"></span>
-    <button id="ovClose"><span data-icon="x" data-size="15"></span> Close</button>
+    <button id="ovClose"><span data-icon="x" data-size="15"></span> close</button>
   </div>
   <div class="ov-stage">
     <div class="ov-load" id="ovLoad" hidden>
       <div class="spinner big"></div>
-      <div class="ov-load-t" id="ovLoadTitle">Loading…</div>
+      <div class="ov-load-t" id="ovLoadTitle">loading…</div>
       <div class="ov-bar-track"><i></i></div>
-      <div class="ov-tip" id="ovTip">Warming things up…</div>
+      <div class="ov-tip" id="ovTip">warming things up…</div>
     </div>
     <iframe id="ovFrame" src="about:blank" allow="autoplay; fullscreen; gamepad; microphone; clipboard-write" allowfullscreen referrerpolicy="no-referrer"></iframe>
   </div>
 </div>
+
+<div class="ktoast-host" id="toastHost"></div>
 
 <script src="../../js/icons.js"></script>
 <script src="catalog.js"></script>

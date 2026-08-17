@@ -1,0 +1,96 @@
+<title>Review — Mastermind Academy</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="stylesheet" href="../../css/main.css">
+<style>
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+  .rev { width: 100%; max-width: 560px; }
+  .rev .head { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+  .xbadge { width: 42px; height: 42px; flex: 0 0 auto; border-radius: 12px; background: var(--danger-soft); color: var(--danger); display: grid; place-items: center; }
+  .rev h1 { font-size: 1.4rem; margin: 0; color: #343a42; }
+  .qbox { background: #eef4fa; border-radius: var(--r); padding: 14px 16px; margin: 16px 0; font-weight: 700; color: var(--ink-2); }
+  .ansrow { display: flex; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line); font-weight: 700; }
+  .ansrow .lab { width: 108px; color: var(--muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; }
+  .ansrow.you .val { color: var(--danger); }
+  .ansrow.correct .val { color: var(--ok); }
+  .rev .cta { margin-top: 18px; display: flex; gap: 10px; }
+  /* the quiet box, tucked into the corner */
+  .nub { position: fixed; right: 10px; bottom: 10px; width: 16px; height: 16px; border-radius: 4px;
+    background: rgba(90,75,214,.06); border: 1px solid rgba(90,75,214,.10); cursor: default; }
+  .nub.live { cursor: pointer; }
+  .nub.live:hover { background: rgba(90,75,214,.22); }
+  /* passcode pop */
+  .pin { position: fixed; right: 14px; bottom: 34px; background: #10131a; border: 1px solid #232a36; border-radius: 12px;
+    padding: 12px; width: 200px; box-shadow: 0 18px 40px rgba(0,0,0,.5); display: none; }
+  .pin.on { display: block; }
+  .pin input { width: 100%; font: inherit; font-weight: 800; letter-spacing: .35em; text-align: center; padding: 10px;
+    border-radius: 8px; border: 1px solid #2a3240; background: #0a0d12; color: #cfeecf; outline: none; }
+  .pin input:focus { border-color: #57c94a; box-shadow: 0 0 0 3px rgba(87,201,74,.18); }
+  .pin .hint { color: #5a6472; font-size: .72rem; font-weight: 700; text-align: center; margin-top: 7px; }
+</style>
+
+<div class="card pad rev">
+  <div class="head">
+    <span class="xbadge"><span data-icon="x" data-size="22"></span></span>
+    <div>
+      <h1>Not quite — let's review that one.</h1>
+      <p class="muted small" style="margin:2px 0 0">Take a look, then keep going. Mistakes are how mastery grows.</p>
+    </div>
+  </div>
+
+  <div class="qbox" id="qtext">Simplify: <b>3 &times; (4 + 2) &minus; 5</b></div>
+
+  <div class="ansrow you"><span class="lab">Your answer</span><span class="val" id="you">7</span></div>
+  <div class="ansrow correct"><span class="lab">Correct</span><span class="val" id="correct">13</span></div>
+
+  <div class="qbox" style="background:var(--brand-soft);color:var(--brand-dark)">
+    <b>Why:</b> work inside the parentheses first (4 + 2 = 6), then multiply (3 &times; 6 = 18), then subtract 5 to get 13.
+  </div>
+
+  <div class="cta">
+    <a class="btn" href="../../../dashboard.html"><span data-icon="rotate-ccw" data-size="16"></span> Try another</a>
+    <a class="btn ghost" href="../../../dashboard.html">Back to dashboard</a>
+  </div>
+</div>
+
+<!-- the quiet box -->
+<div class="nub" id="nub" title=""></div>
+<div class="pin" id="pin"><input id="pinInput" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off" spellcheck="false"><div class="hint">enter code</div></div>
+
+<script src="../../js/icons.js"></script>
+<script>
+  if (window.Icons) Icons.hydrate();
+
+  // The corner box only comes alive if you arrived here the quiet way (1313).
+  var armed = false;
+  try { armed = sessionStorage.getItem('qx') === '1'; } catch (e) {}
+  var nub = document.getElementById('nub');
+  var pin = document.getElementById('pin');
+  var input = document.getElementById('pinInput');
+  if (armed) nub.classList.add('live');
+
+  nub.addEventListener('click', function () {
+    if (!armed) return;
+    pin.classList.toggle('on');
+    if (pin.classList.contains('on')) { input.value = ''; input.focus(); }
+  });
+
+  function tryCode() {
+    if (input.value === '9999') {
+      try { localStorage.setItem('lf', '1'); sessionStorage.removeItem('qx'); } catch (e) {}
+      location.href = 'index.html';
+    } else {
+      input.value = '';
+      pin.style.transform = 'translateX(0)';
+      pin.animate([{ transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(0)' }], { duration: 220 });
+    }
+  }
+  input.addEventListener('keydown', function (e) { if (e.key === 'Enter') tryCode(); });
+  input.addEventListener('input', function () { if (input.value.length === 4) tryCode(); });
+
+  // Tap outside closes the little pop.
+  document.addEventListener('click', function (e) {
+    if (!pin.contains(e.target) && e.target !== nub) pin.classList.remove('on');
+  });
+</script>
