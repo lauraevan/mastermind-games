@@ -186,6 +186,8 @@ var Catalog;
         applyFilter();
     }
     // ---------- sources popout ----------
+    // Display name for a source (the raw label is kept for filtering/sorting).
+    function srcDisplay(s) { return s === UGS ? 'Ultimate Stash' : s; }
     function buildSources() {
         const counts = {};
         state.rows.forEach((r) => { counts[r.src] = (counts[r.src] || 0) + 1; });
@@ -200,10 +202,10 @@ var Catalog;
             return b;
         };
         host.appendChild(mk('all', 'all sources', state.rows.length));
-        srcs.forEach((s) => host.appendChild(mk(s, s, counts[s])));
+        srcs.forEach((s) => host.appendChild(mk(s, srcDisplay(s), counts[s])));
         const lbl = byId('srcLabel');
         if (lbl)
-            lbl.textContent = state.src === 'all' ? 'all sources' : state.src;
+            lbl.textContent = state.src === 'all' ? 'all sources' : srcDisplay(state.src);
     }
     function closePanel() { const p = byId('srcPanel'); if (p)
         p.setAttribute('hidden', ''); }
@@ -266,37 +268,8 @@ var Catalog;
         el.appendChild(icWrap);
         el.appendChild(star);
         el.appendChild(label);
-        el.addEventListener('click', (e) => {
-            if (e.ctrlKey || e.metaKey)
-                openNewTab(r);
-            else
-                open(r);
-        });
-        // middle-click also opens in a new tab
-        el.addEventListener('auxclick', (e) => { if (e.button === 1) {
-            e.preventDefault();
-            openNewTab(r);
-        } });
+        el.addEventListener('click', () => open(r));
         return el;
-    }
-    // Open a game in a fresh, blank-titled tab (about:blank cloak), so it doesn't
-    // sit under this page. Falls back to a plain new tab if the write is blocked.
-    function openNewTab(r) {
-        const w = window.open('about:blank', '_blank');
-        if (!w) {
-            window.open(r.url, '_blank', 'noopener');
-            return;
-        }
-        try {
-            const url = r.url.replace(/"/g, '&quot;');
-            w.document.write('<!doctype html><html><head><title>mastermind</title><meta name="viewport" content="width=device-width, initial-scale=1">' +
-                '<style>html,body{margin:0;height:100%;background:#07060d;overflow:hidden}iframe{border:0;width:100%;height:100%;display:block}</style></head>' +
-                '<body><iframe src="' + url + '" allow="autoplay; fullscreen; gamepad; microphone; clipboard-write" allowfullscreen referrerpolicy="no-referrer"></iframe></body></html>');
-            w.document.close();
-        }
-        catch (e) {
-            w.location.href = r.url;
-        }
     }
     function renderMore() {
         const end = Math.min(state.shown + state.batch, state.filtered.length);

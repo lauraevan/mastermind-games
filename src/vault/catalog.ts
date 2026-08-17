@@ -141,6 +141,8 @@ namespace Catalog {
   }
 
   // ---------- sources popout ----------
+  // Display name for a source (the raw label is kept for filtering/sorting).
+  function srcDisplay(s: string): string { return s === UGS ? 'Ultimate Stash' : s; }
   function buildSources(): void {
     const counts: { [k: string]: number } = {};
     state.rows.forEach((r) => { counts[r.src] = (counts[r.src] || 0) + 1; });
@@ -155,9 +157,9 @@ namespace Catalog {
       return b;
     };
     host.appendChild(mk('all', 'all sources', state.rows.length));
-    srcs.forEach((s) => host.appendChild(mk(s, s, counts[s])));
+    srcs.forEach((s) => host.appendChild(mk(s, srcDisplay(s), counts[s])));
     const lbl = byId('srcLabel');
-    if (lbl) lbl.textContent = state.src === 'all' ? 'all sources' : state.src;
+    if (lbl) lbl.textContent = state.src === 'all' ? 'all sources' : srcDisplay(state.src);
   }
   function closePanel(): void { const p = byId('srcPanel'); if (p) p.setAttribute('hidden', ''); }
   function togglePanel(): void { const p = byId('srcPanel'); if (p) { if (p.hasAttribute('hidden')) p.removeAttribute('hidden'); else p.setAttribute('hidden', ''); } }
@@ -213,27 +215,8 @@ namespace Catalog {
     el.appendChild(icWrap);
     el.appendChild(star);
     el.appendChild(label);
-    el.addEventListener('click', (e) => {
-      if ((e as MouseEvent).ctrlKey || (e as MouseEvent).metaKey) openNewTab(r);
-      else open(r);
-    });
-    // middle-click also opens in a new tab
-    el.addEventListener('auxclick', (e) => { if ((e as MouseEvent).button === 1) { e.preventDefault(); openNewTab(r); } });
+    el.addEventListener('click', () => open(r));
     return el;
-  }
-
-  // Open a game in a fresh, blank-titled tab (about:blank cloak), so it doesn't
-  // sit under this page. Falls back to a plain new tab if the write is blocked.
-  function openNewTab(r: Row): void {
-    const w = window.open('about:blank', '_blank');
-    if (!w) { window.open(r.url, '_blank', 'noopener'); return; }
-    try {
-      const url = r.url.replace(/"/g, '&quot;');
-      w.document.write('<!doctype html><html><head><title>mastermind</title><meta name="viewport" content="width=device-width, initial-scale=1">' +
-        '<style>html,body{margin:0;height:100%;background:#07060d;overflow:hidden}iframe{border:0;width:100%;height:100%;display:block}</style></head>' +
-        '<body><iframe src="' + url + '" allow="autoplay; fullscreen; gamepad; microphone; clipboard-write" allowfullscreen referrerpolicy="no-referrer"></iframe></body></html>');
-      w.document.close();
-    } catch (e) { w.location.href = r.url; }
   }
 
   function renderMore(): void {
