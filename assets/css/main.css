@@ -222,3 +222,15 @@ table.data tr:hover td { background: var(--surface-2); }
   .navsearch { display: none; }
   h1 { font-size: 1.6rem; }
 }
+@media (max-width: 520px) {
+  .wrap { padding: 0 15px; }
+  .section { padding: 34px 0; }
+  .section.tight { padding: 22px 0; }
+  .card.pad, .panel { padding: 16px; }
+  h2 { font-size: 1.3rem; }
+  .nav-in { gap: 9px; height: 56px; }
+  .brand { font-size: 1rem; padding: 5px 10px; }
+  .nav-right { gap: 6px; }
+  .btn.lg { padding: 12px 18px; font-size: .96rem; }
+  .foot-bottom { flex-direction: column; gap: 6px; }
+}

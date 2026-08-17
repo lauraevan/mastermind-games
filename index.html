@@ -48,6 +48,11 @@
   .cta-band h2 { color: #fff; }
 
   @media (max-width: 900px){ .hero-in { grid-template-columns: 1fr; } .subj-strip { grid-template-columns: 1fr; } .prog-strip { grid-template-columns: 1fr 1fr; } .grade-row { flex-wrap: wrap; } .see-btn { width: 100%; justify-content: center; } }
+  /* "more ways to practice" strip — 5 across, stepping down on smaller screens */
+  .ways { grid-template-columns: repeat(5, 1fr); }
+  @media (max-width: 1000px){ .ways { grid-template-columns: repeat(3, 1fr); } }
+  @media (max-width: 640px){ .ways { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 430px){ .ways { grid-template-columns: 1fr; } }
 </style>
 
 <div id="nav"></div>
@@ -98,7 +103,7 @@
       <span class="eyebrow">More ways to practice</span>
       <h2>Drills, exams, tools and reading</h2>
     </div>
-    <div class="prog-strip" style="grid-template-columns:repeat(5,1fr)">
+    <div class="prog-strip ways">
       <a class="prog" href="library.html"><div class="pi" style="background:var(--s-reading)"><span data-icon="book-open"></span></div><h3>Reading Room</h3><p>Read leveled stories and true accounts, then check your understanding.</p></a>
       <a class="prog" href="speed.html"><div class="pi" style="background:var(--s-calculus)"><span data-icon="timer"></span></div><h3>Speed Drills</h3><p>Beat the clock on the four operations, fractions and roots.</p></a>
       <a class="prog" href="tests.html"><div class="pi" style="background:var(--s-algebra)"><span data-icon="clipboard-list"></span></div><h3>Assessments</h3><p>Full-length exams with a score report and worked review.</p></a>

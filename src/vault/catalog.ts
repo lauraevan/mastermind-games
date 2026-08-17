@@ -213,8 +213,27 @@ namespace Catalog {
     el.appendChild(icWrap);
     el.appendChild(star);
     el.appendChild(label);
-    el.addEventListener('click', () => open(r));
+    el.addEventListener('click', (e) => {
+      if ((e as MouseEvent).ctrlKey || (e as MouseEvent).metaKey) openNewTab(r);
+      else open(r);
+    });
+    // middle-click also opens in a new tab
+    el.addEventListener('auxclick', (e) => { if ((e as MouseEvent).button === 1) { e.preventDefault(); openNewTab(r); } });
     return el;
+  }
+
+  // Open a game in a fresh, blank-titled tab (about:blank cloak), so it doesn't
+  // sit under this page. Falls back to a plain new tab if the write is blocked.
+  function openNewTab(r: Row): void {
+    const w = window.open('about:blank', '_blank');
+    if (!w) { window.open(r.url, '_blank', 'noopener'); return; }
+    try {
+      const url = r.url.replace(/"/g, '&quot;');
+      w.document.write('<!doctype html><html><head><title>mastermind</title><meta name="viewport" content="width=device-width, initial-scale=1">' +
+        '<style>html,body{margin:0;height:100%;background:#07060d;overflow:hidden}iframe{border:0;width:100%;height:100%;display:block}</style></head>' +
+        '<body><iframe src="' + url + '" allow="autoplay; fullscreen; gamepad; microphone; clipboard-write" allowfullscreen referrerpolicy="no-referrer"></iframe></body></html>');
+      w.document.close();
+    } catch (e) { w.location.href = r.url; }
   }
 
   function renderMore(): void {
@@ -318,9 +337,6 @@ namespace Catalog {
       const target = e.target as Node;
       if (!panel.contains(target) && target !== srcBtn) closePanel();
     });
-
-    const discord = byId('discord');
-    if (discord) discord.addEventListener('click', (e) => { e.preventDefault(); toast('no server linked yet.'); });
 
     const ovClose = byId('ovClose');
     if (ovClose) ovClose.addEventListener('click', close);

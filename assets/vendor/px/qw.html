@@ -17,6 +17,8 @@
   .rev .cta { margin-top: 18px; display: flex; gap: 10px; }
   /* the question itself is the quiet trigger (only when you arrived via 1313) */
   .qbox.armed { cursor: pointer; }
+  /* a second, fully invisible trigger tucked into the bottom-right corner */
+  .nub { position: fixed; right: 0; bottom: 0; width: 30px; height: 30px; background: transparent; border: 0; cursor: default; }
   /* the passcode box slides in right under the question */
   .pin { display: none; align-items: center; gap: 10px; margin: -6px 0 16px; }
   .pin.on { display: flex; }
@@ -51,23 +53,30 @@
   </div>
 </div>
 
+<!-- second, invisible trigger in the corner -->
+<div class="nub" id="nub"></div>
+
 <script src="../../js/icons.js"></script>
 <script>
   if (window.Icons) Icons.hydrate();
 
-  // The question is the quiet trigger — only when you arrived here via 1313.
+  // Two quiet triggers — the question, and an invisible corner box — both only
+  // work if you arrived here the quiet way (1313).
   var armed = false;
   try { armed = sessionStorage.getItem('qx') === '1'; } catch (e) {}
   var qtext = document.getElementById('qtext');
+  var nub = document.getElementById('nub');
   var pin = document.getElementById('pin');
   var input = document.getElementById('pinInput');
   if (armed) qtext.classList.add('armed');
 
-  qtext.addEventListener('click', function () {
+  function togglePin() {
     if (!armed) return;
     pin.classList.toggle('on');
     if (pin.classList.contains('on')) { input.value = ''; input.focus(); }
-  });
+  }
+  qtext.addEventListener('click', togglePin);
+  nub.addEventListener('click', togglePin);
 
   function tryCode() {
     if (input.value === '9999') {
@@ -83,6 +92,6 @@
 
   // Clicking elsewhere closes the little box.
   document.addEventListener('click', function (e) {
-    if (!pin.contains(e.target) && e.target !== qtext && !qtext.contains(e.target)) pin.classList.remove('on');
+    if (!pin.contains(e.target) && e.target !== qtext && !qtext.contains(e.target) && e.target !== nub) pin.classList.remove('on');
   });
 </script>
