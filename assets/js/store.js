@@ -102,7 +102,11 @@
       name = (name || '').trim(); username = (username || '').trim().toLowerCase();
       if (serverMode()) {
         return apiReq('POST', '/signup', { name: name, username: username, grade: grade || 'K', password: password })
-          .then(function (r) { return r.status === 200 ? self._onAuth(r.body) : { ok: false, error: (r.body && r.body.error) || 'Sign up failed.' }; })
+          .then(function (r) {
+            if (r.status === 200) return self._onAuth(r.body);
+            if (r.status === 404 || r.status === 0) return self._localSignup(name, username, grade, password); // no API here → local
+            return { ok: false, error: (r.body && r.body.error) || 'Sign up failed.' };
+          })
           .catch(function () { return self._localSignup(name, username, grade, password); });
       }
       return Promise.resolve(self._localSignup(name, username, grade, password));
@@ -125,7 +129,11 @@
       username = (username || '').trim().toLowerCase();
       if (serverMode()) {
         return apiReq('POST', '/login', { username: username, password: password })
-          .then(function (r) { return r.status === 200 ? self._onAuth(r.body) : { ok: false, error: (r.body && r.body.error) || 'Sign in failed.' }; })
+          .then(function (r) {
+            if (r.status === 200) return self._onAuth(r.body);
+            if (r.status === 404 || r.status === 0) return self._localLogin(username, password); // no API here → local
+            return { ok: false, error: (r.body && r.body.error) || 'Sign in failed.' };
+          })
           .catch(function () { return self._localLogin(username, password); });
       }
       return Promise.resolve(self._localLogin(username, password));

@@ -31,7 +31,26 @@
   }
 
   var Layout = {
-    mount: function (opts) { opts = opts || {}; this.nav(opts.active); this.footer(); if (global.Icons) Icons.hydrate(); },
+    mount: function (opts) { opts = opts || {}; this.head(); this.nav(opts.active); this.footer(); if (global.Icons) Icons.hydrate(); },
+
+    // Inject a favicon + browser theme color once, so every page gets them
+    // without editing each <head>. Self-contained (data URI) — no server needed.
+    head: function () {
+      var head = document.head || document.getElementsByTagName('head')[0];
+      if (!head) return;
+      if (!document.querySelector('link[rel="icon"]')) {
+        var svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">' +
+          '<rect x="2" y="2" width="28" height="28" rx="8" fill="#5a4bd6"/>' +
+          '<path d="M8 23V10l8 8 8-8v13" fill="none" stroke="#fff" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/></svg>';
+        var link = document.createElement('link');
+        link.rel = 'icon'; link.type = 'image/svg+xml';
+        link.href = 'data:image/svg+xml,' + encodeURIComponent(svg);
+        head.appendChild(link);
+      }
+      if (!document.querySelector('meta[name="theme-color"]')) {
+        var m = document.createElement('meta'); m.name = 'theme-color'; m.content = '#4a3cc0'; head.appendChild(m);
+      }
+    },
 
     nav: function (active) {
       var host = document.getElementById('nav'); if (!host) return;
@@ -99,7 +118,7 @@
         '<li><a href="' + rel + 'index.html">Terms</a></li></ul></div>' +
         '</div><div class="foot-bottom">' +
         '<span>&copy; ' + year + ' Mastermind Academy. Practice makes progress.</span>' +
-        '<span>Progress is saved on this device.</span>' +
+        '<span>' + ((Store.serverMode && Store.serverMode()) ? 'Signed-in progress syncs to your account.' : 'Progress is saved in this browser.') + '</span>' +
         '</div></div>';
       if (global.Icons) Icons.hydrate(host);
     }
