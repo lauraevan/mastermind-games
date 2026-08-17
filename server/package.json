@@ -1,0 +1,11 @@
+{
+  "name": "mastermind-academy-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Auth + progress API for Mastermind Academy. Server-side scrypt password hashing, JWT sessions. Zero dependencies.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": { "node": ">=18" }
+}

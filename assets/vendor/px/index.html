@@ -48,7 +48,15 @@
     <span class="t" id="ovTitle"></span>
     <button id="ovClose"><span data-icon="x" data-size="15"></span> Close</button>
   </div>
-  <iframe id="ovFrame" src="about:blank" allow="autoplay; fullscreen; gamepad; microphone; clipboard-write" allowfullscreen referrerpolicy="no-referrer"></iframe>
+  <div class="ov-stage">
+    <div class="ov-load" id="ovLoad" hidden>
+      <div class="spinner big"></div>
+      <div class="ov-load-t" id="ovLoadTitle">Loading…</div>
+      <div class="ov-bar-track"><i></i></div>
+      <div class="ov-tip" id="ovTip">Warming things up…</div>
+    </div>
+    <iframe id="ovFrame" src="about:blank" allow="autoplay; fullscreen; gamepad; microphone; clipboard-write" allowfullscreen referrerpolicy="no-referrer"></iframe>
+  </div>
 </div>
 
 <script src="../../js/icons.js"></script>

@@ -65,7 +65,7 @@
         <p class="muted small center" style="margin:14px 0 0">Already registered? <a href="#" id="toLogin">Sign in</a></p>
       </form>
 
-      <p class="muted small center" style="margin:18px 0 0;font-size:.76rem">Accounts are stored locally in this browser. No data leaves your device.</p>
+      <p class="muted small center" id="storeNote" style="margin:18px 0 0;font-size:.76rem">Accounts are stored locally in this browser.</p>
     </div>
   </div>
 </div>
@@ -96,6 +96,26 @@
     gWrap.appendChild(b);
   });
 
-  loginForm.addEventListener('submit', function (e) { e.preventDefault(); clearErr(); var r = Store.login(document.getElementById('li-user').value, document.getElementById('li-pass').value); if (!r.ok) return showErr(r.error); location.href = 'dashboard.html'; });
-  signupForm.addEventListener('submit', function (e) { e.preventDefault(); clearErr(); var r = Store.signup(document.getElementById('su-name').value, document.getElementById('su-user').value, gInput.value, document.getElementById('su-pass').value); if (!r.ok) return showErr(r.error); location.href = 'dashboard.html'; });
+  // When the site is served by our Node server, accounts are real:
+  // passwords hashed server-side (scrypt) and progress syncs across devices.
+  if (Store.serverMode && Store.serverMode()) {
+    document.getElementById('storeNote').textContent = 'Passwords are hashed on the server (never stored in plain text); progress syncs across your devices.';
+  }
+
+  function busy(form, on) {
+    var b = form.querySelector('button[type=submit]');
+    if (b) { b.disabled = on; b.dataset.label = b.dataset.label || b.textContent; b.textContent = on ? 'Please wait…' : b.dataset.label; }
+  }
+  loginForm.addEventListener('submit', function (e) {
+    e.preventDefault(); clearErr(); busy(loginForm, true);
+    Promise.resolve(Store.login(document.getElementById('li-user').value, document.getElementById('li-pass').value))
+      .then(function (r) { if (!r.ok) { busy(loginForm, false); return showErr(r.error); } location.href = 'dashboard.html'; })
+      .catch(function () { busy(loginForm, false); showErr('Something went wrong. Please try again.'); });
+  });
+  signupForm.addEventListener('submit', function (e) {
+    e.preventDefault(); clearErr(); busy(signupForm, true);
+    Promise.resolve(Store.signup(document.getElementById('su-name').value, document.getElementById('su-user').value, gInput.value, document.getElementById('su-pass').value))
+      .then(function (r) { if (!r.ok) { busy(signupForm, false); return showErr(r.error); } location.href = 'dashboard.html'; })
+      .catch(function () { busy(signupForm, false); showErr('Something went wrong. Please try again.'); });
+  });
 </script>

@@ -150,17 +150,65 @@ namespace Catalog {
     if (more) more.style.display = state.shown < state.filtered.length ? 'inline-flex' : 'none';
   }
 
+  // Rotating hints shown while a title loads — some are large and take a
+  // while, so the wait gets a friendly face instead of a blank frame.
+  const TIPS = [
+    'Warming things up…',
+    'This one’s a big one — hang tight.',
+    'Loading assets. Larger titles can take a moment.',
+    'Reticulating splines…',
+    'Almost there…',
+    'Good things load to those who wait.',
+    'Buffering the fun…',
+    'Still going — thanks for your patience.'
+  ];
+  let tipTimer = 0;
+  let loadTimer = 0;
+
+  function showLoad(title: string): void {
+    const load = byId('ovLoad');
+    const lt = byId('ovLoadTitle');
+    const tip = byId('ovTip');
+    if (lt) lt.textContent = title || 'Loading…';
+    let i = 0;
+    if (tip) tip.textContent = TIPS[0];
+    window.clearInterval(tipTimer);
+    tipTimer = window.setInterval(() => {
+      i = (i + 1) % TIPS.length;
+      if (tip) {
+        tip.style.opacity = '0';
+        window.setTimeout(() => { tip.textContent = TIPS[i]; tip.style.opacity = '1'; }, 180);
+      }
+    }, 2600);
+    if (load) load.removeAttribute('hidden');
+  }
+  function hideLoad(): void {
+    window.clearInterval(tipTimer);
+    window.clearTimeout(loadTimer);
+    const load = byId('ovLoad');
+    if (load) load.setAttribute('hidden', '');
+  }
+
   function open(r: Row): void {
     const ov = q<HTMLElement>('#ov');
     const frame = q<HTMLIFrameElement>('#ovFrame');
     q<HTMLElement>('#ovTitle').textContent = r.title;
+    showLoad(r.title);
+    // Hide the loader when the frame reports it has loaded; keep a ceiling so
+    // a frame that never fires `load` (some embeds don't) can't spin forever.
+    frame.onload = () => { if (frame.src !== 'about:blank') hideLoad(); };
+    window.clearTimeout(loadTimer);
+    loadTimer = window.setTimeout(hideLoad, 20000);
     frame.src = r.url;
     ov.classList.add('on');
     document.body.style.overflow = 'hidden';
   }
   function close(): void {
     const ov = q<HTMLElement>('#ov');
-    q<HTMLIFrameElement>('#ovFrame').src = 'about:blank';
+    const frame = q<HTMLIFrameElement>('#ovFrame');
+    frame.onload = null;
+    frame.src = 'about:blank';
+    hideLoad();
     ov.classList.remove('on');
     document.body.style.overflow = '';
   }

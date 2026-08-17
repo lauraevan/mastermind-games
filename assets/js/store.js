@@ -1,7 +1,10 @@
 /* ============================================================
-   store.js — client-side accounts, progress & streaks
-   Everything lives in localStorage; this is a front-end demo,
-   so "passwords" are lightly hashed, not secure. No server.
+   store.js — accounts, progress & streaks.
+   When an API is available (the site is served by the Node
+   server, or window.MM_API is set) real accounts are used:
+   passwords are hashed server-side with scrypt, sessions are
+   JWTs, and progress syncs across devices. On a plain static
+   host (e.g. githack) it falls back to a local-only demo mode.
    ============================================================ */
 (function (global) {
   'use strict';
@@ -9,6 +12,32 @@
   var LS = global.localStorage;
   var USERS_KEY = 'mm_users';
   var SESSION_KEY = 'mm_session';
+  var TOKEN_KEY = 'mm_token';
+  var USER_KEY = 'mm_user';
+
+  // Where the API lives. Same-origin /api when served by our server;
+  // empty (local-only) on file:// and known static hosts.
+  var API = (function () {
+    if (typeof global.MM_API === 'string') return global.MM_API;
+    if (location.protocol === 'file:') return '';
+    var h = location.host || '';
+    if (/githack|github\.io|githubusercontent/i.test(h)) return '';
+    return location.origin + '/api';
+  })();
+  function serverMode() { return !!API; }
+  function apiReq(method, p, body) {
+    var headers = { 'Content-Type': 'application/json' };
+    var tk = LS.getItem(TOKEN_KEY); if (tk) headers['Authorization'] = 'Bearer ' + tk;
+    return fetch(API + p, { method: method, headers: headers, body: body ? JSON.stringify(body) : undefined })
+      .then(function (res) { return res.json().catch(function () { return {}; }).then(function (j) { return { status: res.status, body: j }; }); });
+  }
+  // Debounced push of progress to the server.
+  var pushTimer = null, pushPayload = null;
+  function schedulePush(p) {
+    if (!serverMode()) return;
+    pushPayload = p; clearTimeout(pushTimer);
+    pushTimer = setTimeout(function () { apiReq('PUT', '/progress', { progress: pushPayload }).catch(function () {}); }, 1200);
+  }
 
   function read(key, fallback) {
     try { var v = LS.getItem(key); return v ? JSON.parse(v) : fallback; }
@@ -64,47 +93,72 @@
 
   var Store = {
     // ---- accounts ----
+    serverMode: serverMode,
     users: function () { return read(USERS_KEY, {}); },
 
+    // signup/login return a Promise resolving to { ok, user } or { ok:false, error }.
     signup: function (name, username, grade, password) {
-      username = (username || '').trim().toLowerCase();
-      name = (name || '').trim();
+      var self = this;
+      name = (name || '').trim(); username = (username || '').trim().toLowerCase();
+      if (serverMode()) {
+        return apiReq('POST', '/signup', { name: name, username: username, grade: grade || 'K', password: password })
+          .then(function (r) { return r.status === 200 ? self._onAuth(r.body) : { ok: false, error: (r.body && r.body.error) || 'Sign up failed.' }; })
+          .catch(function () { return self._localSignup(name, username, grade, password); });
+      }
+      return Promise.resolve(self._localSignup(name, username, grade, password));
+    },
+    _localSignup: function (name, username, grade, password) {
       if (!name || !username || !password) return { ok: false, error: 'Please fill in every field.' };
       if (username.length < 3) return { ok: false, error: 'Username must be at least 3 characters.' };
+      if ((password || '').length < 6) return { ok: false, error: 'Password must be at least 6 characters.' };
       var users = this.users();
       if (users[username]) return { ok: false, error: 'That username is already taken.' };
-      users[username] = {
-        name: name, username: username, grade: grade || 'K',
-        pass: hash(password), avatar: pickAvatar(name), createdAt: Date.now()
-      };
+      users[username] = { name: name, username: username, grade: grade || 'K', pass: hash(password), avatar: pickAvatar(name), createdAt: Date.now() };
       write(USERS_KEY, users);
       write('mm_progress_' + username, blankProgress());
-      LS.setItem(SESSION_KEY, username);
+      write(USER_KEY, users[username]); LS.setItem(SESSION_KEY, username);
       return { ok: true, user: users[username] };
     },
 
     login: function (username, password) {
+      var self = this;
       username = (username || '').trim().toLowerCase();
-      var users = this.users();
-      var u = users[username];
+      if (serverMode()) {
+        return apiReq('POST', '/login', { username: username, password: password })
+          .then(function (r) { return r.status === 200 ? self._onAuth(r.body) : { ok: false, error: (r.body && r.body.error) || 'Sign in failed.' }; })
+          .catch(function () { return self._localLogin(username, password); });
+      }
+      return Promise.resolve(self._localLogin(username, password));
+    },
+    _localLogin: function (username, password) {
+      var users = this.users(); var u = users[username];
       if (!u) return { ok: false, error: 'No account with that username.' };
       if (u.pass !== hash(password)) return { ok: false, error: 'Incorrect password.' };
-      LS.setItem(SESSION_KEY, username);
+      write(USER_KEY, u); LS.setItem(SESSION_KEY, username);
       return { ok: true, user: u };
     },
-
-    logout: function () { LS.removeItem(SESSION_KEY); },
-
-    current: function () {
-      var username = LS.getItem(SESSION_KEY);
-      if (!username) return null;
-      var u = this.users()[username];
-      return u || null;
+    // Store token + user and pull server-side progress into the local cache.
+    _onAuth: function (body) {
+      LS.setItem(TOKEN_KEY, body.token);
+      write(USER_KEY, body.user);
+      LS.setItem(SESSION_KEY, body.user.username);
+      var key = 'mm_progress_' + body.user.username;
+      return apiReq('GET', '/progress').then(function (r) {
+        if (r.status === 200 && r.body.progress) write(key, r.body.progress);
+        else if (!read(key, null)) write(key, blankProgress());
+        return { ok: true, user: body.user };
+      }).catch(function () { if (!read(key, null)) write(key, blankProgress()); return { ok: true, user: body.user }; });
     },
+
+    logout: function () { LS.removeItem(TOKEN_KEY); LS.removeItem(USER_KEY); LS.removeItem(SESSION_KEY); },
+
+    current: function () { return read(USER_KEY, null); },
 
     setGrade: function (grade) {
       var u = this.current(); if (!u) return;
-      var users = this.users(); users[u.username].grade = grade; write(USERS_KEY, users);
+      u.grade = grade; write(USER_KEY, u);
+      var users = this.users(); if (users[u.username]) { users[u.username].grade = grade; write(USERS_KEY, users); }
+      if (serverMode()) apiReq('PUT', '/grade', { grade: grade }).catch(function () {});
     },
 
     // ---- progress ----
@@ -117,6 +171,7 @@
     saveProgress: function (p) {
       var u = this.current(); if (!u) return;
       write('mm_progress_' + u.username, p);
+      schedulePush(p);
     },
 
     // Record one answered question. Returns updated progress + events.
