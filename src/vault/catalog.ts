@@ -233,7 +233,7 @@ namespace Catalog {
   const TIPS = [
     'warming things up…',
     'this one’s a big one — hang tight.',
-    'loading assets. larger titles can take a moment.',
+    'loading assets. larger exercises can take a moment.',
     'reticulating splines…',
     'almost there…',
     'good things load to those who wait.',

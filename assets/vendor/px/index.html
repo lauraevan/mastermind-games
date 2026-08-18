@@ -4,7 +4,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Syncopate:wght@700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="vault.css">
 <script>
   (function () { try { if (localStorage.getItem('lf') !== '1') location.replace('../../../index.html'); } catch (e) { location.replace('../../../index.html'); } })();
@@ -32,7 +33,7 @@
     <span class="chip" id="ping"><span data-icon="wifi" data-size="13"></span><b>— ms</b></span>
   </div>
   <label class="ksearch"><span data-icon="search" data-size="16"></span>
-    <input id="search" type="search" spellcheck="false" autocomplete="off" placeholder="search">
+    <input id="search" type="search" spellcheck="false" autocomplete="off" placeholder="search exercises">
   </label>
 </header>
 
@@ -45,7 +46,7 @@
 <!-- shelf -->
 <section class="shelf">
   <div class="shelf-top">
-    <span class="shelf-title"><b id="count">…</b> titles</span>
+    <span class="shelf-title"><b id="count">…</b> learning exercises</span>
     <span class="src-wrap">
       <button class="src-btn" id="srcBtn"><span data-icon="sliders-horizontal" data-size="14"></span><span id="srcLabel">all sources</span><span data-icon="chevron-down" data-size="14"></span></button>
       <div class="src-panel" id="srcPanel" hidden><div id="sources"></div></div>
@@ -53,7 +54,7 @@
   </div>
   <div class="loading" id="loading" style="display:none"><div class="spinner"></div><div>loading…</div></div>
   <div class="grid" id="grid"></div>
-  <div class="more-wrap"><button id="more" style="display:none">more</button></div>
+  <div class="more-wrap"><button id="more" style="display:none">more exercises</button></div>
 </section>
 
 <!-- play overlay -->

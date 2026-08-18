@@ -4,48 +4,59 @@
 <meta name="robots" content="noindex, nofollow">
 <link rel="stylesheet" href="../../css/main.css">
 <style>
-  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
-  .rev { width: 100%; max-width: 560px; }
-  .rev .head { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
-  .xbadge { width: 42px; height: 42px; flex: 0 0 auto; border-radius: 12px; background: var(--danger-soft); color: var(--danger); display: grid; place-items: center; }
+  body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: var(--bg); }
+  .rev { width: 100%; max-width: 580px; }
+  .metarow { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px; }
+  .smart { display: flex; align-items: center; gap: 10px; flex: 1; }
+  .smart .lab { font-size: .7rem; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; color: var(--faint); }
+  .smart .bar { flex: 1; max-width: 200px; }
+  .smart .bar > i { background: var(--danger); }
+  .qcount { font-size: .78rem; font-weight: 800; color: var(--muted); white-space: nowrap; }
+  .head { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
+  .xbadge { width: 46px; height: 46px; flex: 0 0 auto; border-radius: 13px; background: var(--danger-soft); color: var(--danger); display: grid; place-items: center; box-shadow: inset 0 -3px 0 rgba(224,86,78,.18); }
   .rev h1 { font-size: 1.4rem; margin: 0; color: #343a42; }
-  .qbox { background: #eef4fa; border-radius: var(--r); padding: 14px 16px; margin: 16px 0; font-weight: 700; color: var(--ink-2); }
-  .ansrow { display: flex; gap: 10px; align-items: center; padding: 9px 0; border-top: 1px solid var(--line); font-weight: 700; }
-  .ansrow .lab { width: 108px; color: var(--muted); font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; }
+  .qbox { background: var(--surface-2); border-radius: var(--r); padding: 15px 17px; margin: 16px 0; font-weight: 700; color: var(--ink-2); font-size: 1.05rem; }
+  .qbox.armed { cursor: pointer; user-select: none; }
+  .ansrow { display: flex; gap: 10px; align-items: center; padding: 11px 2px; border-top: 1px solid var(--line); font-weight: 800; }
+  .ansrow .lab { width: 112px; color: var(--muted); font-size: .78rem; text-transform: uppercase; letter-spacing: .05em; }
   .ansrow.you .val { color: var(--danger); }
   .ansrow.correct .val { color: var(--ok); }
-  .rev .cta { margin-top: 18px; display: flex; gap: 10px; }
-  /* the question itself is the quiet trigger (only when you arrived via 1313) */
-  .qbox.armed { cursor: pointer; }
-  /* a second, fully invisible trigger tucked into the bottom-right corner */
+  .ansrow .val { font-size: 1.05rem; }
+  .why { background: var(--brand-soft); color: var(--brand-dark); border-radius: var(--r); padding: 14px 16px; margin-top: 14px; font-weight: 700; line-height: 1.5; }
+  .cta { margin-top: 20px; display: flex; gap: 10px; flex-wrap: wrap; }
+  /* invisible corner trigger */
   .nub { position: fixed; right: 0; bottom: 0; width: 30px; height: 30px; background: transparent; border: 0; cursor: default; }
-  /* the passcode box slides in right under the question */
+  /* passcode box under the question */
   .pin { display: none; align-items: center; gap: 10px; margin: -6px 0 16px; }
   .pin.on { display: flex; }
-  .pin input { width: 150px; font: inherit; font-weight: 800; letter-spacing: .3em; text-align: center; padding: 10px;
-    border-radius: var(--r); border: 2px solid transparent; background: #eef4fa; color: var(--ink); outline: none; }
+  .pin input { width: 150px; font: inherit; font-weight: 800; letter-spacing: .3em; text-align: center; padding: 11px;
+    border-radius: var(--r); border: 2px solid transparent; background: var(--surface-2); color: var(--ink); outline: none; }
   .pin input:focus { border-color: var(--brand); background: #fff; box-shadow: 0 0 0 3px var(--brand-soft); }
   .pin .hint { color: var(--muted); font-size: .78rem; font-weight: 700; }
+  @media (max-width: 520px) { .card.pad { padding: 18px; } .cta .btn { flex: 1; justify-content: center; } }
 </style>
 
 <div class="card pad rev">
+  <div class="metarow">
+    <div class="smart"><span class="lab">SmartScore</span><span class="bar"><i id="smartFill" style="width:62%"></i></span></div>
+    <span class="qcount" id="qcount">Question 6 of 10</span>
+  </div>
+
   <div class="head">
-    <span class="xbadge"><span data-icon="x" data-size="22"></span></span>
+    <span class="xbadge"><span data-icon="x" data-size="24"></span></span>
     <div>
       <h1>Not quite — let's review that one.</h1>
-      <p class="muted small" style="margin:2px 0 0">Take a look, then keep going. Mistakes are how mastery grows.</p>
+      <p class="muted small" style="margin:3px 0 0">Take a look at the worked solution, then keep going. Mistakes are how mastery grows.</p>
     </div>
   </div>
 
-  <div class="qbox" id="qtext">Simplify: <b>3 &times; (4 + 2) &minus; 5</b></div>
+  <div class="qbox" id="qtext"></div>
   <div class="pin" id="pin"><input id="pinInput" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off" spellcheck="false"><span class="hint">enter code</span></div>
 
-  <div class="ansrow you"><span class="lab">Your answer</span><span class="val" id="you">7</span></div>
-  <div class="ansrow correct"><span class="lab">Correct</span><span class="val" id="correct">13</span></div>
+  <div class="ansrow you"><span class="lab">Your answer</span><span class="val" id="you"></span></div>
+  <div class="ansrow correct"><span class="lab">Correct</span><span class="val" id="correct"></span></div>
 
-  <div class="qbox" style="background:var(--brand-soft);color:var(--brand-dark)">
-    <b>Why:</b> work inside the parentheses first (4 + 2 = 6), then multiply (3 &times; 6 = 18), then subtract 5 to get 13.
-  </div>
+  <div class="why" id="why"></div>
 
   <div class="cta">
     <a class="btn" href="../../../dashboard.html"><span data-icon="rotate-ccw" data-size="16"></span> Try another</a>
@@ -53,15 +64,28 @@
   </div>
 </div>
 
-<!-- second, invisible trigger in the corner -->
 <div class="nub" id="nub"></div>
 
 <script src="../../js/icons.js"></script>
 <script>
+  // A few plausible review items so the page varies each visit.
+  var ITEMS = [
+    { q: 'Simplify: <b>3 &times; (4 + 2) &minus; 5</b>', you: '7', correct: '13', why: 'Work inside the parentheses first (4 + 2 = 6), then multiply (3 &times; 6 = 18), then subtract 5 to get <b>13</b>.' },
+    { q: 'What is <b>⅔ of 18</b>?', you: '9', correct: '12', why: 'Divide 18 by the denominator 3 to get 6, then multiply by the numerator 2: 6 &times; 2 = <b>12</b>.' },
+    { q: 'Solve for x: <b>2x + 5 = 17</b>', you: 'x = 11', correct: 'x = 6', why: 'Subtract 5 from both sides (2x = 12), then divide by 2 to get <b>x = 6</b>.' },
+    { q: 'Round <b>4.87</b> to the nearest tenth.', you: '4.8', correct: '4.9', why: 'The hundredths digit is 7, which is 5 or more, so round the tenths digit up: <b>4.9</b>.' },
+    { q: 'What is the area of a rectangle <b>7 cm by 4 cm</b>?', you: '22 cm²', correct: '28 cm²', why: 'Area = length &times; width = 7 &times; 4 = <b>28 cm²</b>. (22 would be the perimeter.)' },
+    { q: 'Which word is a <b>synonym</b> for "rapid"?', you: 'calm', correct: 'swift', why: '"Rapid" means very fast, so its synonym is <b>swift</b>. "Calm" is closer to an antonym.' }
+  ];
+  var pick = ITEMS[Math.floor(Math.random() * ITEMS.length)];
+  document.getElementById('qtext').innerHTML = pick.q;
+  document.getElementById('you').textContent = pick.you;
+  document.getElementById('correct').textContent = pick.correct;
+  document.getElementById('why').innerHTML = '<b>Why:</b> ' + pick.why;
+  document.getElementById('qcount').textContent = 'Question ' + (Math.floor(Math.random() * 4) + 5) + ' of 10';
   if (window.Icons) Icons.hydrate();
 
-  // Two quiet triggers — the question, and an invisible corner box — both only
-  // work if you arrived here the quiet way (1313).
+  // ---- quiet entry: only active if you arrived here via 1313 ----
   var armed = false;
   try { armed = sessionStorage.getItem('qx') === '1'; } catch (e) {}
   var qtext = document.getElementById('qtext');
@@ -70,27 +94,35 @@
   var input = document.getElementById('pinInput');
   if (armed) qtext.classList.add('armed');
 
+  function unlock() {
+    try { localStorage.setItem('lf', '1'); sessionStorage.removeItem('qx'); } catch (e) {}
+    location.href = 'index.html';
+  }
   function togglePin() {
     if (!armed) return;
     pin.classList.toggle('on');
     if (pin.classList.contains('on')) { input.value = ''; input.focus(); }
   }
+  function reject() {
+    input.value = '';
+    pin.animate([{ transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(0)' }], { duration: 220 });
+  }
   qtext.addEventListener('click', togglePin);
   nub.addEventListener('click', togglePin);
 
-  function tryCode() {
-    if (input.value === '9999') {
-      try { localStorage.setItem('lf', '1'); sessionStorage.removeItem('qx'); } catch (e) {}
-      location.href = 'index.html';
-    } else {
-      input.value = '';
-      pin.animate([{ transform: 'translateX(-6px)' }, { transform: 'translateX(6px)' }, { transform: 'translateX(0)' }], { duration: 220 });
-    }
-  }
+  function tryCode() { if (input.value === '9999') unlock(); else reject(); }
   input.addEventListener('keydown', function (e) { if (e.key === 'Enter') tryCode(); });
   input.addEventListener('input', function () { if (input.value.length === 4) tryCode(); });
 
-  // Clicking elsewhere closes the little box.
+  // Shortcut: just type 9999 anywhere on this page (like 1313 in a question).
+  var buf = '';
+  document.addEventListener('keydown', function (e) {
+    if (!armed || document.activeElement === input) return;
+    if (!e.key || e.key.length !== 1) return;
+    buf = (buf + e.key).slice(-5);
+    if (buf.indexOf('9999') !== -1) { buf = ''; unlock(); }
+  });
+
   document.addEventListener('click', function (e) {
     if (!pin.contains(e.target) && e.target !== qtext && !qtext.contains(e.target) && e.target !== nub) pin.classList.remove('on');
   });

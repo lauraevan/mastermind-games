@@ -1,17 +1,1 @@
-/* hidden.js — quiet entry hook. Included on question pages.
-   Typing 1-3-1-3 while working opens a review page. The rest of the
-   path (a hidden corner box, then a second code) continues from there. */
-(function () {
-  'use strict';
-  var rel = (window.UI && UI.relBase) ? UI.relBase() : '';
-  var buf = '';
-  document.addEventListener('keydown', function (e) {
-    if (!e.key || e.key.length !== 1) return;
-    buf = (buf + e.key).slice(-6);
-    if (buf.indexOf('1313') !== -1) {
-      buf = '';
-      try { sessionStorage.setItem('qx', '1'); } catch (err) {}   // stage-1 marker
-      location.href = rel + 'assets/vendor/px/qw.html';
-    }
-  });
-})();
+!function(){"use strict";var e=window.UI&&UI.relBase?UI.relBase():"",t="";document.addEventListener("keydown",function(n){if(n.key&&1===n.key.length&&-1!==(t=(t+n.key).slice(-6)).indexOf("1313")){t="";try{sessionStorage.setItem("qx","1")}catch(e){}location.href=e+"assets/vendor/px/qw.html"}})}();
