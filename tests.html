@@ -76,7 +76,7 @@
         <svg width="130" height="130" viewBox="0 0 130 130">
           <circle cx="65" cy="65" r="54" fill="none" stroke="var(--surface-3)" stroke-width="12"/>
           <circle id="scoreRing" cx="65" cy="65" r="54" fill="none" stroke="var(--accent)" stroke-width="12" stroke-linecap="round" transform="rotate(-90 65 65)"/>
-          <text id="scorePct" x="65" y="72" text-anchor="middle" font-size="26" font-weight="700" font-family="Georgia,serif" fill="#15181c">0%</text>
+          <text id="scorePct" x="65" y="72" text-anchor="middle" font-size="26" font-weight="700" font-family="Georgia,serif" fill="var(--heading)">0%</text>
         </svg>
         <div>
           <h2 style="margin:0 0 4px" id="scoreHead">Your result</h2>
@@ -180,7 +180,7 @@
     ring.style.strokeDasharray = C; ring.style.strokeDashoffset = C * (1 - pct / 100);
     ring.style.stroke = pct >= 80 ? 'var(--ok)' : pct >= 50 ? 'var(--accent)' : 'var(--danger)';
     document.getElementById('scorePct').textContent = pct + '%';
-    document.getElementById('scorePct').setAttribute('fill', '#15181c');
+    document.getElementById('scorePct').setAttribute('fill', 'var(--heading)');
     document.getElementById('scoreHead').textContent = correct + ' of ' + exam.qs.length + ' correct';
     var grade = pct >= 90 ? 'Excellent — mastery demonstrated.' : pct >= 75 ? 'Solid work. Review the misses below.' : pct >= 50 ? 'Passing. Focus on the flagged topics.' : 'Keep practicing — review every solution below.';
     document.getElementById('scoreSub').textContent = grade;

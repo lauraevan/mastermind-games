@@ -7,7 +7,7 @@
   /* dense, filled dashboard */
   .dash { padding: 16px 0 44px; }
   .dash .panel { padding: 15px 16px; }
-  .hello { display: flex; align-items: center; gap: 13px; flex-wrap: wrap; background: #fff; border-radius: var(--r2); padding: 14px 18px; box-shadow: var(--sh); border-left: 5px solid var(--brand); }
+  .hello { display: flex; align-items: center; gap: 13px; flex-wrap: wrap; background: var(--surface); border-radius: var(--r2); padding: 14px 18px; box-shadow: var(--sh); border-left: 5px solid var(--brand); }
   .avatar { width: 46px; height: 46px; border-radius: 12px; background: var(--brand); color: #fff; display: grid; place-items: center; font-weight: 900; font-size: 1rem; flex: 0 0 auto; }
   .hello h1 { margin: 0; font-size: 1.3rem; }
   .hello .sub { margin: 2px 0 0; color: var(--muted); font-size: .9rem; display: flex; align-items: center; gap: 6px; font-weight: 700; }
@@ -15,7 +15,7 @@
   .hello .lvlbox { margin-left: auto; min-width: 230px; }
   .lvl-line { display: flex; justify-content: space-between; align-items: center; font-size: .82rem; color: var(--muted); margin-bottom: 5px; font-weight: 800; }
   .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 10px; }
-  .tile { background: #fff; border-radius: var(--r2); padding: 12px 14px; box-shadow: var(--sh); }
+  .tile { background: var(--surface); border-radius: var(--r2); padding: 12px 14px; box-shadow: var(--sh); }
   .tile .tk { display: flex; align-items: center; gap: 6px; color: var(--muted); font-weight: 800; font-size: .72rem; text-transform: uppercase; letter-spacing: .03em; }
   .tile .tk svg { width: 15px; height: 15px; }
   .tile .tn { font-size: 1.7rem; font-weight: 900; line-height: 1.1; margin-top: 3px; }
@@ -25,14 +25,21 @@
   .panel h2 { font-size: 1rem; margin: 0 0 10px; }
   .rec-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 9px; }
   .rec { background: var(--surface-2); border-radius: var(--r); padding: 11px; display: block; color: inherit; }
-  .rec:hover { background: #fff; box-shadow: var(--sh); text-decoration: none; }
+  .rec:hover { background: var(--surface); box-shadow: var(--sh); text-decoration: none; }
   .rec .rt { display: flex; align-items: center; gap: 6px; font-size: .72rem; font-weight: 800; margin-bottom: 6px; }
   .ach-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 7px; }
-  .ach { text-align: center; padding: 11px 5px; background: var(--surface-2); border-radius: var(--r); }
+  .ach { position: relative; text-align: center; padding: 12px 5px; background: var(--surface-2); border-radius: var(--r); transition: transform .1s; }
   .ach svg { color: var(--brand); }
+  .ach.got { background: linear-gradient(160deg,#fff6e2,#ffe4b0); box-shadow: inset 0 0 0 1px #eecb83; }
+  .ach.got svg { color: #d99413; }
+  .ach.got:hover { transform: translateY(-2px); }
+  .ach.got .an { color: #5a4a1e; }
   .ach.locked { opacity: .5; }
   .ach.locked svg { color: var(--faint); }
   .ach .an { font-weight: 800; font-size: .72rem; margin-top: 5px; }
+  .ach .chk { position: absolute; top: 6px; right: 6px; width: 16px; height: 16px; border-radius: 50%; background: var(--ok); color: #fff; display: none; place-items: center; }
+  .ach.got .chk { display: grid; }
+  .ach .chk svg { color: #fff; }
   .ring-wrap { display: flex; align-items: center; gap: 16px; }
   .sub-row { display: flex; align-items: center; gap: 11px; padding: 8px 6px; border-radius: var(--r); color: inherit; }
   .sub-row:hover { background: var(--surface-2); text-decoration: none; }
@@ -79,7 +86,7 @@
       </div>
 
       <div class="panel" style="margin-top:18px">
-        <h2>Achievements</h2>
+        <h2 style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">Trophy case <span class="tag" id="achCount" style="font-weight:800"></span></h2>
         <div class="ach-grid" id="achievements"></div>
       </div>
     </div>
@@ -91,7 +98,7 @@
           <svg width="118" height="118" viewBox="0 0 118 118" style="flex:0 0 auto">
             <circle cx="59" cy="59" r="48" fill="none" stroke="var(--surface-3)" stroke-width="11"/>
             <circle id="goalRing" cx="59" cy="59" r="48" fill="none" stroke="var(--accent)" stroke-width="11" stroke-linecap="round" transform="rotate(-90 59 59)"/>
-            <text id="goalText" x="59" y="66" text-anchor="middle" font-size="22" font-weight="700" font-family="Georgia, serif" fill="#15181c">0/20</text>
+            <text id="goalText" x="59" y="66" text-anchor="middle" font-size="22" font-weight="700" font-family="Georgia, serif" fill="var(--heading)">0/20</text>
           </svg>
           <div>
             <p id="goalCaption" style="font-weight:600;margin:0 0 10px">Let's begin.</p>

@@ -39,6 +39,33 @@ namespace Catalog {
     try { state.favs = JSON.parse(localStorage.getItem(FAV_KEY) || '{}') || {}; } catch (e) { state.favs = {}; }
   }
   function saveFavs(): void { try { localStorage.setItem(FAV_KEY, JSON.stringify(state.favs)); } catch (e) {} }
+
+  // ---------- recently opened ----------
+  const RECENT_KEY = 'krecent';
+  function loadRecent(): Row[] { try { return JSON.parse(localStorage.getItem(RECENT_KEY) || '[]') || []; } catch (e) { return []; } }
+  function pushRecent(r: Row): void {
+    let list = loadRecent().filter((x) => x.url !== r.url);
+    list.unshift({ title: r.title, url: r.url, icon: r.icon, src: r.src });
+    list = list.slice(0, 12);
+    try { localStorage.setItem(RECENT_KEY, JSON.stringify(list)); } catch (e) {}
+    renderRecent();
+  }
+  function renderRecent(): void {
+    const wrap = byId('recentWrap'); const row = byId('recentRow'); if (!wrap || !row) return;
+    const list = loadRecent();
+    if (!list.length) { wrap.setAttribute('hidden', ''); return; }
+    wrap.removeAttribute('hidden'); row.innerHTML = '';
+    list.forEach((r) => {
+      const el = document.createElement('button'); el.className = 'rtile';
+      const img = document.createElement('img'); img.loading = 'lazy'; img.decoding = 'async'; img.alt = '';
+      img.onerror = () => { el.classList.add('noicon'); };
+      img.src = encodeURI(r.icon);
+      const label = document.createElement('span'); label.className = 'rlabel'; label.textContent = r.title;
+      el.appendChild(img); el.appendChild(label);
+      el.addEventListener('click', () => open(r));
+      row.appendChild(el);
+    });
+  }
   function isFav(url: string): boolean { return !!state.favs[url]; }
   function toggleFav(url: string): boolean {
     if (state.favs[url]) { delete state.favs[url]; } else { state.favs[url] = 1; }
@@ -275,6 +302,7 @@ namespace Catalog {
     frame.src = r.url;
     ov.classList.add('on');
     document.body.style.overflow = 'hidden';
+    pushRecent(r);
   }
   function close(): void {
     const ov = q<HTMLElement>('#ov');
@@ -323,7 +351,19 @@ namespace Catalog {
 
     const ovClose = byId('ovClose');
     if (ovClose) ovClose.addEventListener('click', close);
+    const ovFull = byId('ovFull');
+    if (ovFull) ovFull.addEventListener('click', () => {
+      const stage = q<HTMLElement>('.ov-stage');
+      const el = (stage || q<HTMLElement>('#ov')) as any;
+      if (document.fullscreenElement) { document.exitFullscreen(); }
+      else if (el.requestFullscreen) { el.requestFullscreen().catch(() => {}); }
+      else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+    });
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { close(); closePanel(); } });
+
+    renderRecent();
+    // focus the filter on desktop (not touch) for quick searching
+    if (search && !('ontouchstart' in window) && window.innerWidth > 760) { try { search.focus(); } catch (e) {} }
 
     const l = byId('loading');
     if (l) l.style.display = 'block';

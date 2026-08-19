@@ -52,6 +52,10 @@
       <div class="src-panel" id="srcPanel" hidden><div id="sources"></div></div>
     </span>
   </div>
+  <div class="recent" id="recentWrap" hidden>
+    <div class="recent-h">recently opened</div>
+    <div class="recent-row" id="recentRow"></div>
+  </div>
   <div class="loading" id="loading" style="display:none"><div class="spinner"></div><div>loading…</div></div>
   <div class="grid" id="grid"></div>
   <div class="more-wrap"><button id="more" style="display:none">more exercises</button></div>
@@ -61,6 +65,7 @@
 <div class="ov" id="ov">
   <div class="ov-bar">
     <span class="t" id="ovTitle"></span>
+    <button id="ovFull"><span data-icon="maximize" data-size="15"></span> fullscreen</button>
     <button id="ovClose"><span data-icon="x" data-size="15"></span> close</button>
   </div>
   <div class="ov-stage">

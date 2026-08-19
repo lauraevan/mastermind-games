@@ -19,17 +19,17 @@
   @media (max-width: 900px){ .mascot2 { left: 12%; width: 110px; } }
 
   .grade-list { display: flex; flex-direction: column; gap: 14px; }
-  .grade-row { display: flex; align-items: center; gap: 18px; background: #fff; border-radius: var(--r2); box-shadow: var(--sh); padding: 16px 18px; }
+  .grade-row { display: flex; align-items: center; gap: 18px; background: var(--surface); border-radius: var(--r2); box-shadow: var(--sh); padding: 16px 18px; }
   .grade-badge { width: 58px; height: 58px; flex: 0 0 auto; border-radius: 14px; display: grid; place-items: center; color: #fff; font-family: var(--serif); font-weight: 900; font-size: 1.5rem; box-shadow: inset 0 -3px 0 rgba(0,0,0,.12); }
   .grade-main { flex: 1; min-width: 0; }
-  .grade-main h3 { margin: 0 0 3px; font-size: 1.2rem; color: #343a42; }
+  .grade-main h3 { margin: 0 0 3px; font-size: 1.2rem; color: var(--heading); }
   .grade-main .inc { color: var(--muted); font-size: .9rem; font-weight: 700; }
   .grade-main .inc b { color: var(--ink-2); font-weight: 800; }
   .see-btn { flex: 0 0 auto; border: 0; border-radius: 999px; color: #fff; font-weight: 800; padding: 11px 18px; font-size: .9rem; cursor: pointer; box-shadow: 0 2px 0 rgba(0,0,0,.12); display: inline-flex; align-items: center; gap: 6px; }
   .see-btn:hover { filter: brightness(1.06); text-decoration: none; }
 
   .subj-strip { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
-  .subj-card { display: block; border-radius: var(--r2); background: #fff; box-shadow: var(--sh); overflow: hidden; color: inherit; }
+  .subj-card { display: block; border-radius: var(--r2); background: var(--surface); box-shadow: var(--sh); overflow: hidden; color: inherit; }
   .subj-card:hover { transform: translateY(-3px); box-shadow: var(--sh-2); text-decoration: none; }
   .subj-card .cap { padding: 14px 16px; color: #fff; display: flex; align-items: center; gap: 10px; }
   .subj-card .cap h3 { margin: 0; color: #fff; font-size: 1.1rem; }
@@ -38,7 +38,7 @@
   .subj-card .bd .meta { color: var(--faint); font-weight: 800; font-size: .82rem; display: inline-flex; align-items: center; gap: 5px; }
 
   .prog-strip { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; }
-  .prog { display: block; border-radius: var(--r2); background: #fff; box-shadow: var(--sh); padding: 18px; color: inherit; }
+  .prog { display: block; border-radius: var(--r2); background: var(--surface); box-shadow: var(--sh); padding: 18px; color: inherit; }
   .prog:hover { transform: translateY(-3px); box-shadow: var(--sh-2); text-decoration: none; }
   .prog .pi { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; color: #fff; margin-bottom: 10px; }
   .prog h3 { margin: 0 0 4px; font-size: 1.02rem; }
@@ -69,7 +69,7 @@
         <a class="btn lg" href="login.html#signup">Join for free</a>
         <a class="btn ghost lg" href="#grades">Browse by grade</a>
       </div>
-      <div class="tag" style="margin-top:18px;background:#fff;box-shadow:var(--sh)"><span data-icon="check" data-size="13" style="color:var(--brand)"></span> <span id="tStats">100 skills · 3,000+ problems</span></div>
+      <div class="tag" style="margin-top:18px;background: var(--surface);box-shadow:var(--sh)"><span data-icon="check" data-size="13" style="color:var(--brand)"></span> <span id="tStats">100 skills · 3,000+ problems</span></div>
     </div>
     <div class="mascot-wrap" id="mascotWrap"></div>
   </div>
@@ -86,7 +86,7 @@
   </div>
 </section>
 
-<section class="section" style="background:#fff" >
+<section class="section" style="background: var(--surface)" >
   <div class="wrap">
     <div style="text-align:center;max-width:640px;margin:0 auto 26px">
       <span class="eyebrow">Curriculum</span>
